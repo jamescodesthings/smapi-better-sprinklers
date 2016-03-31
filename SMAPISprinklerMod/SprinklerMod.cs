@@ -137,7 +137,7 @@ namespace SprinklerMod
             {                
                 if (craftingRecipe.Key.Contains("prinkler"))
                 {
-                    Log.Debug(String.Format("key {0} value {1}", craftingRecipe.Key, craftingRecipe.Value));
+                    //Log.Debug(String.Format("key {0} value {1}", craftingRecipe.Key, craftingRecipe.Value));
                     infoSplit = craftingRecipe.Value.Split('/');
                     int sprinklerSheet = infoSplit[2].AsInt32();
                     int multiplier = ModConfig.sprinklerPrices[sprinklerSheet];
@@ -150,7 +150,7 @@ namespace SprinklerMod
                     }
                     infoSplit[0] = string.Join(" ", ingredientsSplit);
                     newCraftingRecipes[craftingRecipe.Key] = string.Join("/", infoSplit);
-                    Log.Debug(String.Format("key {0} value {1}", craftingRecipe.Key, newCraftingRecipes[craftingRecipe.Key]));
+                    //Log.Debug(String.Format("key {0} value {1}", craftingRecipe.Key, newCraftingRecipes[craftingRecipe.Key]));
                 }
                 else
                 {
@@ -165,7 +165,7 @@ namespace SprinklerMod
                 {
                     int multiplier = ModConfig.sprinklerPrices[objectInfo.Key];
                     infoSplit = objectInfo.Value.Split('/');
-                    Log.Debug(String.Format("object index {0}, name {1}, old price {2}, new price {3}", objectInfo.Key, infoSplit[0], infoSplit[1], infoSplit[1].AsInt32() * multiplier));
+                    //Log.Debug(String.Format("object index {0}, name {1}, old price {2}, new price {3}", objectInfo.Key, infoSplit[0], infoSplit[1], infoSplit[1].AsInt32() * multiplier));
                     infoSplit[1] = (infoSplit[1].AsInt32() * multiplier).ToString();
                     newObjectInfo[objectInfo.Key] = string.Join("/", infoSplit);
                 }

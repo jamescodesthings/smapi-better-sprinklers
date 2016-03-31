@@ -193,7 +193,7 @@ namespace SMAPISprinklerMod
                             if (stateRequest == 2) ++originalArea;
                         }
                         SprinklerMod.SprinklerMod.ModConfig.sprinklerPrices[sprinklerGrid.Key] = (counter / originalArea) + 1;
-                        Log.Debug(String.Format("Sprinkler Type {0} has price {1}", sprinklerGrid.Key, SprinklerMod.SprinklerMod.ModConfig.sprinklerPrices[sprinklerGrid.Key]));
+                        //Log.Debug(String.Format("Sprinkler Type {0} has price {1}", sprinklerGrid.Key, SprinklerMod.SprinklerMod.ModConfig.sprinklerPrices[sprinklerGrid.Key]));
                     }
                     SprinklerMod.SprinklerMod.ModConfig.UpdateConfig<SprinklerModConfig>();
                     SprinklerMod.SprinklerMod.ModConfig.WriteConfig();
