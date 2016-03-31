@@ -1,4 +1,25 @@
-﻿using Microsoft.Xna.Framework;
+﻿/*
+    Copyright 2016 Maurício Gomes (Speeder)
+
+    Configurable Improved Sprinklers mod is free software: 
+    you can redistribute it and/or modify it under the terms of the 
+    GNU General Public License as published by the Free Software Foundation,
+    either version 3 of the License, or (at your option) any later version.
+
+    Configurable Improved Sprinklers mod is distributed in the hope
+    that it will be useful, but WITHOUT ANY WARRANTY; 
+    without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Configurable Improved Sprinklers mod. 
+    If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using SMAPISprinklerMod;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Inheritance;
@@ -6,134 +27,156 @@ using StardewValley;
 using StardewValley.TerrainFeatures;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SprinklerMod
 {
     public class SprinklerMod : Mod
     {
-        public override string Name
-        {
-            get { return "Sprinkler Mod"; }
-        }
+        public static SprinklerModConfig ModConfig { get; protected set; }
 
-        public override string Authour
-        {
-            get { return "Maurício Gomes (Speeder)"; }
-        }
+        int[] validSprinklers;
 
-        public override string Version
-        {
-            get { return "1.0"; }
-        }
-
-        public override string Description
-        {
-            get { return "Make the Sprinklers work better."; }
-        }
+        private static Dictionary<string, string> oldCraftingRecipes;
+        private static Dictionary<int, string> oldObjectInfo;
 
         public override void Entry(params object[] objects)
         {
-            TimeEvents.DayOfMonthChanged += Event_ChangedDayOfMonth;            
+            ModConfig = new SprinklerModConfig().InitializeConfig(BaseConfigPath);
+            oldCraftingRecipes = null;
+            oldObjectInfo = null;
+
+            TimeEvents.DayOfMonthChanged += Event_ChangedDayOfMonth;
+            GameEvents.LoadContent += Event_LoadContent;
+            GameEvents.UpdateTick += Event_UpdateTick;                            
         }
 
         static void Event_ChangedDayOfMonth(object sender, EventArgs e)
-        {
-            GameLocation farm = SGame.getLocationFromName("Farm");
-            foreach (StardewValley.Object obj in farm.objects.Values)
+        {                      
+            foreach(GameLocation location in Game1.locations)
             {
-                if (obj.parentSheetIndex == 599)
+                foreach (KeyValuePair<Vector2, StardewValley.Object> objectPair in location.objects)
                 {
-                    Vector2 location = obj.tileLocation;
-
-                    if (farm.terrainFeatures.ContainsKey(location) && farm.terrainFeatures[location] is HoeDirt)
+                    StardewValley.Object obj = objectPair.Value;
+                    Vector2 centerLocation = objectPair.Key;                    
+                    if (ModConfig.sprinklerShapes.ContainsKey(obj.parentSheetIndex))
                     {
-                        (farm.terrainFeatures[location] as HoeDirt).state = 1;
-                    }
+                        int[,] configGrid = ModConfig.sprinklerShapes[obj.parentSheetIndex];
 
-                    location.X -= 2;
+                        Vector2 iterativeLocation = centerLocation;
+                        int arrayHalfSizeX = ModConfig.sprinklerShapes[obj.parentSheetIndex].GetLength(0) / 2;
+                        int arrayHalfSizeY = ModConfig.sprinklerShapes[obj.parentSheetIndex].GetLength(1) / 2;
+                        iterativeLocation.X -= arrayHalfSizeX;
+                        iterativeLocation.Y -= arrayHalfSizeY;
+                        float maxX = centerLocation.X + arrayHalfSizeX + 1;
+                        float maxY = centerLocation.Y + arrayHalfSizeY + 1;
 
-                    if (farm.terrainFeatures.ContainsKey(location) && farm.terrainFeatures[location] is HoeDirt)
-                    {
-                        (farm.terrainFeatures[location] as HoeDirt).state = 1;
-                    }
+                        int counterX = 0;
+                        int counterY = 0;
 
-                    location.X += 4;
-                    if (farm.terrainFeatures.ContainsKey(location) && farm.terrainFeatures[location] is HoeDirt)
-                    {
-                        (farm.terrainFeatures[location] as HoeDirt).state = 1;
-                    }
-
-                    location.X -= 2;
-                    location.Y -= 2;
-                    if (farm.terrainFeatures.ContainsKey(location) && farm.terrainFeatures[location] is HoeDirt)
-                    {
-                        (farm.terrainFeatures[location] as HoeDirt).state = 1;
-                    }
-
-                    location.Y += 4;
-                    if (farm.terrainFeatures.ContainsKey(location) && farm.terrainFeatures[location] is HoeDirt)
-                    {
-                        (farm.terrainFeatures[location] as HoeDirt).state = 1;
-                    }
-                }
-                else if (obj.parentSheetIndex == 621)
-                {
-                    Vector2 columnLocation = obj.TileLocation;
-                    Vector2 rowLocation = obj.TileLocation;
-                    float maxLocationY = columnLocation.Y + 4;
-                    float maxLocationX = rowLocation.X + 4;
-                    columnLocation.Y -= 3;
-                    rowLocation.X -= 3;
-
-                    while(columnLocation.Y < maxLocationY)
-                    {
-                        if (farm.terrainFeatures.ContainsKey(columnLocation) && farm.terrainFeatures[columnLocation] is HoeDirt)
+                        while(iterativeLocation.X < maxX)
                         {
-                            (farm.terrainFeatures[columnLocation] as HoeDirt).state = 1;
+                            iterativeLocation.Y = centerLocation.Y - arrayHalfSizeY;
+                            counterY = 0;
+                            while(iterativeLocation.Y < maxY)
+                            {                            
+                                if (configGrid[counterX, counterY] > 0 && location.terrainFeatures.ContainsKey(iterativeLocation))
+                                {
+                                    if (location.terrainFeatures[iterativeLocation] is HoeDirt)
+                                    {
+                                        (location.terrainFeatures[iterativeLocation] as HoeDirt).state = 1;
+                                    }
+                                }
+                                ++iterativeLocation.Y;
+                                ++counterY;
+                            }
+                            ++iterativeLocation.X;
+                            ++counterX;
                         }
-                        ++columnLocation.Y;
-                    }
-
-                    while (rowLocation.X < maxLocationX)
-                    {
-                        if (farm.terrainFeatures.ContainsKey(rowLocation) && farm.terrainFeatures[rowLocation] is HoeDirt)
-                        {
-                            (farm.terrainFeatures[rowLocation] as HoeDirt).state = 1;
-                        }
-                        ++rowLocation.X;
-                    }
-                }
-                else if (obj.parentSheetIndex == 645)
-                {
-                    Vector2 columnLocation = obj.TileLocation;
-                    Vector2 rowLocation = obj.TileLocation;
-                    float maxLocationY = columnLocation.Y + 7;
-                    float maxLocationX = rowLocation.X + 7;
-                    columnLocation.Y -= 6;
-                    rowLocation.X -= 6;
-
-                    while (columnLocation.Y < maxLocationY)
-                    {
-                        if (farm.terrainFeatures.ContainsKey(columnLocation) && farm.terrainFeatures[columnLocation] is HoeDirt)
-                        {
-                            (farm.terrainFeatures[columnLocation] as HoeDirt).state = 1;
-                        }
-                        ++columnLocation.Y;
-                    }
-
-                    while (rowLocation.X < maxLocationX)
-                    {
-                        if (farm.terrainFeatures.ContainsKey(rowLocation) && farm.terrainFeatures[rowLocation] is HoeDirt)
-                        {
-                            (farm.terrainFeatures[rowLocation] as HoeDirt).state = 1;
-                        }
-                        ++rowLocation.X;
                     }
                 }
             }
+        }
+
+        static void Event_LoadContent(object sender, EventArgs e)
+        {
+            UpdatePrices();       
+        }
+
+        static void Event_UpdateTick(object sender, EventArgs e)
+        {
+            if(Game1.activeClickableMenu == null && Game1.CurrentEvent == null)
+            {
+                KeyboardState currentKeyboardState = Keyboard.GetState();
+                if (currentKeyboardState.IsKeyDown(Keys.K))
+                {                    
+                    Game1.activeClickableMenu = new SprinklerShapeEditMenu();
+                }
+            }
+        }        
+
+        public static void UpdatePrices()
+        {
+            string[] infoSplit;
+            string[] ingredientsSplit;
+            int counter;            
+
+            if(oldCraftingRecipes == null)
+            {
+                oldCraftingRecipes = CraftingRecipe.craftingRecipes;
+                oldObjectInfo = Game1.objectInformation;           
+            }
+            else
+            {
+                CraftingRecipe.craftingRecipes = oldCraftingRecipes;
+                Game1.objectInformation = oldObjectInfo;
+            }
+            
+
+            Dictionary<string, string> newCraftingRecipes = new Dictionary<string, string>();
+            foreach (KeyValuePair<string, string> craftingRecipe in CraftingRecipe.craftingRecipes)
+            {                
+                if (craftingRecipe.Key.Contains("prinkler"))
+                {
+                    Log.Debug(String.Format("key {0} value {1}", craftingRecipe.Key, craftingRecipe.Value));
+                    infoSplit = craftingRecipe.Value.Split('/');
+                    int sprinklerSheet = infoSplit[2].AsInt32();
+                    int multiplier = ModConfig.sprinklerPrices[sprinklerSheet];
+                    ingredientsSplit = infoSplit[0].Split(' ');
+                    counter = 1;
+                    while (counter < ingredientsSplit.Length)
+                    {
+                        ingredientsSplit[counter] = (ingredientsSplit[counter].AsInt32() * multiplier).ToString();
+                        counter += 2;
+                    }
+                    infoSplit[0] = string.Join(" ", ingredientsSplit);
+                    newCraftingRecipes[craftingRecipe.Key] = string.Join("/", infoSplit);
+                    Log.Debug(String.Format("key {0} value {1}", craftingRecipe.Key, newCraftingRecipes[craftingRecipe.Key]));
+                }
+                else
+                {
+                    newCraftingRecipes[craftingRecipe.Key] = craftingRecipe.Value;
+                }                
+            }
+
+            Dictionary<int, string> newObjectInfo = new Dictionary<int, string>();
+            foreach (KeyValuePair<int, string> objectInfo in Game1.objectInformation)
+            {
+                if (ModConfig.sprinklerPrices.ContainsKey(objectInfo.Key))
+                {
+                    int multiplier = ModConfig.sprinklerPrices[objectInfo.Key];
+                    infoSplit = objectInfo.Value.Split('/');
+                    Log.Debug(String.Format("object index {0}, name {1}, old price {2}, new price {3}", objectInfo.Key, infoSplit[0], infoSplit[1], infoSplit[1].AsInt32() * multiplier));
+                    infoSplit[1] = (infoSplit[1].AsInt32() * multiplier).ToString();
+                    newObjectInfo[objectInfo.Key] = string.Join("/", infoSplit);
+                }
+                else
+                {
+                    newObjectInfo[objectInfo.Key] = objectInfo.Value;
+                }
+            }
+
+            CraftingRecipe.craftingRecipes = newCraftingRecipes;
+            Game1.objectInformation = newObjectInfo;
         }
     }
 }

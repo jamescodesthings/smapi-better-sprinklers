@@ -1,0 +1,15 @@
+﻿{
+	"Name": "Configurable Improved Sprinklers Mod",
+	"Authour": "Maurício Gomes (Speeder)",
+	"Version":
+	{
+		"MajorVersion": 2,
+		"MinorVersion": 0,
+		"PatchVersion": 0,
+		"Build": ""
+	},
+	"UniqueID": "SPDSprinklersMod",
+	"Description": "Make the Sprinklers work better.",
+	"PerSaveConfigs": true,
+	"EntryDll":  "SMAPISprinklerMod.dll"
+}
