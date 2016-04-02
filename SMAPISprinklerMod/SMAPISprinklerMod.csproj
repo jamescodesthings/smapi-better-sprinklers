@@ -92,11 +92,12 @@
   <PropertyGroup>
     <PostBuildEvent>SET STARDEWMODDIR="D:\\gog games\\Stardew Valley\\Mods\\$(ProjectName)"
 erase *.pdb
-copy ..\..\..\..\README.md README.md
+..\..\..\..\multimarkdown.exe ..\..\..\..\README.md &gt; readme.html
 copy ..\..\..\..\screenshot.png screenshot.png
 copy ..\..\..\..\butterfly.pngbutterfly.png
 copy ..\..\..\..\circle.png circle.png
 copy ..\..\..\..\ipatreon.png ipatreon.png
+copy ..\..\..\..\scarecrowarea.png scarecrowarea.png
 cd..
 xcopy $(ProjectName) %25STARDEWMODDIR%25 /S /I /Y</PostBuildEvent>
   </PropertyGroup>

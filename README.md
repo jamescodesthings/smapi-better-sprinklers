@@ -1,4 +1,5 @@
-﻿# Speeder's Configurable Improved Sprinklers
+﻿Speeder's Configurable Improved Sprinklers
+==========================================
  
 This is a mod for the game [Stardew Valley](http://stardewvalley.net/), it improves the existing sprinklers and let you configure them to your liking.
 
@@ -12,7 +13,8 @@ The idea for this mod originally was only to improve the normal sprinkler, that 
 
 The 1.x version was rewritten entirely for this 2.0 release, to support future sprinkler mods, UI-based configuration, and other nice features, including autobalance.
 
-## Features
+Features
+--------
 
 * Default sprinkler shapes allow more flexibility in farm layouts.
 * You can use any shape you want, literally.
@@ -20,7 +22,8 @@ The 1.x version was rewritten entirely for this 2.0 release, to support future s
 * Automatic balancing, sprinkler monetary value, and crafting cost increase as you increase the sprinkler area, ensuring the game stay balanced.
 * You CAN cheat though, in two different ways, but I won't explain how, this is for the more adventurous people to mess with.
 
-## Usage
+Usage
+-----
 
 Press K, edit what you want, and click OK.
 
@@ -36,20 +39,46 @@ Butterfly Shape (like real world sprinklers)
 
 The sprinklers activate at night, like the normal game rules.
 
+There is a feature that highlight scarecrow effect area, and sprinkler area, it is always on when you are going to place them, and can be turned on and off for ones that you are only hovering your cursor over them, the default button in the configuration is F3.
+
+![Game Screenshot](scarecrowarea.png)
+
 Visit the [Forum thread](http://community.playstarbound.com/threads/storm-and-smapi-better-sprinklers-mod.108847/)
 
-## Installing
+Changelog
+---------
+
+### 2.1
+
+Added highlighting to the area of sprinklers and scarecrows.
+Added html readme.
+
+### 2.0.1
+
+Fixed a mistake that made it incompatible with SMAPI 0.39.2
+
+### 2.0
+
+Updated to SMAPI 0.39.2
+Added a GUI to configure the sprinklers.
+Sprinklers now work on all farmable areas, including greenhouses and anything added by mods.
+
+Installing
+----------
 
 Just unpack the .zip file in the mods folder.
 
-## Uninstalling
+Uninstalling
+------------
 
 Just delete the mod files again.
 
-## Credits
+Credits
+-------
 
-Author: Maurício Gomes [![Patreon Logo](ipatreon.png)](https://patreon.com/user?u=3066937)
+Author: Maur&#237;cio Gomes (Speeder) [![Patreon](ipatreon.png)](https://patreon.com/user?u=3066937)
 
-## License
+License
+-------
 
 The license of the project is [GPL3](https://gnu.org/licenses/gpl.html).
