@@ -107,7 +107,7 @@ namespace SprinklerMod
             if(Game1.activeClickableMenu == null && Game1.CurrentEvent == null)
             {
                 KeyboardState currentKeyboardState = Keyboard.GetState();
-                if (currentKeyboardState.IsKeyDown(Keys.K))
+                if (currentKeyboardState.IsKeyDown(ModConfig.configKey))
                 {                    
                     Game1.activeClickableMenu = new SprinklerShapeEditMenu();
                 }

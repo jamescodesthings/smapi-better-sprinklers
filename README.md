@@ -54,6 +54,7 @@ Changelog
 
 Added highlighting to the area of sprinklers and scarecrows.
 Added html readme.
+Fixed a bug with the configuration key (it was always K even if you edited the config.json)
 
 ### 2.0.1
 
