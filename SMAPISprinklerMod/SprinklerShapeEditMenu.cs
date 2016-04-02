@@ -212,7 +212,8 @@ namespace SMAPISprinklerMod
                     }
                     SprinklerMod.SprinklerMod.ModConfig.UpdateConfig<SprinklerModConfig>();
                     SprinklerMod.SprinklerMod.ModConfig.WriteConfig();
-                    Game1.showGlobalMessage("Sprinkler Configurations Saved");
+                    //Game1.showGlobalMessage("Sprinkler Configurations Saved");
+                    Game1.addHUDMessage(new HUDMessage("Sprinkler Configurations Saved", Color.Green, 3500f));
                     SprinklerMod.SprinklerMod.UpdatePrices();
                 }
             }
