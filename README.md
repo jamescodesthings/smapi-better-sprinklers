@@ -1,7 +1,7 @@
 ﻿Speeder's Configurable Improved Sprinklers
 ==========================================
  
-This is a mod for the game [Stardew Valley](http://stardewvalley.net/), it improves the existing sprinklers and let you configure them to your liking.
+This is a mod for the game [Stardew Valley](http://stardewvalley.net/), it improves the existing sprinklers and let you configure them to your liking, it also has highlight area for scarecrows and sprinklers.
 
 ![Game Screenshot](screenshot.png)
 
@@ -21,6 +21,8 @@ Features
 * Infinite sprinkler range (requires editing the config file manually though, not recommended).
 * Automatic balancing, sprinkler monetary value, and crafting cost increase as you increase the sprinkler area, ensuring the game stay balanced.
 * You CAN cheat though, in two different ways, but I won't explain how, this is for the more adventurous people to mess with.
+* When placing sprinklers or scarecrows you can a highlight of the area they cover.
+* After pressing a hotkey (default, F3) you can also see highlight of the areas when hovering the cursor over existing sprinklers and scarecrows.
 
 Usage
 -----
@@ -82,3 +84,13 @@ License
 -------
 
 The license of the project is [GPL3](https://gnu.org/licenses/gpl.html).
+
+Source
+------
+
+Mod [source hosted on ![GitLab](igitlab.png)](https://gitlab.com/speeder1/SMAPISprinklerMod), special thanks to them! (that even provided free support when needed!)
+
+Binary Download Link
+--------------------
+
+You can download the compiled mod from [Nexus Mods](http://www.nexusmods.com/stardewvalley/mods/41/?).
