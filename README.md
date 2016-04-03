@@ -53,6 +53,7 @@ Changelog
 ### 2.1
 
 Added highlighting to the area of sprinklers and scarecrows.
+Added grid rendering.
 Added html readme.
 Fixed a bug with the configuration key (it was always K even if you edited the config.json)
 
