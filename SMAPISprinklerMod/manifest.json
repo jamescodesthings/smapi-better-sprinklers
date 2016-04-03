@@ -10,6 +10,6 @@
 	},
 	"UniqueID": "SPDSprinklersMod",
 	"Description": "Make the Sprinklers work better.",
-	"PerSaveConfigs": true,
+	"PerSaveConfigs": false,
 	"EntryDll":  "SMAPISprinklerMod.dll"
 }
