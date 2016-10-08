@@ -50,6 +50,9 @@ Visit the [Forum thread](http://community.playstarbound.com/threads/storm-and-sm
 Changelog
 ---------
 
+### 2.2
+Updated for Stardew Valley 1.1 and SMAPI 0.40.0 1.1.
+
 ### 2.1
 
 Added highlighting to the area of sprinklers and scarecrows.

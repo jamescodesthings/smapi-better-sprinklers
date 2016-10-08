@@ -82,7 +82,7 @@ namespace SMAPISprinklerMod
             tabs.Add(new ClickableComponent(new Rectangle(menuX - tabDistanceFromMenu - tabWidth, tabs[0].bounds.Y + tabHeight + tabDistanceVerticalBetweenTabs, tabWidth, tabHeight), new StardewValley.Object(Vector2.Zero, 621, false)));
             tabs.Add(new ClickableComponent(new Rectangle(menuX - tabDistanceFromMenu - tabWidth, tabs[1].bounds.Y + tabHeight + tabDistanceVerticalBetweenTabs, tabWidth, tabHeight), new StardewValley.Object(Vector2.Zero, 645, false)));
 
-            okButton = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + width - Game1.tileSize/2, yPositionOnScreen+height-Game1.tileSize/2, Game1.tileSize, Game1.tileSize), "", "Save Changes", Game1.mouseCursors, new Rectangle(128, 256, 64, 64), 1f);
+            okButton = new ClickableTextureComponent("save-changes", new Rectangle(xPositionOnScreen + width - Game1.tileSize/2, yPositionOnScreen+height-Game1.tileSize/2, Game1.tileSize, Game1.tileSize), "", "Save Changes", Game1.mouseCursors, new Rectangle(128, 256, 64, 64), 1f);
 
             if (whitePixel == null)
             {
