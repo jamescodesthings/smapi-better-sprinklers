@@ -1,78 +1,65 @@
-﻿/*
-    Copyright 2016 Maurício Gomes (Speeder)
-
-    Configurable Improved Sprinklers mod is free software: 
-    you can redistribute it and/or modify it under the terms of the 
-    GNU General Public License as published by the Free Software Foundation,
-    either version 3 of the License, or (at your option) any later version.
-
-    Configurable Improved Sprinklers mod is distributed in the hope
-    that it will be useful, but WITHOUT ANY WARRANTY; 
-    without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Configurable Improved Sprinklers mod. 
-    If not, see <http://www.gnu.org/licenses/>.
- */
-
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using StardewModdingAPI;
 
 namespace SMAPISprinklerMod
 {
-    class SprinklerShapeEditMenu : IClickableMenu
+    internal class SprinklerShapeEditMenu : IClickableMenu
     {
-        static Texture2D whitePixel;
+        /*********
+        ** Properties
+        *********/
+        private static Texture2D whitePixel;
 
-        const int maxArraySize = 15;
-        const int defaultTileSize = 32;
-        int arraySize = 15;
-        int centerTile = 7;
-        int tileSize = 32; //including padding
-        int padding = 2;
+        private const int maxArraySize = 15;
+        private const int defaultTileSize = 32;
+        private int arraySize = 15;
+        private int centerTile = 7;
+        private int tileSize = 32; //including padding
+        private int padding = 2;
 
-        int hoveredItemX;
-        int hoveredItemY;
+        private int hoveredItemX;
+        private int hoveredItemY;
 
-        Color[] colors = {Color.Tomato, Color.ForestGreen, Color.LightSteelBlue };
+        private readonly Color[] colors = { Color.Tomato, Color.ForestGreen, Color.LightSteelBlue };
 
-        const int minLeftMargin = 32;
-        const int minTopMargin = 32;
-        int leftMargin;
-        int topMargin;
+        private const int minLeftMargin = 32;
+        private const int minTopMargin = 32;
+        private int leftMargin;
+        private int topMargin;
 
-        const int tabDistanceFromMenu = -32;
-        const int tabItemWidth = 64;
-        const int tabItemHeight = 64;
-        const int tabDistanceVerticalBetweenTabs = 16;
+        private const int tabDistanceFromMenu = -32;
+        private const int tabItemWidth = 64;
+        private const int tabItemHeight = 64;
+        private const int tabDistanceVerticalBetweenTabs = 16;
 
-        const int tabLeftMargin = 16;
-        const int tabVerticalMargins = 16;
-        const int tabRightMargin = 32;
+        private const int tabLeftMargin = 16;
+        private const int tabVerticalMargins = 16;
+        private const int tabRightMargin = 32;
 
-        int[,] sprinklerGrid;
+        private int[,] sprinklerGrid;
 
         private int activeSprinklerSheet;
 
-        private List<ClickableComponent> tabs;
-        private ClickableTextureComponent okButton;
+        private readonly List<ClickableComponent> tabs;
+        private readonly ClickableTextureComponent okButton;
 
         //OptionsInputListener thisMenuKeyInput;
 
+
+        /*********
+        ** Public methods
+        *********/
         public SprinklerShapeEditMenu()
         {
             //thisMenuKeyInput = new OptionsInputListener("Key To Open This Screen", 1, 50, -1, -1);
 
             int menuWidth = maxArraySize * defaultTileSize + minLeftMargin * 2;
             int menuHeight = maxArraySize * defaultTileSize + minTopMargin * 2;
-            int menuX = Game1.viewport.Width/2 - menuWidth / 2;
-            int menuY = Game1.viewport.Height/2 - menuHeight / 2;
+            int menuX = Game1.viewport.Width / 2 - menuWidth / 2;
+            int menuY = Game1.viewport.Height / 2 - menuHeight / 2;
             initialize(menuX, menuY, menuWidth, menuHeight, true);
 
             tabs = new List<ClickableComponent>();
@@ -82,7 +69,7 @@ namespace SMAPISprinklerMod
             tabs.Add(new ClickableComponent(new Rectangle(menuX - tabDistanceFromMenu - tabWidth, tabs[0].bounds.Y + tabHeight + tabDistanceVerticalBetweenTabs, tabWidth, tabHeight), new StardewValley.Object(Vector2.Zero, 621, false)));
             tabs.Add(new ClickableComponent(new Rectangle(menuX - tabDistanceFromMenu - tabWidth, tabs[1].bounds.Y + tabHeight + tabDistanceVerticalBetweenTabs, tabWidth, tabHeight), new StardewValley.Object(Vector2.Zero, 645, false)));
 
-            okButton = new ClickableTextureComponent("save-changes", new Rectangle(xPositionOnScreen + width - Game1.tileSize/2, yPositionOnScreen+height-Game1.tileSize/2, Game1.tileSize, Game1.tileSize), "", "Save Changes", Game1.mouseCursors, new Rectangle(128, 256, 64, 64), 1f);
+            okButton = new ClickableTextureComponent("save-changes", new Rectangle(xPositionOnScreen + width - Game1.tileSize / 2, yPositionOnScreen + height - Game1.tileSize / 2, Game1.tileSize, Game1.tileSize), "", "Save Changes", Game1.mouseCursors, new Rectangle(128, 256, 64, 64), 1f);
 
             if (whitePixel == null)
             {
@@ -95,10 +82,10 @@ namespace SMAPISprinklerMod
 
         public override void draw(SpriteBatch b)
         {
-            foreach(ClickableComponent tab in tabs)
+            foreach (ClickableComponent tab in tabs)
             {
                 IClickableMenu.drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), tab.bounds.X, tab.bounds.Y, tab.bounds.Width, tab.bounds.Height, Color.White, 1f, true);
-                Game1.spriteBatch.Draw(Game1.objectSpriteSheet, new Rectangle(tab.bounds.X+tabLeftMargin, tab.bounds.Y+tabVerticalMargins, tabItemWidth, tabItemHeight), Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, tab.item.parentSheetIndex, 16, 16), Color.White);
+                Game1.spriteBatch.Draw(Game1.objectSpriteSheet, new Rectangle(tab.bounds.X + tabLeftMargin, tab.bounds.Y + tabVerticalMargins, tabItemWidth, tabItemHeight), Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, tab.item.parentSheetIndex, 16, 16), Color.White);
             }
 
             //Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true, null, false);
@@ -121,11 +108,11 @@ namespace SMAPISprinklerMod
             while (countX < arraySize)
             {
                 countY = 0;
-                while(countY < arraySize)
+                while (countY < arraySize)
                 {
                     x = xPositionOnScreen + leftMargin + padding + countX * tileSize;
                     y = yPositionOnScreen + topMargin + padding + countY * tileSize;
-                    Game1.spriteBatch.Draw(whitePixel, new Rectangle(x, y, tileSize-padding*2, tileSize-padding*2), colors[sprinklerGrid[countX,countY]]);
+                    Game1.spriteBatch.Draw(whitePixel, new Rectangle(x, y, tileSize - padding * 2, tileSize - padding * 2), colors[sprinklerGrid[countX, countY]]);
                     ++countY;
                 }
                 ++countX;
@@ -136,7 +123,7 @@ namespace SMAPISprinklerMod
             Game1.spriteBatch.Draw(Game1.objectSpriteSheet, new Rectangle(x, y, tileSize - padding * 2, tileSize - padding * 2), Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, activeSprinklerSheet, 16, 16), Color.White);
             okButton.draw(Game1.spriteBatch);
 
-            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()), new Microsoft.Xna.Framework.Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 0, 16, 16)), Color.White, 0f, Vector2.Zero, 4f + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 0);            
+            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()), new Microsoft.Xna.Framework.Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 0, 16, 16)), Color.White, 0f, Vector2.Zero, 4f + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 0);
 
             base.draw(b);
         }
@@ -148,7 +135,7 @@ namespace SMAPISprinklerMod
             int mouseGridRelX = Game1.getOldMouseX() - xPositionOnScreen - leftMargin - padding;
             int mouseGridRelY = Game1.getOldMouseY() - yPositionOnScreen - topMargin - padding;
 
-            if(mouseGridRelX > 0 && mouseGridRelY > 0 && mouseGridRelX < arraySize*tileSize-padding && mouseGridRelY < arraySize*tileSize-padding)
+            if (mouseGridRelX > 0 && mouseGridRelY > 0 && mouseGridRelX < arraySize * tileSize - padding && mouseGridRelY < arraySize * tileSize - padding)
             {
                 hoveredItemX = mouseGridRelX / tileSize;
                 hoveredItemY = mouseGridRelY / tileSize;
@@ -159,7 +146,7 @@ namespace SMAPISprinklerMod
                 hoveredItemY = -1;
             }
 
-            okButton.tryHover(Game1.getOldMouseX(), Game1.getOldMouseY());            
+            okButton.tryHover(Game1.getOldMouseX(), Game1.getOldMouseY());
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
@@ -184,21 +171,21 @@ namespace SMAPISprinklerMod
                 hoveredItemX = -1;
                 hoveredItemY = -1;
 
-                foreach(ClickableComponent tab in tabs)
+                foreach (ClickableComponent tab in tabs)
                 {
-                    if(tab.containsPoint(x, y))
+                    if (tab.containsPoint(x, y))
                     {
                         Game1.playSound("select");
                         setActiveSprinklerSheetIndex(tab.item.parentSheetIndex);
                     }
                 }
 
-                if(okButton.containsPoint(x, y))
+                if (okButton.containsPoint(x, y))
                 {
                     Game1.playSound("select");
                     int counter;
                     int originalArea;
-                    foreach(KeyValuePair<int, int[,]> sprinklerGrid in SprinklerMod.SprinklerMod.ModConfig.sprinklerShapes)
+                    foreach (KeyValuePair<int, int[,]> sprinklerGrid in SprinklerMod.SprinklerMod.ModConfig.SprinklerShapes)
                     {
                         counter = 0;
                         originalArea = 0;
@@ -207,11 +194,10 @@ namespace SMAPISprinklerMod
                             if (stateRequest == 1) ++counter;
                             if (stateRequest == 2) ++originalArea;
                         }
-                        SprinklerMod.SprinklerMod.ModConfig.sprinklerPrices[sprinklerGrid.Key] = (counter / originalArea) + 1;
+                        SprinklerMod.SprinklerMod.ModConfig.SprinklerPrices[sprinklerGrid.Key] = (counter / originalArea) + 1;
                         //Log.Debug(String.Format("Sprinkler Type {0} has price {1}", sprinklerGrid.Key, SprinklerMod.SprinklerMod.ModConfig.sprinklerPrices[sprinklerGrid.Key]));
                     }
-                    SprinklerMod.SprinklerMod.ModConfig.UpdateConfig<SprinklerModConfig>();
-                    SprinklerMod.SprinklerMod.ModConfig.WriteConfig();
+                    SprinklerMod.SprinklerMod.SaveConfig();
                     //Game1.showGlobalMessage("Sprinkler Configurations Saved");
                     Game1.addHUDMessage(new HUDMessage("Sprinkler Configurations Saved", Color.Green, 3500f));
                     SprinklerMod.SprinklerMod.UpdatePrices();
@@ -223,6 +209,10 @@ namespace SMAPISprinklerMod
         {
         }
 
+
+        /*********
+        ** Private methods
+        *********/
         private void setActiveSprinklerSheetIndex(int type)
         {
             activeSprinklerSheet = type;
@@ -233,20 +223,20 @@ namespace SMAPISprinklerMod
             hoveredItemX = -1;
             hoveredItemY = -1;
 
-            sprinklerGrid = SprinklerMod.SprinklerMod.ModConfig.sprinklerShapes[type];
+            sprinklerGrid = SprinklerMod.SprinklerMod.ModConfig.SprinklerShapes[type];
 
             switch (type)
             {
                 case 599:
-                    arraySize = 7;                    
+                    arraySize = 7;
                     centerTile = arraySize / 2;
                     tileSize = 64;
 
                     sprinklerGrid[centerTile, centerTile] = 2;
-                    sprinklerGrid[centerTile-1, centerTile] = 2;
-                    sprinklerGrid[centerTile+1, centerTile] = 2;
-                    sprinklerGrid[centerTile, centerTile-1] = 2;                    
-                    sprinklerGrid[centerTile, centerTile+1] = 2;
+                    sprinklerGrid[centerTile - 1, centerTile] = 2;
+                    sprinklerGrid[centerTile + 1, centerTile] = 2;
+                    sprinklerGrid[centerTile, centerTile - 1] = 2;
+                    sprinklerGrid[centerTile, centerTile + 1] = 2;
                     break;
                 case 621:
                     tileSize = 32;
@@ -254,13 +244,13 @@ namespace SMAPISprinklerMod
                     //sprinklerGrid = new int[arraySize, arraySize];
                     centerTile = arraySize / 2;
 
-                    countX = centerTile-1;
-                    countY = centerTile-1;
+                    countX = centerTile - 1;
+                    countY = centerTile - 1;
 
-                    while (countX < centerTile+2)
+                    while (countX < centerTile + 2)
                     {
                         countY = centerTile - 1;
-                        while (countY < centerTile+2)
+                        while (countY < centerTile + 2)
                         {
                             sprinklerGrid[countX, countY] = 2;
                             ++countY;
