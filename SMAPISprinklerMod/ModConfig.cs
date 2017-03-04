@@ -1,39 +1,28 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using StardewModdingAPI;
 
 namespace SMAPISprinklerMod
 {
-    public class SprinklerModConfig : Config
+    public class SprinklerModConfig
     {
         /*********
         ** Accessors
         *********/
-        public Keys ConfigKey { get; set; }
-        public Keys HighlightKey { get; set; }
-        public Color GridColour { get; set; }
-        public Dictionary<int, int[,]> SprinklerShapes { get; set; }
-        public Dictionary<int, int> SprinklerPrices { get; set; }
-
-
-        /*********
-        ** Public methods
-        *********/
-        public override T GenerateDefaultConfig<T>()
+        public Keys ConfigKey { get; set; } = Keys.K;
+        public Keys HighlightKey { get; set; } = Keys.F3;
+        public Color GridColour { get; set; } = Color.PowderBlue;
+        public Dictionary<int, int[,]> SprinklerShapes { get; set; } = new Dictionary<int, int[,]>
         {
-            this.GridColour = Color.PowderBlue;
-            this.ConfigKey = Keys.K;
-            this.HighlightKey = Keys.F3;
-            this.SprinklerShapes = new Dictionary<int, int[,]>();
-            this.SprinklerPrices = new Dictionary<int, int>();
-            this.SprinklerShapes.Add(599, new int[7, 7]);
-            this.SprinklerShapes.Add(621, new int[11, 11]);
-            this.SprinklerShapes.Add(645, new int[15, 15]);
-            this.SprinklerPrices.Add(599, 1);
-            this.SprinklerPrices.Add(621, 1);
-            this.SprinklerPrices.Add(645, 1);
-            return this as T;
-        }
+            [599] = new int[7, 7],
+            [621] = new int[11, 11],
+            [645] = new int[15, 15]
+        };
+        public Dictionary<int, int> SprinklerPrices { get; set; } = new Dictionary<int, int>
+        {
+            [599] = 1,
+            [621] = 1,
+            [645] = 1
+        };
     }
 }

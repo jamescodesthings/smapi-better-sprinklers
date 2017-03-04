@@ -18,6 +18,7 @@ namespace SprinklerMod
         *********/
         int[] validSprinklers;
 
+        private static IModHelper Helper;
         private static Dictionary<string, string> oldCraftingRecipes;
         private static Dictionary<int, string> oldObjectInfo;
         private static Texture2D buildingPlacementTiles;
@@ -28,16 +29,19 @@ namespace SprinklerMod
         /*********
         ** Accessors
         *********/
-        public static SprinklerModConfig ModConfig { get; protected set; }
+        public static SprinklerModConfig ModConfig { get; private set; }
         public static bool extraInfoActive; //deliberately public, so other mods can read it.
 
 
         /*********
         ** Public methods
         *********/
-        public override void Entry(params object[] objects)
+        /// <summary>The mod entry point, called after the mod is first loaded.</summary>
+        /// <param name="helper">Provides simplified APIs for writing mods.</param>
+        public override void Entry(IModHelper helper)
         {
-            ModConfig = new SprinklerModConfig().InitializeConfig(BaseConfigPath);
+            SprinklerMod.Helper = helper;
+            ModConfig = helper.ReadConfig<SprinklerModConfig>();
             oldCraftingRecipes = null;
             oldObjectInfo = null;
             extraInfoActive = false;
@@ -137,6 +141,12 @@ namespace SprinklerMod
 
             CraftingRecipe.craftingRecipes = newCraftingRecipes;
             Game1.objectInformation = newObjectInfo;
+        }
+
+        /// <summary>Save the current configuration settings.</summary>
+        internal static void SaveConfig()
+        {
+            SprinklerMod.Helper.WriteConfig(SprinklerMod.ModConfig);
         }
 
 

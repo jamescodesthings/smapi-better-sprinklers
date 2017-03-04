@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -198,8 +197,7 @@ namespace SMAPISprinklerMod
                         SprinklerMod.SprinklerMod.ModConfig.SprinklerPrices[sprinklerGrid.Key] = (counter / originalArea) + 1;
                         //Log.Debug(String.Format("Sprinkler Type {0} has price {1}", sprinklerGrid.Key, SprinklerMod.SprinklerMod.ModConfig.sprinklerPrices[sprinklerGrid.Key]));
                     }
-                    SprinklerMod.SprinklerMod.ModConfig.UpdateConfig<SprinklerModConfig>();
-                    SprinklerMod.SprinklerMod.ModConfig.WriteConfig();
+                    SprinklerMod.SprinklerMod.SaveConfig();
                     //Game1.showGlobalMessage("Sprinkler Configurations Saved");
                     Game1.addHUDMessage(new HUDMessage("Sprinkler Configurations Saved", Color.Green, 3500f));
                     SprinklerMod.SprinklerMod.UpdatePrices();
