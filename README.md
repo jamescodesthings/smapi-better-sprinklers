@@ -50,6 +50,10 @@ Visit the [Forum thread](http://community.playstarbound.com/threads/configurable
 Changelog
 ---------
 
+### 2.3
+
+Corrected forum thread link, and default config minor error.
+
 ### 2.2
 
 Updated for Stardew Valley 1.1 and SMAPI 0.40.0 1.1.
