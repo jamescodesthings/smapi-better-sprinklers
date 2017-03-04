@@ -1,15 +1,14 @@
 ﻿{
-	"Name": "Configurable Improved Sprinklers Mod",
-	"Authour": "Maurício Gomes (Speeder)",
-	"Version":
-	{
-		"MajorVersion": 2,
-		"MinorVersion": 1,
-		"PatchVersion": 0,
-		"Build": ""
-	},
-	"UniqueID": "SPDSprinklersMod",
-	"Description": "Make the Sprinklers work better.",
-	"PerSaveConfigs": false,
-	"EntryDll":  "SMAPISprinklerMod.dll"
+  "Name": "Better Sprinklers",
+  "Author": "Maurício Gomes (Speeder)",
+  "Version": {
+    "MajorVersion": 2,
+    "MinorVersion": 2,
+    "PatchVersion": 0,
+    "Build": null
+  },
+  "MinimumApiVersion": "1.8",
+  "UniqueID": "Speeder.BetterSprinklers",
+  "Description": "Make the Sprinklers work better.",
+  "EntryDll": "SMAPISprinklerMod.dll"
 }

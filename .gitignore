@@ -1,0 +1,19 @@
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+# Build results
+**/bin/*
+**/obj/*
+
+# Visual Studio cache/options
+.vs/
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# NuGet
+**/packages/*

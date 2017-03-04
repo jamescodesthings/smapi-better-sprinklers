@@ -50,6 +50,9 @@ Visit the [Forum thread](http://community.playstarbound.com/threads/storm-and-sm
 Changelog
 ---------
 
+### 2.2
+Updated for Stardew Valley 1.1 and SMAPI 0.40.0 1.1.
+
 ### 2.1
 
 Added highlighting to the area of sprinklers and scarecrows.
@@ -91,6 +94,11 @@ Source
 ------
 
 Mod [source hosted on ![GitLab](igitlab.png)](https://gitlab.com/speeder1/SMAPISprinklerMod), special thanks to them! (that even provided free support when needed!)
+
+[Installing a stable release from Nexus Mods](http://www.nexusmods.com/stardewvalley/mods/41/) is
+recommended. If you really want to compile the mod yourself, just edit `SMAPISprinklerMod.csproj` and
+set the `<GamePath>` setting to your Stardew Valley directory path. Launching the project in Visual
+Studio will compile the code, package it into the mod directory, and start the game.
 
 Binary Download Link
 --------------------
