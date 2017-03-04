@@ -17,11 +17,11 @@ namespace SMAPISprinklerMod
             [599] = new int[7, 7]
             {
                 { 0, 0, 0, 0, 0, 0, 0 },
-                { 0, 1, 1, 1, 1, 1, 0 },
-                { 0, 1, 1, 2, 1, 1, 0 },
+                { 0, 0, 0, 1, 0, 0, 0 },
+                { 0, 0, 0, 2, 0, 0, 0 },
                 { 0, 1, 2, 2, 2, 1, 0 },
-                { 0, 1, 1, 2, 1, 1, 0 },
-                { 0, 1, 1, 1, 1, 1, 0 },
+                { 0, 0, 0, 2, 0, 0, 0 },
+                { 0, 0, 0, 1, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0 }
             },
             [621] = new int[11, 11]
@@ -59,7 +59,7 @@ namespace SMAPISprinklerMod
         };
         public Dictionary<int, int> SprinklerPrices { get; set; } = new Dictionary<int, int>
         {
-            [599] = 5,
+            [599] = 1,
             [621] = 1,
             [645] = 1
         };
