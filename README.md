@@ -45,12 +45,13 @@ There is a feature that highlight scarecrow effect area, and sprinkler area, it 
 
 ![Game Screenshot](scarecrowarea.png)
 
-Visit the [Forum thread](http://community.playstarbound.com/threads/storm-and-smapi-better-sprinklers-mod.108847/)
+Visit the [Forum thread](http://community.playstarbound.com/threads/configurable-improved-sprinklers-scarecrow-and-sprinklers-area-highlights.112443/)
 
 Changelog
 ---------
 
 ### 2.2
+
 Updated for Stardew Valley 1.1 and SMAPI 0.40.0 1.1.
 
 ### 2.1
@@ -84,6 +85,8 @@ Credits
 -------
 
 Author: Maur&#237;cio Gomes (Speeder) [![Patreon](ipatreon.png)](https://patreon.com/user?u=3066937)
+
+Special Thanks: Jesse and Pathoschild.
 
 License
 -------

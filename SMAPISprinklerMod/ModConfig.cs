@@ -59,7 +59,7 @@ namespace SMAPISprinklerMod
         };
         public Dictionary<int, int> SprinklerPrices { get; set; } = new Dictionary<int, int>
         {
-            [599] = 5,
+            [599] = 1,
             [621] = 1,
             [645] = 1
         };
