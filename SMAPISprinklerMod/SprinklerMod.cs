@@ -109,7 +109,7 @@ namespace SprinklerMod
                     counter = 1;
                     while (counter < ingredientsSplit.Length)
                     {
-                        ingredientsSplit[counter] = (int.Parse(ingredientsSplit[counter]ToString()) * multiplier).ToString();
+                        ingredientsSplit[counter] = (int.Parse(ingredientsSplit[counter]) * multiplier).ToString();
                         counter += 2;
                     }
                     infoSplit[0] = string.Join(" ", ingredientsSplit);
