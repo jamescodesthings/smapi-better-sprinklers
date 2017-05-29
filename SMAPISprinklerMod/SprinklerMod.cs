@@ -16,7 +16,10 @@ namespace SprinklerMod
         /*********
         ** Properties
         *********/
-        int[] validSprinklers;
+        /// <summary>The maximum grid size.</summary>
+        private readonly int MaxGridSize = 19;
+
+        private int[] validSprinklers;
 
         private static IModHelper Helper;
         private static Dictionary<string, string> oldCraftingRecipes;
@@ -51,8 +54,8 @@ namespace SprinklerMod
             GameEvents.UpdateTick += Event_UpdateTick;
             GraphicsEvents.OnPreRenderHudEvent += Event_PreRenderHud;
 
-            scarecrowGrid = new int[19, 19];
-            int scarecrowCenterValue = 19 / 2;
+            scarecrowGrid = new int[this.MaxGridSize, this.MaxGridSize];
+            int scarecrowCenterValue = this.MaxGridSize / 2;
             Vector2 scarecrowCenter = new Vector2(scarecrowCenterValue, scarecrowCenterValue);
             int x = 0;
             int y = 0;
@@ -155,67 +158,30 @@ namespace SprinklerMod
         *********/
         private static void RenderSprinklerHighlight(int objIndex, Vector2 mousePositionTile)
         {
-            int[,] configGrid = ModConfig.SprinklerShapes[objIndex];
-
-            Vector2 iterativeLocation = mousePositionTile;
-            int arrayHalfSizeX = configGrid.GetLength(0) / 2;
-            int arrayHalfSizeY = configGrid.GetLength(1) / 2;
-            iterativeLocation.X -= arrayHalfSizeX;
-            iterativeLocation.Y -= arrayHalfSizeY;
-            float maxX = mousePositionTile.X + arrayHalfSizeX + 1;
-            float maxY = mousePositionTile.Y + arrayHalfSizeY + 1;
-
-            int counterX = 0;
-            int counterY = 0;
-
-            while (iterativeLocation.X < maxX)
-            {
-                iterativeLocation.Y = mousePositionTile.Y - arrayHalfSizeY;
-                counterY = 0;
-                while (iterativeLocation.Y < maxY)
-                {
-                    if (configGrid[counterX, counterY] > 0)
-                    {
-                        Game1.spriteBatch.Draw(buildingPlacementTiles, Game1.GlobalToLocal(Game1.viewport, iterativeLocation * (float)Game1.tileSize), new Microsoft.Xna.Framework.Rectangle?(Game1.getSourceRectForStandardTileSheet(buildingPlacementTiles, 0, -1, -1)), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.999f);
-                    }
-                    ++iterativeLocation.Y;
-                    ++counterY;
-                }
-                ++iterativeLocation.X;
-                ++counterX;
-            }
+            SprinklerMod.RenderHighlight(mousePositionTile, ModConfig.SprinklerShapes[objIndex]);
         }
 
         private static void RenderScarecrowHighlight(Vector2 mousePositionTile)
         {
-            int[,] configGrid = scarecrowGrid;
+            SprinklerMod.RenderHighlight(mousePositionTile, scarecrowGrid);
+        }
 
-            Vector2 iterativeLocation = mousePositionTile;
-            int arrayHalfSizeX = configGrid.GetLength(0) / 2;
-            int arrayHalfSizeY = configGrid.GetLength(1) / 2;
-            iterativeLocation.X -= arrayHalfSizeX;
-            iterativeLocation.Y -= arrayHalfSizeY;
-            float maxX = mousePositionTile.X + arrayHalfSizeX + 1;
-            float maxY = mousePositionTile.Y + arrayHalfSizeY + 1;
+        private static void RenderHighlight(Vector2 mousePositionTile, int[,] grid)
+        {
+            int arrayHalfSizeX = grid.GetLength(0) / 2;
+            int arrayHalfSizeY = grid.GetLength(1) / 2;
+            int minX = (int)mousePositionTile.X - arrayHalfSizeX;
+            int minY = (int)mousePositionTile.Y - arrayHalfSizeY;
+            int maxX = (int)mousePositionTile.X + arrayHalfSizeX;
+            int maxY = (int)mousePositionTile.Y + arrayHalfSizeY;
 
-            int counterX = 0;
-            int counterY = 0;
-
-            while (iterativeLocation.X < maxX)
+            for (int gridX = 0, x = minX; x <= maxX; x++, gridX++)
             {
-                iterativeLocation.Y = mousePositionTile.Y - arrayHalfSizeY;
-                counterY = 0;
-                while (iterativeLocation.Y < maxY)
+                for (int gridY = 0, y = minY; y <= maxY; y++, gridY++)
                 {
-                    if (configGrid[counterX, counterY] > 0)
-                    {
-                        Game1.spriteBatch.Draw(buildingPlacementTiles, Game1.GlobalToLocal(Game1.viewport, iterativeLocation * (float)Game1.tileSize), new Microsoft.Xna.Framework.Rectangle?(Game1.getSourceRectForStandardTileSheet(buildingPlacementTiles, 0, -1, -1)), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.999f);
-                    }
-                    ++iterativeLocation.Y;
-                    ++counterY;
+                    if (grid[gridX, gridY] > 0)
+                        Game1.spriteBatch.Draw(buildingPlacementTiles, Game1.GlobalToLocal(Game1.viewport, new Vector2(x, y) * Game1.tileSize), Game1.getSourceRectForStandardTileSheet(buildingPlacementTiles, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.999f);
                 }
-                ++iterativeLocation.X;
-                ++counterX;
             }
         }
 
