@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace SMAPISprinklerMod
+namespace BetterSprinklers
 {
     public class SprinklerModConfig
     {

@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using SMAPISprinklerMod;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.TerrainFeatures;
 using SObject = StardewValley.Object;
 
-namespace SprinklerMod
+namespace BetterSprinklers
 {
     public class SprinklerMod : Mod
     {

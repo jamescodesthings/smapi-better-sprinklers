@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace SMAPISprinklerMod
+namespace BetterSprinklers
 {
     internal class SprinklerShapeEditMenu : IClickableMenu
     {
@@ -181,7 +181,7 @@ namespace SMAPISprinklerMod
                 if (okButton.containsPoint(x, y))
                 {
                     Game1.playSound("select");
-                    foreach (KeyValuePair<int, int[,]> sprinklerGrid in SprinklerMod.SprinklerMod.ModConfig.SprinklerShapes)
+                    foreach (KeyValuePair<int, int[,]> sprinklerGrid in SprinklerMod.ModConfig.SprinklerShapes)
                     {
                         int counter = 0;
                         int originalArea = 0;
@@ -190,11 +190,11 @@ namespace SMAPISprinklerMod
                             if (stateRequest == 1) ++counter;
                             if (stateRequest == 2) ++originalArea;
                         }
-                        SprinklerMod.SprinklerMod.ModConfig.SprinklerPrices[sprinklerGrid.Key] = (counter / originalArea) + 1;
+                        SprinklerMod.ModConfig.SprinklerPrices[sprinklerGrid.Key] = (counter / originalArea) + 1;
                     }
-                    SprinklerMod.SprinklerMod.SaveConfig();
+                    SprinklerMod.SaveConfig();
                     Game1.addHUDMessage(new HUDMessage("Sprinkler Configurations Saved", Color.Green, 3500f));
-                    SprinklerMod.SprinklerMod.UpdatePrices();
+                    SprinklerMod.UpdatePrices();
                 }
             }
         }
@@ -217,7 +217,7 @@ namespace SMAPISprinklerMod
             hoveredItemX = -1;
             hoveredItemY = -1;
 
-            sprinklerGrid = SprinklerMod.SprinklerMod.ModConfig.SprinklerShapes[type];
+            sprinklerGrid = SprinklerMod.ModConfig.SprinklerShapes[type];
 
             switch (type)
             {
