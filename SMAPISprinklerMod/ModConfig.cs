@@ -14,7 +14,7 @@ namespace SMAPISprinklerMod
         public Color GridColour { get; set; } = Color.PowderBlue;
         public Dictionary<int, int[,]> SprinklerShapes { get; set; } = new Dictionary<int, int[,]>
         {
-            [599] = new int[7, 7]
+            [599] = new[,]
             {
                 { 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 1, 0, 0, 0 },
@@ -24,7 +24,7 @@ namespace SMAPISprinklerMod
                 { 0, 0, 0, 1, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0 }
             },
-            [621] = new int[11, 11]
+            [621] = new[,]
             {
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -38,7 +38,7 @@ namespace SMAPISprinklerMod
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
             },
-            [645] = new int[15, 15]
+            [645] = new[,]
             {
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 },

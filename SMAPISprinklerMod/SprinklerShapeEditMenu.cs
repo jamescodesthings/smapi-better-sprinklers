@@ -65,16 +65,16 @@ namespace SMAPISprinklerMod
             tabs = new List<ClickableComponent>();
             int tabWidth = tabItemWidth + tabLeftMargin + tabRightMargin;
             int tabHeight = tabItemHeight + tabVerticalMargins * 2;
-            tabs.Add(new ClickableComponent(new Rectangle(menuX - tabDistanceFromMenu - tabWidth, menuY + tabHeight * 0 + tabDistanceVerticalBetweenTabs, tabWidth, tabHeight), new StardewValley.Object(Vector2.Zero, 599, false)));
-            tabs.Add(new ClickableComponent(new Rectangle(menuX - tabDistanceFromMenu - tabWidth, tabs[0].bounds.Y + tabHeight + tabDistanceVerticalBetweenTabs, tabWidth, tabHeight), new StardewValley.Object(Vector2.Zero, 621, false)));
-            tabs.Add(new ClickableComponent(new Rectangle(menuX - tabDistanceFromMenu - tabWidth, tabs[1].bounds.Y + tabHeight + tabDistanceVerticalBetweenTabs, tabWidth, tabHeight), new StardewValley.Object(Vector2.Zero, 645, false)));
+            tabs.Add(new ClickableComponent(new Rectangle(menuX - tabDistanceFromMenu - tabWidth, menuY + tabHeight * 0 + tabDistanceVerticalBetweenTabs, tabWidth, tabHeight), new Object(Vector2.Zero, 599)));
+            tabs.Add(new ClickableComponent(new Rectangle(menuX - tabDistanceFromMenu - tabWidth, tabs[0].bounds.Y + tabHeight + tabDistanceVerticalBetweenTabs, tabWidth, tabHeight), new Object(Vector2.Zero, 621)));
+            tabs.Add(new ClickableComponent(new Rectangle(menuX - tabDistanceFromMenu - tabWidth, tabs[1].bounds.Y + tabHeight + tabDistanceVerticalBetweenTabs, tabWidth, tabHeight), new Object(Vector2.Zero, 645)));
 
             okButton = new ClickableTextureComponent("save-changes", new Rectangle(xPositionOnScreen + width - Game1.tileSize / 2, yPositionOnScreen + height - Game1.tileSize / 2, Game1.tileSize, Game1.tileSize), "", "Save Changes", Game1.mouseCursors, new Rectangle(128, 256, 64, 64), 1f);
 
             if (whitePixel == null)
             {
                 whitePixel = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
-                whitePixel.SetData(new Color[] { Color.White });
+                whitePixel.SetData(new[] { Color.White });
             }
 
             setActiveSprinklerSheetIndex(599);
@@ -84,17 +84,15 @@ namespace SMAPISprinklerMod
         {
             foreach (ClickableComponent tab in tabs)
             {
-                IClickableMenu.drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), tab.bounds.X, tab.bounds.Y, tab.bounds.Width, tab.bounds.Height, Color.White, 1f, true);
+                IClickableMenu.drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), tab.bounds.X, tab.bounds.Y, tab.bounds.Width, tab.bounds.Height, Color.White);
                 Game1.spriteBatch.Draw(Game1.objectSpriteSheet, new Rectangle(tab.bounds.X + tabLeftMargin, tab.bounds.Y + tabVerticalMargins, tabItemWidth, tabItemHeight), Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, tab.item.parentSheetIndex, 16, 16), Color.White);
             }
 
             //Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true, null, false);
-            IClickableMenu.drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), xPositionOnScreen, yPositionOnScreen, this.width, this.height, Color.White, 1f, true);
+            IClickableMenu.drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), xPositionOnScreen, yPositionOnScreen, width, height, Color.White);
 
             //draw our grid
             int countX = 0;
-            int countY = 0;
-
             int x;
             int y;
 
@@ -107,7 +105,7 @@ namespace SMAPISprinklerMod
 
             while (countX < arraySize)
             {
-                countY = 0;
+                int countY = 0;
                 while (countY < arraySize)
                 {
                     x = xPositionOnScreen + leftMargin + padding + countX * tileSize;
@@ -123,7 +121,7 @@ namespace SMAPISprinklerMod
             Game1.spriteBatch.Draw(Game1.objectSpriteSheet, new Rectangle(x, y, tileSize - padding * 2, tileSize - padding * 2), Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, activeSprinklerSheet, 16, 16), Color.White);
             okButton.draw(Game1.spriteBatch);
 
-            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()), new Microsoft.Xna.Framework.Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 0, 16, 16)), Color.White, 0f, Vector2.Zero, 4f + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 0);
+            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()), Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 0, 16, 16), Color.White, 0f, Vector2.Zero, 4f + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 0);
 
             base.draw(b);
         }
@@ -183,22 +181,18 @@ namespace SMAPISprinklerMod
                 if (okButton.containsPoint(x, y))
                 {
                     Game1.playSound("select");
-                    int counter;
-                    int originalArea;
                     foreach (KeyValuePair<int, int[,]> sprinklerGrid in SprinklerMod.SprinklerMod.ModConfig.SprinklerShapes)
                     {
-                        counter = 0;
-                        originalArea = 0;
+                        int counter = 0;
+                        int originalArea = 0;
                         foreach (int stateRequest in sprinklerGrid.Value)
                         {
                             if (stateRequest == 1) ++counter;
                             if (stateRequest == 2) ++originalArea;
                         }
                         SprinklerMod.SprinklerMod.ModConfig.SprinklerPrices[sprinklerGrid.Key] = (counter / originalArea) + 1;
-                        //Log.Debug(String.Format("Sprinkler Type {0} has price {1}", sprinklerGrid.Key, SprinklerMod.SprinklerMod.ModConfig.sprinklerPrices[sprinklerGrid.Key]));
                     }
                     SprinklerMod.SprinklerMod.SaveConfig();
-                    //Game1.showGlobalMessage("Sprinkler Configurations Saved");
                     Game1.addHUDMessage(new HUDMessage("Sprinkler Configurations Saved", Color.Green, 3500f));
                     SprinklerMod.SprinklerMod.UpdatePrices();
                 }

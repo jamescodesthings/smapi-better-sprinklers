@@ -8,6 +8,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.TerrainFeatures;
+using SObject = StardewValley.Object;
 
 namespace SprinklerMod
 {
@@ -57,36 +58,18 @@ namespace SprinklerMod
             scarecrowGrid = new int[this.MaxGridSize, this.MaxGridSize];
             int scarecrowCenterValue = this.MaxGridSize / 2;
             Vector2 scarecrowCenter = new Vector2(scarecrowCenterValue, scarecrowCenterValue);
-            int x = 0;
-            int y = 0;
-            float maxX = 19f;
-            float maxY = 19f;
-            Vector2 vIterator = new Vector2(0, 0);
-            while (vIterator.X < maxX)
+            for (int x = 0; x < this.MaxGridSize; x++)
             {
-                vIterator.Y = 0;
-                y = 0;
-                while (vIterator.Y < maxY)
+                for (int y = 0; y < this.MaxGridSize; y++)
                 {
-                    if (Vector2.Distance(vIterator, scarecrowCenter) < 9f)
-                        scarecrowGrid[x, y] = 1;
-                    else
-                        scarecrowGrid[x, y] = 0;
-
-                    ++vIterator.Y;
-                    ++y;
+                    Vector2 vector = new Vector2(x, y);
+                    scarecrowGrid[x, y] = Vector2.Distance(vector, scarecrowCenter) < 9f ? 1 : 0;
                 }
-                ++vIterator.X;
-                ++x;
             }
         }
 
         public static void UpdatePrices()
         {
-            string[] infoSplit;
-            string[] ingredientsSplit;
-            int counter;
-
             if (oldCraftingRecipes == null)
             {
                 oldCraftingRecipes = CraftingRecipe.craftingRecipes;
@@ -98,31 +81,23 @@ namespace SprinklerMod
                 Game1.objectInformation = oldObjectInfo;
             }
 
-
-            Dictionary<string, string> newCraftingRecipes = new Dictionary<string, string>();
+            var newCraftingRecipes = new Dictionary<string, string>();
+            string[] infoSplit;
             foreach (KeyValuePair<string, string> craftingRecipe in CraftingRecipe.craftingRecipes)
             {
                 if (craftingRecipe.Key.Contains("prinkler"))
                 {
-                    //Log.Debug(String.Format("key {0} value {1}", craftingRecipe.Key, craftingRecipe.Value));
                     infoSplit = craftingRecipe.Value.Split('/');
-                    int sprinklerSheet = int.Parse(infoSplit[2].ToString());
+                    int sprinklerSheet = int.Parse(infoSplit[2]);
                     int multiplier = ModConfig.SprinklerPrices[sprinklerSheet];
-                    ingredientsSplit = infoSplit[0].Split(' ');
-                    counter = 1;
-                    while (counter < ingredientsSplit.Length)
-                    {
-                        ingredientsSplit[counter] = (int.Parse(ingredientsSplit[counter]) * multiplier).ToString();
-                        counter += 2;
-                    }
+                    string[] ingredientsSplit = infoSplit[0].Split(' ');
+                    for (int i = 1; i < ingredientsSplit.Length; i += 2)
+                        ingredientsSplit[i] = (int.Parse(ingredientsSplit[i]) * multiplier).ToString();
                     infoSplit[0] = string.Join(" ", ingredientsSplit);
                     newCraftingRecipes[craftingRecipe.Key] = string.Join("/", infoSplit);
-                    //Log.Debug(String.Format("key {0} value {1}", craftingRecipe.Key, newCraftingRecipes[craftingRecipe.Key]));
                 }
                 else
-                {
                     newCraftingRecipes[craftingRecipe.Key] = craftingRecipe.Value;
-                }
             }
 
             Dictionary<int, string> newObjectInfo = new Dictionary<int, string>();
@@ -132,14 +107,11 @@ namespace SprinklerMod
                 {
                     int multiplier = ModConfig.SprinklerPrices[objectInfo.Key];
                     infoSplit = objectInfo.Value.Split('/');
-                    //Log.Debug(String.Format("object index {0}, name {1}, old price {2}, new price {3}", objectInfo.Key, infoSplit[0], infoSplit[1], int.Parse(infoSplit[1].ToString()) * multiplier));
-                    infoSplit[1] = (int.Parse(infoSplit[1].ToString()) * multiplier).ToString();
+                    infoSplit[1] = (int.Parse(infoSplit[1]) * multiplier).ToString();
                     newObjectInfo[objectInfo.Key] = string.Join("/", infoSplit);
                 }
                 else
-                {
                     newObjectInfo[objectInfo.Key] = objectInfo.Value;
-                }
             }
 
             CraftingRecipe.craftingRecipes = newCraftingRecipes;
@@ -188,12 +160,12 @@ namespace SprinklerMod
         private static void RenderGrid()
         {
             int startingX = -Game1.viewport.X % Game1.tileSize;
-            float startingY = (float)(-(float)Game1.viewport.Y % Game1.tileSize);
+            float startingY = -(float)Game1.viewport.Y % Game1.tileSize;
             for (int x = startingX; x < Game1.graphics.GraphicsDevice.Viewport.Width; x += Game1.tileSize)
             {
                 Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(x, (int)startingY, 1, Game1.graphics.GraphicsDevice.Viewport.Height), ModConfig.GridColour);
             }
-            for (float y = startingY; y < (float)Game1.graphics.GraphicsDevice.Viewport.Height; y += (float)Game1.tileSize)
+            for (float y = startingY; y < Game1.graphics.GraphicsDevice.Viewport.Height; y += Game1.tileSize)
             {
                 Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(startingX, (int)y, Game1.graphics.GraphicsDevice.Viewport.Width, 1), ModConfig.GridColour);
             }
@@ -205,7 +177,7 @@ namespace SprinklerMod
 
             if (Game1.activeClickableMenu == null && Game1.CurrentEvent == null && Game1.gameMode == Game1.playingGameMode)
             {
-                Vector2 mousePositionTile = new Vector2((float)((Game1.viewport.X + Game1.getOldMouseX()) / Game1.tileSize), (float)((Game1.viewport.Y + Game1.getOldMouseY()) / Game1.tileSize));
+                Vector2 mousePositionTile = new Vector2((Game1.viewport.X + Game1.getOldMouseX()) / Game1.tileSize, (Game1.viewport.Y + Game1.getOldMouseY()) / Game1.tileSize);
 
                 if (Game1.player.ActiveObject != null)
                 {
@@ -226,7 +198,7 @@ namespace SprinklerMod
                 {
                     if (Game1.currentLocation.objects.ContainsKey(mousePositionTile))
                     {
-                        StardewValley.Object hoveredObject = Game1.currentLocation.objects[mousePositionTile];
+                        SObject hoveredObject = Game1.currentLocation.objects[mousePositionTile];
 
                         if (ModConfig.SprinklerShapes.ContainsKey(hoveredObject.parentSheetIndex))
                         {
@@ -250,9 +222,9 @@ namespace SprinklerMod
         {
             foreach (GameLocation location in Game1.locations)
             {
-                foreach (KeyValuePair<Vector2, StardewValley.Object> objectPair in location.objects)
+                foreach (KeyValuePair<Vector2, SObject> objectPair in location.objects)
                 {
-                    StardewValley.Object obj = objectPair.Value;
+                    SObject obj = objectPair.Value;
                     Vector2 centerLocation = objectPair.Key;
                     if (ModConfig.SprinklerShapes.ContainsKey(obj.parentSheetIndex))
                     {
@@ -267,20 +239,16 @@ namespace SprinklerMod
                         float maxY = centerLocation.Y + arrayHalfSizeY + 1;
 
                         int counterX = 0;
-                        int counterY = 0;
-
                         while (iterativeLocation.X < maxX)
                         {
                             iterativeLocation.Y = centerLocation.Y - arrayHalfSizeY;
-                            counterY = 0;
+                            int counterY = 0;
                             while (iterativeLocation.Y < maxY)
                             {
                                 if (configGrid[counterX, counterY] > 0 && location.terrainFeatures.ContainsKey(iterativeLocation))
                                 {
-                                    if (location.terrainFeatures[iterativeLocation] is HoeDirt)
-                                    {
-                                        (location.terrainFeatures[iterativeLocation] as HoeDirt).state = 1;
-                                    }
+                                    if (location.terrainFeatures[iterativeLocation] is HoeDirt dirt)
+                                        dirt.state = 1;
                                 }
                                 ++iterativeLocation.Y;
                                 ++counterY;
