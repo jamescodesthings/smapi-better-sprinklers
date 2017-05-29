@@ -19,8 +19,6 @@ namespace BetterSprinklers
         /// <summary>The maximum grid size.</summary>
         private readonly int MaxGridSize = 19;
 
-        private int[] ValidSprinklers;
-
         private Dictionary<string, string> OldCraftingRecipes;
         private Dictionary<int, string> OldObjectInfo;
         private Texture2D BuildingPlacementTiles;
