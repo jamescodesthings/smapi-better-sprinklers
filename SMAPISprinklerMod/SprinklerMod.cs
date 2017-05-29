@@ -128,33 +128,23 @@ namespace SprinklerMod
         /*********
         ** Private methods
         *********/
-        private static void RenderSprinklerHighlight(int objIndex, Vector2 mousePositionTile)
+        private static void RenderSprinklerHighlight(int sprinklerID, Vector2 centerTile)
         {
-            SprinklerMod.RenderHighlight(mousePositionTile, ModConfig.SprinklerShapes[objIndex]);
+            SprinklerMod.RenderHighlight(centerTile, ModConfig.SprinklerShapes[sprinklerID]);
         }
 
-        private static void RenderScarecrowHighlight(Vector2 mousePositionTile)
+        private static void RenderScarecrowHighlight(Vector2 centerTile)
         {
-            SprinklerMod.RenderHighlight(mousePositionTile, scarecrowGrid);
+            SprinklerMod.RenderHighlight(centerTile, scarecrowGrid);
         }
 
-        private static void RenderHighlight(Vector2 mousePositionTile, int[,] grid)
+        private static void RenderHighlight(Vector2 centerTile, int[,] grid)
         {
-            int arrayHalfSizeX = grid.GetLength(0) / 2;
-            int arrayHalfSizeY = grid.GetLength(1) / 2;
-            int minX = (int)mousePositionTile.X - arrayHalfSizeX;
-            int minY = (int)mousePositionTile.Y - arrayHalfSizeY;
-            int maxX = (int)mousePositionTile.X + arrayHalfSizeX;
-            int maxY = (int)mousePositionTile.Y + arrayHalfSizeY;
-
-            for (int gridX = 0, x = minX; x <= maxX; x++, gridX++)
+            SprinklerMod.ForGridTiles(centerTile, grid, (tilePos, gridPos) =>
             {
-                for (int gridY = 0, y = minY; y <= maxY; y++, gridY++)
-                {
-                    if (grid[gridX, gridY] > 0)
-                        Game1.spriteBatch.Draw(buildingPlacementTiles, Game1.GlobalToLocal(Game1.viewport, new Vector2(x, y) * Game1.tileSize), Game1.getSourceRectForStandardTileSheet(buildingPlacementTiles, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.999f);
-                }
-            }
+                if (grid[(int)gridPos.X, (int)gridPos.Y] > 0)
+                    Game1.spriteBatch.Draw(buildingPlacementTiles, Game1.GlobalToLocal(Game1.viewport, tilePos * Game1.tileSize), Game1.getSourceRectForStandardTileSheet(buildingPlacementTiles, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.999f);
+            });
         }
 
         private static void RenderGrid()
@@ -224,38 +214,16 @@ namespace SprinklerMod
             {
                 foreach (KeyValuePair<Vector2, SObject> objectPair in location.objects)
                 {
-                    SObject obj = objectPair.Value;
-                    Vector2 centerLocation = objectPair.Key;
-                    if (ModConfig.SprinklerShapes.ContainsKey(obj.parentSheetIndex))
+                    int targetID = objectPair.Value.parentSheetIndex;
+                    Vector2 targetTile = objectPair.Key;
+                    if (ModConfig.SprinklerShapes.ContainsKey(targetID))
                     {
-                        int[,] configGrid = ModConfig.SprinklerShapes[obj.parentSheetIndex];
-
-                        Vector2 iterativeLocation = centerLocation;
-                        int arrayHalfSizeX = configGrid.GetLength(0) / 2;
-                        int arrayHalfSizeY = configGrid.GetLength(1) / 2;
-                        iterativeLocation.X -= arrayHalfSizeX;
-                        iterativeLocation.Y -= arrayHalfSizeY;
-                        float maxX = centerLocation.X + arrayHalfSizeX + 1;
-                        float maxY = centerLocation.Y + arrayHalfSizeY + 1;
-
-                        int counterX = 0;
-                        while (iterativeLocation.X < maxX)
+                        int[,] grid = ModConfig.SprinklerShapes[targetID];
+                        SprinklerMod.ForGridTiles(targetTile, grid, (tilePos, gridPos) =>
                         {
-                            iterativeLocation.Y = centerLocation.Y - arrayHalfSizeY;
-                            int counterY = 0;
-                            while (iterativeLocation.Y < maxY)
-                            {
-                                if (configGrid[counterX, counterY] > 0 && location.terrainFeatures.ContainsKey(iterativeLocation))
-                                {
-                                    if (location.terrainFeatures[iterativeLocation] is HoeDirt dirt)
-                                        dirt.state = 1;
-                                }
-                                ++iterativeLocation.Y;
-                                ++counterY;
-                            }
-                            ++iterativeLocation.X;
-                            ++counterX;
-                        }
+                            if (grid[(int)gridPos.X, (int)gridPos.Y] > 0 && location.terrainFeatures.TryGetValue(tilePos, out TerrainFeature terrainFeature) && terrainFeature is HoeDirt dirt)
+                                dirt.state = 1;
+                        });
                     }
                 }
             }
@@ -285,6 +253,26 @@ namespace SprinklerMod
                 {
                     gridKeyHeldDown = false;
                 }
+            }
+        }
+
+        /// <summary>Get a tile grid centered on the given tile position.</summary>
+        /// <param name="centerTile">The center tile position.</param>
+        /// <param name="grid">The grid to get.</param>
+        /// <param name="perform">The action to perform for each tile, given the tile position and grid position.</param>
+        private static void ForGridTiles(Vector2 centerTile, int[,] grid, Action<Vector2, Vector2> perform)
+        {
+            int arrayHalfSizeX = grid.GetLength(0) / 2;
+            int arrayHalfSizeY = grid.GetLength(1) / 2;
+            int minX = (int)centerTile.X - arrayHalfSizeX;
+            int minY = (int)centerTile.Y - arrayHalfSizeY;
+            int maxX = (int)centerTile.X + arrayHalfSizeX;
+            int maxY = (int)centerTile.Y + arrayHalfSizeY;
+
+            for (int gridX = 0, x = minX; x <= maxX; x++, gridX++)
+            {
+                for (int gridY = 0, y = minY; y <= maxY; y++, gridY++)
+                    perform(new Vector2(x, y), new Vector2(gridX, gridY));
             }
         }
     }
