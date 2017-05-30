@@ -3,11 +3,11 @@
   "Author": "Maurício Gomes (Speeder)",
   "Version": {
     "MajorVersion": 2,
-    "MinorVersion": 3,
+    "MinorVersion": 4,
     "PatchVersion": 0,
     "Build": null
   },
-  "MinimumApiVersion": "1.8",
+  "MinimumApiVersion": "1.13",
   "UniqueID": "Speeder.BetterSprinklers",
   "Description": "Make the Sprinklers work better.",
   "EntryDll": "SMAPISprinklerMod.dll"

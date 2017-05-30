@@ -34,6 +34,9 @@ Compatible with Stardew Valley 1.2+ on Linux, Mac, and Windows.
 * The sprinklers activate in the morning when the day starts.
 
 ## Versions
+### 2.4
+- Updated for Stardew Valley 1.2 and SMAPI 1.13.
+
 ### 2.3
 - Corrected forum thread link, and default config minor error.
 
