@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -20,14 +19,16 @@ namespace BetterSprinklers
         /// <summary>The maximum grid size.</summary>
         private readonly int MaxGridSize = 19;
 
+        /// <summary>The mod configuration.</summary>
+        private SprinklerModConfig Config;
+
         private Dictionary<string, string> OldCraftingRecipes;
         private Dictionary<int, string> OldObjectInfo;
         private Texture2D BuildingPlacementTiles;
         private int[,] ScarecrowGrid;
-        private bool GridKeyHeldDown;
 
-        private SprinklerModConfig Config;
-        private bool ExtraInfoActive;
+        /// <summary>Whether to show a grid overlay and highlight the coverage for sprinklers or scarecrows under the cursor.</summary>
+        private bool ShowInfoOverlay;
 
 
         /*********
@@ -41,15 +42,15 @@ namespace BetterSprinklers
             this.Config = helper.ReadConfig<SprinklerModConfig>();
             this.OldCraftingRecipes = null;
             this.OldObjectInfo = null;
-            this.ExtraInfoActive = false;
+            this.ShowInfoOverlay = false;
             this.ScarecrowGrid = this.GetScarecrowGrid();
             this.BuildingPlacementTiles = Game1.content.Load<Texture2D>("LooseSprites\\buildingPlacementTiles");
             this.UpdatePrices();
 
             // set up events
             TimeEvents.DayOfMonthChanged += Event_ChangedDayOfMonth;
-            GameEvents.UpdateTick += Event_UpdateTick;
             GraphicsEvents.OnPreRenderHudEvent += Event_PreRenderHud;
+            ControlEvents.KeyPressed += Event_OnKeyPressed;
         }
 
 
@@ -79,22 +80,18 @@ namespace BetterSprinklers
         /// <summary>The method after the game updates its state (≈60 times per second).</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event arguments.</param>
-        private void Event_UpdateTick(object sender, EventArgs e)
+        private void Event_OnKeyPressed(object sender, EventArgsKeyPressed e)
         {
-            if (Game1.activeClickableMenu == null && Game1.CurrentEvent == null)
-            {
-                KeyboardState currentKeyboardState = Keyboard.GetState();
-                if (currentKeyboardState.IsKeyDown(this.Config.ConfigKey))
-                    Game1.activeClickableMenu = new SprinklerShapeEditMenu(this.Config, this.SaveChanges);
-                else if (currentKeyboardState.IsKeyDown(this.Config.HighlightKey))
-                {
-                    if (this.GridKeyHeldDown == false)
-                        this.ExtraInfoActive = !this.ExtraInfoActive;
-                    this.GridKeyHeldDown = true;
-                }
-                else
-                    this.GridKeyHeldDown = false;
-            }
+            if (Game1.activeClickableMenu != null || Game1.CurrentEvent != null)
+                return;
+
+            // show menu
+            if (e.KeyPressed == this.Config.ConfigKey)
+                Game1.activeClickableMenu = new SprinklerShapeEditMenu(this.Config, this.SaveChanges);
+
+            // toggle overlay
+            else if (e.KeyPressed == this.Config.HighlightKey)
+                this.ShowInfoOverlay = !this.ShowInfoOverlay;
         }
 
         /****
@@ -222,7 +219,7 @@ namespace BetterSprinklers
             }
 
             // highlight coverage for item under cursor
-            if (this.ExtraInfoActive)
+            if (this.ShowInfoOverlay)
             {
                 if (Game1.currentLocation.objects.TryGetValue(mouseTile, out SObject target))
                 {
