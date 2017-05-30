@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -26,7 +27,7 @@ namespace BetterSprinklers
         private bool GridKeyHeldDown;
 
         private SprinklerModConfig Config;
-        private bool ExtraInfoActive; //deliberately public, so other mods can read it.
+        private bool ExtraInfoActive;
 
 
         /*********
@@ -41,19 +42,8 @@ namespace BetterSprinklers
             this.OldCraftingRecipes = null;
             this.OldObjectInfo = null;
             this.ExtraInfoActive = false;
-
-            // set up grids
-            this.ScarecrowGrid = new int[this.MaxGridSize, this.MaxGridSize];
-            int scarecrowCenterValue = this.MaxGridSize / 2;
-            Vector2 scarecrowCenter = new Vector2(scarecrowCenterValue, scarecrowCenterValue);
-            for (int x = 0; x < this.MaxGridSize; x++)
-            {
-                for (int y = 0; y < this.MaxGridSize; y++)
-                {
-                    Vector2 vector = new Vector2(x, y);
-                    this.ScarecrowGrid[x, y] = Vector2.Distance(vector, scarecrowCenter) < 9f ? 1 : 0;
-                }
-            }
+            this.ScarecrowGrid = this.GetScarecrowGrid();
+            this.BuildingPlacementTiles = Game1.content.Load<Texture2D>("LooseSprites\\buildingPlacementTiles");
 
             // set up events
             TimeEvents.DayOfMonthChanged += Event_ChangedDayOfMonth;
@@ -66,6 +56,84 @@ namespace BetterSprinklers
         /*********
         ** Private methods
         *********/
+        /****
+        ** Event handlers
+        ****/
+        /// <summary>The method called before the game draws the HUD.</summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event arguments.</param>
+        private void Event_PreRenderHud(object sender, EventArgs e)
+        {
+            if (Context.IsWorldReady && Game1.activeClickableMenu == null && Game1.CurrentEvent == null)
+                this.RenderHighlight();
+        }
+
+        /// <summary>The method called when the day-of-month value changes.</summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event arguments.</param>
+        private void Event_ChangedDayOfMonth(object sender, EventArgs e)
+        {
+            this.RunSprinklers();
+        }
+
+        /// <summary>The method called when the game is loaded.</summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event arguments.</param>
+        private void Event_LoadContent(object sender, EventArgs e)
+        {
+            this.UpdatePrices();
+        }
+
+        /// <summary>The method after the game updates its state (≈60 times per second).</summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event arguments.</param>
+        private void Event_UpdateTick(object sender, EventArgs e)
+        {
+            if (Game1.activeClickableMenu == null && Game1.CurrentEvent == null)
+            {
+                KeyboardState currentKeyboardState = Keyboard.GetState();
+                if (currentKeyboardState.IsKeyDown(this.Config.ConfigKey))
+                    Game1.activeClickableMenu = new SprinklerShapeEditMenu(this.Config, this.SaveChanges);
+                else if (currentKeyboardState.IsKeyDown(this.Config.HighlightKey))
+                {
+                    if (this.GridKeyHeldDown == false)
+                        this.ExtraInfoActive = !this.ExtraInfoActive;
+                    this.GridKeyHeldDown = true;
+                }
+                else
+                    this.GridKeyHeldDown = false;
+            }
+        }
+
+        /****
+        ** Methods
+        ****/
+        /// <summary>Get the scarecrow layout grid.</summary>
+        private int[,] GetScarecrowGrid()
+        {
+            int[,] grid = new int[this.MaxGridSize, this.MaxGridSize];
+            int scarecrowCenterValue = this.MaxGridSize / 2;
+            Vector2 scarecrowCenter = new Vector2(scarecrowCenterValue, scarecrowCenterValue);
+            for (int x = 0; x < this.MaxGridSize; x++)
+            {
+                for (int y = 0; y < this.MaxGridSize; y++)
+                {
+                    Vector2 vector = new Vector2(x, y);
+                    grid[x, y] = Vector2.Distance(vector, scarecrowCenter) < 9f ? 1 : 0;
+                }
+            }
+            return grid;
+        }
+
+        /// <summary>Save changes to the mod configuration.</summary>
+        private void SaveChanges()
+        {
+            this.Helper.WriteConfig(this.Config);
+            Game1.addHUDMessage(new HUDMessage("Sprinkler Configurations Saved", Color.Green, 3500f));
+            this.UpdatePrices();
+        }
+
+        /// <summary>Update the sprinkler crafting costs based on the current mod configuration.</summary>
         private void UpdatePrices()
         {
             if (this.OldCraftingRecipes == null)
@@ -87,7 +155,7 @@ namespace BetterSprinklers
                 {
                     infoSplit = craftingRecipe.Value.Split('/');
                     int sprinklerSheet = int.Parse(infoSplit[2]);
-                    int multiplier = Config.SprinklerPrices[sprinklerSheet];
+                    int multiplier = this.Config.SprinklerPrices[sprinklerSheet];
                     string[] ingredientsSplit = infoSplit[0].Split(' ');
                     for (int i = 1; i < ingredientsSplit.Length; i += 2)
                         ingredientsSplit[i] = (int.Parse(ingredientsSplit[i]) * multiplier).ToString();
@@ -101,9 +169,9 @@ namespace BetterSprinklers
             Dictionary<int, string> newObjectInfo = new Dictionary<int, string>();
             foreach (KeyValuePair<int, string> objectInfo in Game1.objectInformation)
             {
-                if (Config.SprinklerPrices.ContainsKey(objectInfo.Key))
+                if (this.Config.SprinklerPrices.ContainsKey(objectInfo.Key))
                 {
-                    int multiplier = Config.SprinklerPrices[objectInfo.Key];
+                    int multiplier = this.Config.SprinklerPrices[objectInfo.Key];
                     infoSplit = objectInfo.Value.Split('/');
                     infoSplit[1] = (int.Parse(infoSplit[1]) * multiplier).ToString();
                     newObjectInfo[objectInfo.Key] = string.Join("/", infoSplit);
@@ -116,82 +184,8 @@ namespace BetterSprinklers
             Game1.objectInformation = newObjectInfo;
         }
 
-        /// <summary>Save the current configuration settings.</summary>
-        private void SaveConfig()
-        {
-            this.Helper.WriteConfig(this.Config);
-        }
-
-        private void RenderSprinklerHighlight(int sprinklerID, Vector2 centerTile)
-        {
-            this.RenderHighlight(centerTile, this.Config.SprinklerShapes[sprinklerID]);
-        }
-
-        private void RenderScarecrowHighlight(Vector2 centerTile)
-        {
-            this.RenderHighlight(centerTile, this.ScarecrowGrid);
-        }
-
-        private void RenderHighlight(Vector2 centerTile, int[,] grid)
-        {
-            this.ForGridTiles(centerTile, grid, (tilePos, gridPos) =>
-            {
-                if (grid[(int)gridPos.X, (int)gridPos.Y] > 0)
-                    Game1.spriteBatch.Draw(this.BuildingPlacementTiles, Game1.GlobalToLocal(Game1.viewport, tilePos * Game1.tileSize), Game1.getSourceRectForStandardTileSheet(this.BuildingPlacementTiles, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.999f);
-            });
-        }
-
-        private void RenderGrid()
-        {
-            int startingX = -Game1.viewport.X % Game1.tileSize;
-            float startingY = -(float)Game1.viewport.Y % Game1.tileSize;
-            for (int x = startingX; x < Game1.graphics.GraphicsDevice.Viewport.Width; x += Game1.tileSize)
-                Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(x, (int)startingY, 1, Game1.graphics.GraphicsDevice.Viewport.Height), Config.GridColour);
-            for (float y = startingY; y < Game1.graphics.GraphicsDevice.Viewport.Height; y += Game1.tileSize)
-                Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(startingX, (int)y, Game1.graphics.GraphicsDevice.Viewport.Width, 1), Config.GridColour);
-        }
-
-        private void Event_PreRenderHud(object sender, EventArgs e)
-        {
-            if (this.BuildingPlacementTiles == null)
-                this.BuildingPlacementTiles = Game1.content.Load<Texture2D>("LooseSprites\\buildingPlacementTiles");
-
-            if (Game1.activeClickableMenu == null && Game1.CurrentEvent == null && Game1.gameMode == Game1.playingGameMode)
-            {
-                Vector2 mouseTile = new Vector2((Game1.viewport.X + Game1.getOldMouseX()) / Game1.tileSize, (Game1.viewport.Y + Game1.getOldMouseY()) / Game1.tileSize);
-
-                if (Game1.player.ActiveObject != null)
-                {
-                    if (Config.SprinklerShapes.ContainsKey(Game1.player.ActiveObject.parentSheetIndex))
-                    {
-                        this.RenderSprinklerHighlight(Game1.player.ActiveObject.parentSheetIndex, mouseTile);
-                        return; //don't want mess with people trying to place things.
-                    }
-
-                    if (Game1.player.ActiveObject.bigCraftable && Game1.player.ActiveObject.Name.Contains("arecrow"))
-                    {
-                        this.RenderScarecrowHighlight(mouseTile);
-                        return; //don't want to mess with people trying to place things.
-                    }
-                }
-
-                if (this.ExtraInfoActive)
-                {
-                    if (Game1.currentLocation.objects.ContainsKey(mouseTile))
-                    {
-                        SObject target = Game1.currentLocation.objects[mouseTile];
-                        if (Config.SprinklerShapes.ContainsKey(target.parentSheetIndex))
-                            this.RenderSprinklerHighlight(target.parentSheetIndex, mouseTile);
-                        else if (target.bigCraftable && target.Name.Contains("arecrow"))
-                            this.RenderScarecrowHighlight(mouseTile);
-                    }
-
-                    this.RenderGrid();
-                }
-            }
-        }
-
-        private void Event_ChangedDayOfMonth(object sender, EventArgs e)
+        /// <summary>Run all sprinklers.</summary>
+        private void RunSprinklers()
         {
             foreach (GameLocation location in Game1.locations)
             {
@@ -199,9 +193,9 @@ namespace BetterSprinklers
                 {
                     int targetID = objectPair.Value.parentSheetIndex;
                     Vector2 targetTile = objectPair.Key;
-                    if (Config.SprinklerShapes.ContainsKey(targetID))
+                    if (this.Config.SprinklerShapes.ContainsKey(targetID))
                     {
-                        int[,] grid = Config.SprinklerShapes[targetID];
+                        int[,] grid = this.Config.SprinklerShapes[targetID];
                         this.ForGridTiles(targetTile, grid, (tilePos, gridPos) =>
                         {
                             if (grid[(int)gridPos.X, (int)gridPos.Y] > 0 && location.terrainFeatures.TryGetValue(tilePos, out TerrainFeature terrainFeature) && terrainFeature is HoeDirt dirt)
@@ -212,35 +206,79 @@ namespace BetterSprinklers
             }
         }
 
-        private void Event_LoadContent(object sender, EventArgs e)
+        /// <summary>Highlight coverage for sprinklers and scarecrows based on the current context.</summary>
+        [SuppressMessage("ReSharper", "PossibleLossOfFraction", Justification = "The decimals are deliberately truncated during conversion to tile coordinates.")]
+        private void RenderHighlight()
         {
-            this.UpdatePrices();
+            // get context
+            Vector2 mouseTile = new Vector2((Game1.viewport.X + Game1.getOldMouseX()) / Game1.tileSize, (Game1.viewport.Y + Game1.getOldMouseY()) / Game1.tileSize);
+            SObject heldItem = Game1.player.ActiveObject;
+
+            // highlight coverage for held item
+            if (heldItem != null)
+            {
+                if (this.Config.SprinklerShapes.ContainsKey(heldItem.parentSheetIndex))
+                {
+                    this.RenderSprinklerHighlight(heldItem.parentSheetIndex, mouseTile);
+                    return;
+                }
+                if (heldItem.bigCraftable && heldItem.Name.Contains("arecrow"))
+                {
+                    this.RenderScarecrowHighlight(mouseTile);
+                    return;
+                }
+            }
+
+            // highlight coverage for item under cursor
+            if (this.ExtraInfoActive)
+            {
+                if (Game1.currentLocation.objects.TryGetValue(mouseTile, out SObject target))
+                {
+                    if (this.Config.SprinklerShapes.ContainsKey(target.parentSheetIndex))
+                        this.RenderSprinklerHighlight(target.parentSheetIndex, mouseTile);
+                    else if (target.bigCraftable && target.Name.Contains("arecrow"))
+                        this.RenderScarecrowHighlight(mouseTile);
+                }
+                this.RenderGrid();
+            }
         }
 
-        private void Event_UpdateTick(object sender, EventArgs e)
+        /// <summary>Highlight coverage for a sprinkler.</summary>
+        /// <param name="sprinklerID">The sprinkler ID.</param>
+        /// <param name="tile">The sprinkler tile.</param>
+        private void RenderSprinklerHighlight(int sprinklerID, Vector2 tile)
         {
-            if (Game1.activeClickableMenu == null && Game1.CurrentEvent == null)
-            {
-                KeyboardState currentKeyboardState = Keyboard.GetState();
-                if (currentKeyboardState.IsKeyDown(this.Config.ConfigKey))
-                {
-                    Game1.activeClickableMenu = new SprinklerShapeEditMenu(this.Config, () =>
-                    {
-                        this.SaveConfig();
-                        Game1.addHUDMessage(new HUDMessage("Sprinkler Configurations Saved", Color.Green, 3500f));
-                        this.UpdatePrices();
-                    });
-                }
+            this.RenderHighlight(tile, this.Config.SprinklerShapes[sprinklerID]);
+        }
 
-                if (currentKeyboardState.IsKeyDown(this.Config.HighlightKey))
-                {
-                    if (GridKeyHeldDown == false)
-                        this.ExtraInfoActive = !this.ExtraInfoActive;
-                    this.GridKeyHeldDown = true;
-                }
-                else
-                    this.GridKeyHeldDown = false;
-            }
+        /// <summary>Highlight coverage for a scarecrow.</summary>
+        /// <param name="tile">The scarecrow tile.</param>
+        private void RenderScarecrowHighlight(Vector2 tile)
+        {
+            this.RenderHighlight(tile, this.ScarecrowGrid);
+        }
+
+        /// <summary>Highlight coverage based on a given grid.</summary>
+        /// <param name="centerTile">The tile at the center of the grid.</param>
+        /// <param name="grid">The grid indicating which tiles to highlight.</param>
+        private void RenderHighlight(Vector2 centerTile, int[,] grid)
+        {
+            this.ForGridTiles(centerTile, grid, (tilePos, gridPos) =>
+            {
+                if (grid[(int)gridPos.X, (int)gridPos.Y] > 0)
+                    Game1.spriteBatch.Draw(this.BuildingPlacementTiles, Game1.GlobalToLocal(Game1.viewport, tilePos * Game1.tileSize), Game1.getSourceRectForStandardTileSheet(this.BuildingPlacementTiles, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.999f);
+            });
+        }
+
+        /// <summary>Render a grid showing the tile layout.</summary>
+        private void RenderGrid()
+        {
+            int startingX = -Game1.viewport.X % Game1.tileSize;
+            float startingY = -(float)Game1.viewport.Y % Game1.tileSize;
+            for (int x = startingX; x < Game1.graphics.GraphicsDevice.Viewport.Width; x += Game1.tileSize)
+                Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(x, (int)startingY, 1, Game1.graphics.GraphicsDevice.Viewport.Height), this.Config.GridColour);
+            for (float y = startingY; y < Game1.graphics.GraphicsDevice.Viewport.Height; y += Game1.tileSize)
+                Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(startingX, (int)y, Game1.graphics.GraphicsDevice.Viewport.Width, 1), this.Config.GridColour);
         }
 
         /// <summary>Get a tile grid centered on the given tile position.</summary>
