@@ -44,10 +44,10 @@ namespace BetterSprinklers
             this.ExtraInfoActive = false;
             this.ScarecrowGrid = this.GetScarecrowGrid();
             this.BuildingPlacementTiles = Game1.content.Load<Texture2D>("LooseSprites\\buildingPlacementTiles");
+            this.UpdatePrices();
 
             // set up events
             TimeEvents.DayOfMonthChanged += Event_ChangedDayOfMonth;
-            GameEvents.LoadContent += Event_LoadContent;
             GameEvents.UpdateTick += Event_UpdateTick;
             GraphicsEvents.OnPreRenderHudEvent += Event_PreRenderHud;
         }
@@ -74,14 +74,6 @@ namespace BetterSprinklers
         private void Event_ChangedDayOfMonth(object sender, EventArgs e)
         {
             this.RunSprinklers();
-        }
-
-        /// <summary>The method called when the game is loaded.</summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="e">The event arguments.</param>
-        private void Event_LoadContent(object sender, EventArgs e)
-        {
-            this.UpdatePrices();
         }
 
         /// <summary>The method after the game updates its state (≈60 times per second).</summary>
