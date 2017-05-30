@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -40,9 +41,8 @@ namespace BetterSprinklers
         {
             // initialise
             this.Config = helper.ReadConfig<SprinklerModConfig>();
-            this.OldCraftingRecipes = null;
-            this.OldObjectInfo = null;
-            this.ShowInfoOverlay = false;
+            this.OldCraftingRecipes = CraftingRecipe.craftingRecipes;
+            this.OldObjectInfo = Game1.objectInformation;
             this.ScarecrowGrid = this.GetScarecrowGrid();
             this.BuildingPlacementTiles = Game1.content.Load<Texture2D>("LooseSprites\\buildingPlacementTiles");
             this.UpdatePrices();
@@ -125,52 +125,43 @@ namespace BetterSprinklers
         /// <summary>Update the sprinkler crafting costs based on the current mod configuration.</summary>
         private void UpdatePrices()
         {
-            if (this.OldCraftingRecipes == null)
+            // reset game data
+            CraftingRecipe.craftingRecipes = this.OldCraftingRecipes;
+            Game1.objectInformation = OldObjectInfo;
+
+            // recalculate sprinkler crafting resources
+            foreach (string recipeKey in CraftingRecipe.craftingRecipes.Keys.ToArray())
             {
-                this.OldCraftingRecipes = CraftingRecipe.craftingRecipes;
-                OldObjectInfo = Game1.objectInformation;
-            }
-            else
-            {
-                CraftingRecipe.craftingRecipes = this.OldCraftingRecipes;
-                Game1.objectInformation = OldObjectInfo;
+                if (!recipeKey.Contains("prinkler"))
+                    continue;
+
+                // multiply resource costs
+                string[] fields = CraftingRecipe.craftingRecipes[recipeKey].Split('/');
+                int sprinklerID = int.Parse(fields[2]);
+                string[] ingredients = fields[0].Split(' ');
+                int multiplier = this.Config.SprinklerPrices[sprinklerID];
+                for (int i = 1; i < ingredients.Length; i += 2)
+                    ingredients[i] = (int.Parse(ingredients[i]) * multiplier).ToString();
+                fields[0] = string.Join(" ", ingredients);
+
+                // update game data
+                CraftingRecipe.craftingRecipes[recipeKey] = string.Join("/", fields);
             }
 
-            var newCraftingRecipes = new Dictionary<string, string>();
-            string[] infoSplit;
-            foreach (KeyValuePair<string, string> craftingRecipe in CraftingRecipe.craftingRecipes)
+            // recalculate sale price
+            foreach (int itemID in Game1.objectInformation.Keys.ToArray())
             {
-                if (craftingRecipe.Key.Contains("prinkler"))
-                {
-                    infoSplit = craftingRecipe.Value.Split('/');
-                    int sprinklerSheet = int.Parse(infoSplit[2]);
-                    int multiplier = this.Config.SprinklerPrices[sprinklerSheet];
-                    string[] ingredientsSplit = infoSplit[0].Split(' ');
-                    for (int i = 1; i < ingredientsSplit.Length; i += 2)
-                        ingredientsSplit[i] = (int.Parse(ingredientsSplit[i]) * multiplier).ToString();
-                    infoSplit[0] = string.Join(" ", ingredientsSplit);
-                    newCraftingRecipes[craftingRecipe.Key] = string.Join("/", infoSplit);
-                }
-                else
-                    newCraftingRecipes[craftingRecipe.Key] = craftingRecipe.Value;
-            }
+                if (!this.Config.SprinklerPrices.ContainsKey(itemID))
+                    continue;
 
-            Dictionary<int, string> newObjectInfo = new Dictionary<int, string>();
-            foreach (KeyValuePair<int, string> objectInfo in Game1.objectInformation)
-            {
-                if (this.Config.SprinklerPrices.ContainsKey(objectInfo.Key))
-                {
-                    int multiplier = this.Config.SprinklerPrices[objectInfo.Key];
-                    infoSplit = objectInfo.Value.Split('/');
-                    infoSplit[1] = (int.Parse(infoSplit[1]) * multiplier).ToString();
-                    newObjectInfo[objectInfo.Key] = string.Join("/", infoSplit);
-                }
-                else
-                    newObjectInfo[objectInfo.Key] = objectInfo.Value;
-            }
+                // multiply cost
+                int multiplier = this.Config.SprinklerPrices[itemID];
+                string[] fields = Game1.objectInformation[itemID].Split('/');
+                fields[1] = (int.Parse(fields[1]) * multiplier).ToString();
 
-            CraftingRecipe.craftingRecipes = newCraftingRecipes;
-            Game1.objectInformation = newObjectInfo;
+                // update game data
+                Game1.objectInformation[itemID] = string.Join("/", fields);
+            }
         }
 
         /// <summary>Run all sprinklers.</summary>
