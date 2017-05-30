@@ -48,9 +48,9 @@ namespace BetterSprinklers
             this.UpdatePrices();
 
             // set up events
-            TimeEvents.DayOfMonthChanged += Event_ChangedDayOfMonth;
-            GraphicsEvents.OnPreRenderHudEvent += Event_PreRenderHud;
-            ControlEvents.KeyPressed += Event_OnKeyPressed;
+            TimeEvents.AfterDayStarted += this.Event_AfterDayStarted;
+            GraphicsEvents.OnPreRenderHudEvent += this.Event_PreRenderHud;
+            ControlEvents.KeyPressed += this.Event_OnKeyPressed;
         }
 
 
@@ -69,10 +69,10 @@ namespace BetterSprinklers
                 this.RenderHighlight();
         }
 
-        /// <summary>The method called when the day-of-month value changes.</summary>
+        /// <summary>The method called when a new day starts.</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event arguments.</param>
-        private void Event_ChangedDayOfMonth(object sender, EventArgs e)
+        private void Event_AfterDayStarted(object sender, EventArgs e)
         {
             this.RunSprinklers();
         }
