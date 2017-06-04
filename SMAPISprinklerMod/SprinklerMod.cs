@@ -41,8 +41,8 @@ namespace BetterSprinklers
         {
             // initialise
             this.Config = helper.ReadConfig<SprinklerModConfig>();
-            this.OldCraftingRecipes = CraftingRecipe.craftingRecipes;
-            this.OldObjectInfo = Game1.objectInformation;
+            this.OldCraftingRecipes = new Dictionary<string, string>(CraftingRecipe.craftingRecipes);
+            this.OldObjectInfo = new Dictionary<int, string>(Game1.objectInformation);
             this.ScarecrowGrid = this.GetScarecrowGrid();
             this.BuildingPlacementTiles = Game1.content.Load<Texture2D>("LooseSprites\\buildingPlacementTiles");
             this.UpdatePrices();
@@ -126,8 +126,8 @@ namespace BetterSprinklers
         private void UpdatePrices()
         {
             // reset game data
-            CraftingRecipe.craftingRecipes = this.OldCraftingRecipes;
-            Game1.objectInformation = OldObjectInfo;
+            CraftingRecipe.craftingRecipes = new Dictionary<string, string>(this.OldCraftingRecipes);
+            Game1.objectInformation = new Dictionary<int, string>(this.OldObjectInfo);
 
             // recalculate sprinkler crafting resources
             foreach (string recipeKey in CraftingRecipe.craftingRecipes.Keys.ToArray())
