@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using BetterSprinklers.Framework;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -51,6 +52,12 @@ namespace BetterSprinklers
             TimeEvents.AfterDayStarted += this.Event_AfterDayStarted;
             GraphicsEvents.OnPreRenderHudEvent += this.Event_PreRenderHud;
             ControlEvents.KeyPressed += this.Event_OnKeyPressed;
+        }
+
+        /// <summary>Get an API that other mods can access. This is always called after <see cref="Entry" />.</summary>
+        public override object GetApi()
+        {
+            return new BetterSprinklersApi(this.Helper, this.MaxGridSize);
         }
 
 
@@ -176,9 +183,9 @@ namespace BetterSprinklers
                     if (this.Config.SprinklerShapes.ContainsKey(targetID))
                     {
                         int[,] grid = this.Config.SprinklerShapes[targetID];
-                        this.ForGridTiles(targetTile, grid, (tilePos, gridPos) =>
+                        GridHelper.ForCoveredTiles(targetTile, grid, tilePos =>
                         {
-                            if (grid[(int)gridPos.X, (int)gridPos.Y] > 0 && location.terrainFeatures.TryGetValue(tilePos, out TerrainFeature terrainFeature) && terrainFeature is HoeDirt dirt)
+                            if (location.terrainFeatures.TryGetValue(tilePos, out TerrainFeature terrainFeature) && terrainFeature is HoeDirt dirt)
                                 dirt.state = 1;
                         });
                     }
@@ -243,10 +250,9 @@ namespace BetterSprinklers
         /// <param name="grid">The grid indicating which tiles to highlight.</param>
         private void RenderHighlight(Vector2 centerTile, int[,] grid)
         {
-            this.ForGridTiles(centerTile, grid, (tilePos, gridPos) =>
+            GridHelper.ForCoveredTiles(centerTile, grid, tilePos =>
             {
-                if (grid[(int)gridPos.X, (int)gridPos.Y] > 0)
-                    Game1.spriteBatch.Draw(this.BuildingPlacementTiles, Game1.GlobalToLocal(Game1.viewport, tilePos * Game1.tileSize), Game1.getSourceRectForStandardTileSheet(this.BuildingPlacementTiles, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.999f);
+                Game1.spriteBatch.Draw(this.BuildingPlacementTiles, Game1.GlobalToLocal(Game1.viewport, tilePos * Game1.tileSize), Game1.getSourceRectForStandardTileSheet(this.BuildingPlacementTiles, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.999f);
             });
         }
 
@@ -259,26 +265,6 @@ namespace BetterSprinklers
                 Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(x, (int)startingY, 1, Game1.graphics.GraphicsDevice.Viewport.Height), this.Config.GridColour);
             for (float y = startingY; y < Game1.graphics.GraphicsDevice.Viewport.Height; y += Game1.tileSize)
                 Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(startingX, (int)y, Game1.graphics.GraphicsDevice.Viewport.Width, 1), this.Config.GridColour);
-        }
-
-        /// <summary>Get a tile grid centered on the given tile position.</summary>
-        /// <param name="centerTile">The center tile position.</param>
-        /// <param name="grid">The grid to get.</param>
-        /// <param name="perform">The action to perform for each tile, given the tile position and grid position.</param>
-        private void ForGridTiles(Vector2 centerTile, int[,] grid, Action<Vector2, Vector2> perform)
-        {
-            int arrayHalfSizeX = grid.GetLength(0) / 2;
-            int arrayHalfSizeY = grid.GetLength(1) / 2;
-            int minX = (int)centerTile.X - arrayHalfSizeX;
-            int minY = (int)centerTile.Y - arrayHalfSizeY;
-            int maxX = (int)centerTile.X + arrayHalfSizeX;
-            int maxY = (int)centerTile.Y + arrayHalfSizeY;
-
-            for (int gridX = 0, x = minX; x <= maxX; x++, gridX++)
-            {
-                for (int gridY = 0, y = minY; y <= maxY; y++, gridY++)
-                    perform(new Vector2(x, y), new Vector2(gridX, gridY));
-            }
         }
     }
 }

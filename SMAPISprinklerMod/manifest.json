@@ -2,7 +2,7 @@
   "Name": "Better Sprinklers",
   "Author": "Maurício Gomes (Speeder)",
   "Version": "2.4",
-  "MinimumApiVersion": "2.0",
+  "MinimumApiVersion": "2.3",
   "UniqueID": "Speeder.BetterSprinklers",
   "Description": "Make the Sprinklers work better.",
   "EntryDll": "SMAPISprinklerMod.dll"

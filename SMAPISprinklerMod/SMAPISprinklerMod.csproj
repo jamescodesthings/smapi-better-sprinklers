@@ -36,10 +36,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Framework\BetterSprinklersApi.cs" />
+    <Compile Include="Framework\GridHelper.cs" />
+    <Compile Include="IBetterSprinklersApi.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="SprinklerMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SprinklerShapeEditMenu.cs" />
+    <Compile Include="Framework\SprinklerShapeEditMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="manifest.json">

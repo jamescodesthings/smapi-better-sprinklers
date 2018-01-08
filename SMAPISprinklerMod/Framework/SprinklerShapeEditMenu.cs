@@ -6,7 +6,7 @@ using StardewValley;
 using StardewValley.Menus;
 using Object = StardewValley.Object;
 
-namespace BetterSprinklers
+namespace BetterSprinklers.Framework
 {
     internal class SprinklerShapeEditMenu : IClickableMenu
     {
@@ -70,7 +70,7 @@ namespace BetterSprinklers
             int menuHeight = this.MaxArraySize * this.DefaultTileSize + this.MinTopMargin * 2;
             int menuX = Game1.viewport.Width / 2 - menuWidth / 2;
             int menuY = Game1.viewport.Height / 2 - menuHeight / 2;
-            initialize(menuX, menuY, menuWidth, menuHeight, true);
+            this.initialize(menuX, menuY, menuWidth, menuHeight, true);
 
             this.Tabs = new List<ClickableComponent>();
             int tabWidth = this.TabItemWidth + this.TabLeftMargin + this.TabRightMargin;
@@ -79,7 +79,7 @@ namespace BetterSprinklers
             this.Tabs.Add(new ClickableComponent(new Rectangle(menuX - this.TabDistanceFromMenu - tabWidth, this.Tabs[0].bounds.Y + tabHeight + this.TabDistanceVerticalBetweenTabs, tabWidth, tabHeight), new Object(Vector2.Zero, 621)));
             this.Tabs.Add(new ClickableComponent(new Rectangle(menuX - this.TabDistanceFromMenu - tabWidth, this.Tabs[1].bounds.Y + tabHeight + this.TabDistanceVerticalBetweenTabs, tabWidth, tabHeight), new Object(Vector2.Zero, 645)));
 
-            this.OkButton = new ClickableTextureComponent("save-changes", new Rectangle(xPositionOnScreen + width - Game1.tileSize / 2, yPositionOnScreen + height - Game1.tileSize / 2, Game1.tileSize, Game1.tileSize), "", "Save Changes", Game1.mouseCursors, new Rectangle(128, 256, 64, 64), 1f);
+            this.OkButton = new ClickableTextureComponent("save-changes", new Rectangle(this.xPositionOnScreen + this.width - Game1.tileSize / 2, this.yPositionOnScreen + this.height - Game1.tileSize / 2, Game1.tileSize, Game1.tileSize), "", "Save Changes", Game1.mouseCursors, new Rectangle(128, 256, 64, 64), 1f);
 
             this.WhitePixel = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
             this.WhitePixel.SetData(new[] { Color.White });
@@ -95,7 +95,7 @@ namespace BetterSprinklers
                 Game1.spriteBatch.Draw(Game1.objectSpriteSheet, new Rectangle(tab.bounds.X + this.TabLeftMargin, tab.bounds.Y + this.TabVerticalMargins, this.TabItemWidth, this.TabItemHeight), Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, tab.item.parentSheetIndex, 16, 16), Color.White);
             }
 
-            IClickableMenu.drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), xPositionOnScreen, yPositionOnScreen, width, height, Color.White);
+            IClickableMenu.drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, Color.White);
 
             //draw our grid
             int countX = 0;
@@ -104,8 +104,8 @@ namespace BetterSprinklers
 
             if (this.HoveredItemX > -1 && this.HoveredItemY > -1)
             {
-                x = xPositionOnScreen + this.LeftMargin + this.HoveredItemX * this.TileSize;
-                y = yPositionOnScreen + this.TopMargin + this.HoveredItemY * this.TileSize;
+                x = this.xPositionOnScreen + this.LeftMargin + this.HoveredItemX * this.TileSize;
+                y = this.yPositionOnScreen + this.TopMargin + this.HoveredItemY * this.TileSize;
                 Game1.spriteBatch.Draw(this.WhitePixel, new Rectangle(x, y, this.TileSize, this.TileSize), Color.AntiqueWhite);
             }
 
@@ -114,16 +114,16 @@ namespace BetterSprinklers
                 int countY = 0;
                 while (countY < this.ArraySize)
                 {
-                    x = xPositionOnScreen + this.LeftMargin + this.Padding + countX * this.TileSize;
-                    y = yPositionOnScreen + this.TopMargin + this.Padding + countY * this.TileSize;
+                    x = this.xPositionOnScreen + this.LeftMargin + this.Padding + countX * this.TileSize;
+                    y = this.yPositionOnScreen + this.TopMargin + this.Padding + countY * this.TileSize;
                     Game1.spriteBatch.Draw(this.WhitePixel, new Rectangle(x, y, this.TileSize - this.Padding * 2, this.TileSize - this.Padding * 2), this.Colors[this.SprinklerGrid[countX, countY]]);
                     ++countY;
                 }
                 ++countX;
             }
 
-            x = xPositionOnScreen + this.LeftMargin + this.Padding + this.CenterTile * this.TileSize;
-            y = yPositionOnScreen + this.TopMargin + this.Padding + this.CenterTile * this.TileSize;
+            x = this.xPositionOnScreen + this.LeftMargin + this.Padding + this.CenterTile * this.TileSize;
+            y = this.yPositionOnScreen + this.TopMargin + this.Padding + this.CenterTile * this.TileSize;
             Game1.spriteBatch.Draw(Game1.objectSpriteSheet, new Rectangle(x, y, this.TileSize - this.Padding * 2, this.TileSize - this.Padding * 2), Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, this.ActiveSprinklerSheet, 16, 16), Color.White);
             this.OkButton.draw(Game1.spriteBatch);
 
@@ -136,8 +136,8 @@ namespace BetterSprinklers
         {
             base.update(time);
 
-            int mouseGridRelX = Game1.getOldMouseX() - xPositionOnScreen - this.LeftMargin - this.Padding;
-            int mouseGridRelY = Game1.getOldMouseY() - yPositionOnScreen - this.TopMargin - this.Padding;
+            int mouseGridRelX = Game1.getOldMouseX() - this.xPositionOnScreen - this.LeftMargin - this.Padding;
+            int mouseGridRelY = Game1.getOldMouseY() - this.yPositionOnScreen - this.TopMargin - this.Padding;
 
             if (mouseGridRelX > 0 && mouseGridRelY > 0 && mouseGridRelX < this.ArraySize * this.TileSize - this.Padding && mouseGridRelY < this.ArraySize * this.TileSize - this.Padding)
             {
@@ -157,8 +157,8 @@ namespace BetterSprinklers
         {
             base.receiveLeftClick(x, y, playSound);
 
-            int mouseGridRelX = x - xPositionOnScreen - this.LeftMargin - this.Padding;
-            int mouseGridRelY = y - yPositionOnScreen - this.TopMargin - this.Padding;
+            int mouseGridRelX = x - this.xPositionOnScreen - this.LeftMargin - this.Padding;
+            int mouseGridRelY = y - this.yPositionOnScreen - this.TopMargin - this.Padding;
 
             if (mouseGridRelX > 0 && mouseGridRelY > 0 && mouseGridRelX < this.ArraySize * this.TileSize - this.Padding && mouseGridRelY < this.ArraySize * this.TileSize - this.Padding)
             {
@@ -255,8 +255,8 @@ namespace BetterSprinklers
                     break;
             }
 
-            this.LeftMargin = (width - (this.ArraySize * this.TileSize)) / 2;
-            this.TopMargin = (height - (this.ArraySize * this.TileSize)) / 2;
+            this.LeftMargin = (this.width - (this.ArraySize * this.TileSize)) / 2;
+            this.TopMargin = (this.height - (this.ArraySize * this.TileSize)) / 2;
         }
     }
 }

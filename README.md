@@ -35,7 +35,8 @@ Compatible with Stardew Valley 1.2+ on Linux, Mac, and Windows.
 
 ## Versions
 ### 2.4
-- Updated for Stardew Valley 1.2 and SMAPI 1.13.
+- Updated for Stardew Valley 1.2 and SMAPI 2.0+.
+- Added mod-provided API to let other mods access the custom sprinkler coverage.
 
 ### 2.3
 - Corrected forum thread link, and default config minor error.
