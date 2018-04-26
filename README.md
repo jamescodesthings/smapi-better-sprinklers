@@ -22,14 +22,14 @@ Compatible with Stardew Valley 1.2+ on Linux, Mac, and Windows.
   Press "OK" when you're done, and the mod will automatically adjust the crafting and purchase cost
   for balance.
 
-  > ![](screenshot.png)
-  > ![](circle.png)
-  > ![](butterfly.png)
+  > ![](docs/screenshot.png)
+  > ![](docs/circle.png)
+  > ![](docs/butterfly.png)
 
 * When placing a sprinkler or scarecrow, its coverage will be highlighted automatically. You can also
   press `F3` and point at a sprinkler or scarecrow to highlight its coverage.
 
-  > ![](scarecrowarea.png)
+  > ![](docs/scarecrowarea.png)
 
 * The sprinklers activate in the morning when the day starts.
 
@@ -59,6 +59,6 @@ Compatible with Stardew Valley 1.2+ on Linux, Mac, and Windows.
 - Sprinklers now work on all farmable areas, including greenhouses and anything added by mods.
 
 ## See also
-* [![Patreon](ipatreon.png)](https://patreon.com/user?u=3066937)
+* [![Patreon](docs/ipatreon.png)](https://patreon.com/user?u=3066937)
 * [Nexus page](http://www.nexusmods.com/stardewvalley/mods/41)
 * [Discussion thread](http://community.playstarbound.com/threads/configurable-improved-sprinklers-scarecrow-and-sprinklers-area-highlights.112443/)

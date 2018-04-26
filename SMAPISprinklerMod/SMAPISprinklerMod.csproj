@@ -66,11 +66,11 @@
     <Copy SourceFiles="$(TargetDir)\$(TargetName).pdb" DestinationFolder="$(ModPath)" Condition="Exists('$(TargetDir)\$(TargetName).pdb')" />
     <Copy SourceFiles="$(TargetDir)\$(TargetName).dll.mdb" DestinationFolder="$(ModPath)" Condition="Exists('$(TargetDir)\$(TargetName).dll.mdb')" />
     <Copy SourceFiles="$(ProjectDir)\manifest.json" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(SolutionDir)\butterfly.png" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(SolutionDir)\circle.png" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(SolutionDir)\ipatreon.png" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(SolutionDir)\scarecrowarea.png" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(SolutionDir)\screenshot.png" DestinationFolder="$(ModPath)" />
-    <Exec Command="&quot;$(SolutionDir)\multimarkdown.exe&quot; &quot;$(SolutionDir)\README.md&quot; &gt; &quot;$(ModPath)\readme.html&quot;" />
+    <Copy SourceFiles="$(SolutionDir)\docs\butterfly.png" DestinationFolder="$(ModPath)\docs" />
+    <Copy SourceFiles="$(SolutionDir)\docs\circle.png" DestinationFolder="$(ModPath)\docs" />
+    <Copy SourceFiles="$(SolutionDir)\docs\ipatreon.png" DestinationFolder="$(ModPath)\docs" />
+    <Copy SourceFiles="$(SolutionDir)\docs\scarecrowarea.png" DestinationFolder="$(ModPath)\docs" />
+    <Copy SourceFiles="$(SolutionDir)\docs\screenshot.png" DestinationFolder="$(ModPath)\docs" />
+    <Exec Command="&quot;$(SolutionDir)\docs\multimarkdown.exe&quot; &quot;$(SolutionDir)\README.md&quot; &gt; &quot;$(ModPath)\readme.html&quot;" />
   </Target>
 </Project>
