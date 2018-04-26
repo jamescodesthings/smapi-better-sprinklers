@@ -11,8 +11,6 @@
     <AssemblyName>SMAPISprinklerMod</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <EnableModDeploy>False</EnableModDeploy>
-    <EnableModZip>False</EnableModZip>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -26,7 +24,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\SMAPISprinklerMod\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -45,9 +43,7 @@
     <Compile Include="Framework\SprinklerShapeEditMenu.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="manifest.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -57,20 +53,5 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.2\build\Pathoschild.Stardew.ModBuildConfig.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.2\build\Pathoschild.Stardew.ModBuildConfig.targets'))" />
-  </Target>
-  <Target Name="AfterBuild">
-    <PropertyGroup>
-      <ModPath>$(GamePath)\Mods\SMAPISprinklerMod</ModPath>
-    </PropertyGroup>
-    <Copy SourceFiles="$(TargetDir)\$(TargetName).dll" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(TargetDir)\$(TargetName).pdb" DestinationFolder="$(ModPath)" Condition="Exists('$(TargetDir)\$(TargetName).pdb')" />
-    <Copy SourceFiles="$(TargetDir)\$(TargetName).dll.mdb" DestinationFolder="$(ModPath)" Condition="Exists('$(TargetDir)\$(TargetName).dll.mdb')" />
-    <Copy SourceFiles="$(ProjectDir)\manifest.json" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(SolutionDir)\docs\butterfly.png" DestinationFolder="$(ModPath)\docs" />
-    <Copy SourceFiles="$(SolutionDir)\docs\circle.png" DestinationFolder="$(ModPath)\docs" />
-    <Copy SourceFiles="$(SolutionDir)\docs\ipatreon.png" DestinationFolder="$(ModPath)\docs" />
-    <Copy SourceFiles="$(SolutionDir)\docs\scarecrowarea.png" DestinationFolder="$(ModPath)\docs" />
-    <Copy SourceFiles="$(SolutionDir)\docs\screenshot.png" DestinationFolder="$(ModPath)\docs" />
-    <Exec Command="&quot;$(SolutionDir)\docs\multimarkdown.exe&quot; &quot;$(SolutionDir)\README.md&quot; &gt; &quot;$(ModPath)\readme.html&quot;" />
   </Target>
 </Project>
