@@ -2,20 +2,19 @@
 mod which lets you edit sprinkler coverage (while adjusting their crafting cost), and lets you view
 a sprinkler's or scarecrow's coverage by pointing at it in `F3` mode.
 
-Compatible with Stardew Valley 1.2+ on Linux, Mac, and Windows.
-
 ## Contents
-* [Installation](#installation)
-* [Usage](#usage)
+* [Install](#install)
+* [Use](#use)
+* [Compatibility](#compatibility)
 * [Versions](#versions)
 * [See also](#see-also)
 
-## Installation
+## Install
 1. [Install the latest version of SMAPI](https://github.com/Pathoschild/SMAPI/releases).
 3. Unzip [the mod files](http://www.nexusmods.com/stardewvalley/mods/41) into your `Mods` folder.
 4. Run the game using SMAPI.
 
-## Usage
+## Use
 ### Editing sprinkler coverage
 * Press `K` (editable in `config.json`) to show a sprinkler coverage editor and click the squares
   to set the coverage. You can use any shape you want, though you can't remove the default squares.
@@ -33,9 +32,14 @@ Compatible with Stardew Valley 1.2+ on Linux, Mac, and Windows.
 
 * The sprinklers activate in the morning when the day starts.
 
+## Compatibility
+Better Sprinklers is compatible with Stardew Valley 1.3+ on Linux/Mac/Windows, both single-player and multiplayer.
+
+If two players have the mod installed in multiplayer, both ranges will apply.
+
 ## Versions
 ### 2.4
-- Updated for Stardew Valley 1.2 and SMAPI 2.0+.
+- Updated for Stardew Valley 1.3 and SMAPI 2.6 (including multiplayer support).
 - Added mod-provided API to let other mods access the custom sprinkler coverage.
 
 ### 2.3

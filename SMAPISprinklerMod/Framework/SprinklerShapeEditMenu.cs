@@ -92,7 +92,7 @@ namespace BetterSprinklers.Framework
             foreach (ClickableComponent tab in this.Tabs)
             {
                 IClickableMenu.drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), tab.bounds.X, tab.bounds.Y, tab.bounds.Width, tab.bounds.Height, Color.White);
-                Game1.spriteBatch.Draw(Game1.objectSpriteSheet, new Rectangle(tab.bounds.X + this.TabLeftMargin, tab.bounds.Y + this.TabVerticalMargins, this.TabItemWidth, this.TabItemHeight), Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, tab.item.parentSheetIndex, 16, 16), Color.White);
+                Game1.spriteBatch.Draw(Game1.objectSpriteSheet, new Rectangle(tab.bounds.X + this.TabLeftMargin, tab.bounds.Y + this.TabVerticalMargins, this.TabItemWidth, this.TabItemHeight), Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, tab.item.ParentSheetIndex, 16, 16), Color.White);
             }
 
             IClickableMenu.drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, Color.White);
@@ -180,7 +180,7 @@ namespace BetterSprinklers.Framework
                     if (tab.containsPoint(x, y))
                     {
                         Game1.playSound("select");
-                        this.SetActiveSprinklerSheetIndex(tab.item.parentSheetIndex);
+                        this.SetActiveSprinklerSheetIndex(tab.item.ParentSheetIndex);
                     }
                 }
 

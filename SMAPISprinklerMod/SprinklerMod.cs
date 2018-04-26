@@ -176,9 +176,9 @@ namespace BetterSprinklers
         {
             foreach (GameLocation location in Game1.locations)
             {
-                foreach (KeyValuePair<Vector2, SObject> objectPair in location.objects)
+                foreach (KeyValuePair<Vector2, SObject> objectPair in location.objects.Pairs)
                 {
-                    int targetID = objectPair.Value.parentSheetIndex;
+                    int targetID = objectPair.Value.ParentSheetIndex;
                     Vector2 targetTile = objectPair.Key;
                     if (this.Config.SprinklerShapes.ContainsKey(targetID))
                     {
@@ -186,7 +186,7 @@ namespace BetterSprinklers
                         GridHelper.ForCoveredTiles(targetTile, grid, tilePos =>
                         {
                             if (location.terrainFeatures.TryGetValue(tilePos, out TerrainFeature terrainFeature) && terrainFeature is HoeDirt dirt)
-                                dirt.state = 1;
+                                dirt.state.Value = 1;
                         });
                     }
                 }
@@ -204,12 +204,12 @@ namespace BetterSprinklers
             // highlight coverage for held item
             if (heldItem != null)
             {
-                if (this.Config.SprinklerShapes.ContainsKey(heldItem.parentSheetIndex))
+                if (this.Config.SprinklerShapes.ContainsKey(heldItem.ParentSheetIndex))
                 {
-                    this.RenderSprinklerHighlight(heldItem.parentSheetIndex, mouseTile);
+                    this.RenderSprinklerHighlight(heldItem.ParentSheetIndex, mouseTile);
                     return;
                 }
-                if (heldItem.bigCraftable && heldItem.Name.Contains("arecrow"))
+                if (heldItem.bigCraftable.Value && heldItem.Name.Contains("arecrow"))
                 {
                     this.RenderScarecrowHighlight(mouseTile);
                     return;
@@ -221,9 +221,9 @@ namespace BetterSprinklers
             {
                 if (Game1.currentLocation.objects.TryGetValue(mouseTile, out SObject target))
                 {
-                    if (this.Config.SprinklerShapes.ContainsKey(target.parentSheetIndex))
-                        this.RenderSprinklerHighlight(target.parentSheetIndex, mouseTile);
-                    else if (target.bigCraftable && target.Name.Contains("arecrow"))
+                    if (this.Config.SprinklerShapes.ContainsKey(target.ParentSheetIndex))
+                        this.RenderSprinklerHighlight(target.ParentSheetIndex, mouseTile);
+                    else if (target.bigCraftable.Value && target.Name.Contains("arecrow"))
                         this.RenderScarecrowHighlight(mouseTile);
                 }
                 this.RenderGrid();
