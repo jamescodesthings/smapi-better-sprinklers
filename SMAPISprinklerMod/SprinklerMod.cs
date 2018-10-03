@@ -57,7 +57,7 @@ namespace BetterSprinklers
         /// <summary>Get an API that other mods can access. This is always called after <see cref="Entry" />.</summary>
         public override object GetApi()
         {
-            return new BetterSprinklersApi(this.Helper, this.MaxGridSize);
+            return new BetterSprinklersApi(this.Config, this.MaxGridSize);
         }
 
 

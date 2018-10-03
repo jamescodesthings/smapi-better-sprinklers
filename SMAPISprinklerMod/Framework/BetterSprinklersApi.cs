@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using StardewModdingAPI;
 
 namespace BetterSprinklers.Framework
 {
@@ -11,8 +10,8 @@ namespace BetterSprinklers.Framework
         /*********
         ** Properties
         *********/
-        /// <summary>The mod helper.</summary>
-        private readonly IModHelper Helper;
+        /// <summary>The mod configuration.</summary>
+        private readonly SprinklerModConfig Config;
 
         /// <summary>The maximum sprinkler coverage supported by this mod (in tiles wide or high).</summary>
         private readonly int MaxGridSize;
@@ -22,11 +21,11 @@ namespace BetterSprinklers.Framework
         ** Public methods
         *********/
         /// <summary>Construct an instance.</summary>
-        /// <param name="helper">The mod helper.</param>
+        /// <param name="config">The mod configuration.</param>
         /// <param name="maxGridSize">The maximum sprinkler coverage supported by this mod (in tiles wide or high).</param>
-        internal BetterSprinklersApi(IModHelper helper, int maxGridSize)
+        internal BetterSprinklersApi(SprinklerModConfig config, int maxGridSize)
         {
-            this.Helper = helper;
+            this.Config = config;
             this.MaxGridSize = maxGridSize;
         }
 
@@ -39,13 +38,9 @@ namespace BetterSprinklers.Framework
         /// <summary>Get the relative tile coverage by supported sprinkler ID.</summary>
         public IDictionary<int, Vector2[]> GetSprinklerCoverage()
         {
-            // get configured sprinkler shapes
-            SprinklerModConfig config = this.Helper.ReadConfig<SprinklerModConfig>();
-            IDictionary<int, int[,]> shapes = config.SprinklerShapes;
-
             // build tile grids
             IDictionary<int, Vector2[]> coverage = new Dictionary<int, Vector2[]>();
-            foreach (KeyValuePair<int, int[,]> shape in shapes)
+            foreach (KeyValuePair<int, int[,]> shape in this.Config.SprinklerShapes)
                 coverage[shape.Key] = GridHelper.GetCoveredTiles(Vector2.Zero, shape.Value).ToArray();
             return coverage;
         }
