@@ -8,7 +8,7 @@ namespace BetterSprinklers.Framework
     public class BetterSprinklersApi : IBetterSprinklersApi
     {
         /*********
-        ** Properties
+        ** Fields
         *********/
         /// <summary>The mod configuration.</summary>
         private readonly SprinklerModConfig Config;

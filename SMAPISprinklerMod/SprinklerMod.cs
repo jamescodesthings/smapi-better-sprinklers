@@ -16,7 +16,7 @@ namespace BetterSprinklers
     public class SprinklerMod : Mod
     {
         /*********
-        ** Properties
+        ** Fields
         *********/
         /// <summary>The maximum grid size.</summary>
         private readonly int MaxGridSize = 19;
@@ -49,9 +49,9 @@ namespace BetterSprinklers
             this.UpdatePrices();
 
             // set up events
-            TimeEvents.AfterDayStarted += this.Event_AfterDayStarted;
-            GraphicsEvents.OnPreRenderHudEvent += this.Event_PreRenderHud;
-            ControlEvents.KeyPressed += this.Event_OnKeyPressed;
+            helper.Events.Display.RenderingHud += this.OnRenderingHud;
+            helper.Events.GameLoop.DayStarted += this.OnDayStarted;
+            helper.Events.Input.ButtonPressed += this.OnButtonPressed;
         }
 
         /// <summary>Get an API that other mods can access. This is always called after <see cref="Entry" />.</summary>
@@ -67,37 +67,37 @@ namespace BetterSprinklers
         /****
         ** Event handlers
         ****/
-        /// <summary>The method called before the game draws the HUD.</summary>
+        /// <summary>Raised before drawing the HUD (item toolbar, clock, etc) to the screen. The vanilla HUD may be hidden at this point (e.g. because a menu is open).</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event arguments.</param>
-        private void Event_PreRenderHud(object sender, EventArgs e)
+        private void OnRenderingHud(object sender, RenderingHudEventArgs e)
         {
             if (Context.IsWorldReady && Game1.activeClickableMenu == null && Game1.CurrentEvent == null)
                 this.RenderHighlight();
         }
 
-        /// <summary>The method called when a new day starts.</summary>
+        /// <summary>Raised after the game begins a new day (including when the player loads a save).</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event arguments.</param>
-        private void Event_AfterDayStarted(object sender, EventArgs e)
+        private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
             this.RunSprinklers();
         }
 
-        /// <summary>The method after the game updates its state (≈60 times per second).</summary>
+        /// <summary>Raised after the player presses a button on the keyboard, controller, or mouse.</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event arguments.</param>
-        private void Event_OnKeyPressed(object sender, EventArgsKeyPressed e)
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
             if (Game1.activeClickableMenu != null || Game1.CurrentEvent != null)
                 return;
 
             // show menu
-            if (e.KeyPressed == this.Config.ConfigKey)
+            if (e.Button == this.Config.ConfigKey)
                 Game1.activeClickableMenu = new SprinklerShapeEditMenu(this.Config, this.SaveChanges);
 
             // toggle overlay
-            else if (e.KeyPressed == this.Config.HighlightKey)
+            else if (e.Button == this.Config.HighlightKey)
                 this.ShowInfoOverlay = !this.ShowInfoOverlay;
         }
 

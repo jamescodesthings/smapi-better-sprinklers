@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
 
 namespace BetterSprinklers
 {
@@ -9,8 +9,8 @@ namespace BetterSprinklers
         /*********
         ** Accessors
         *********/
-        public Keys ConfigKey { get; set; } = Keys.K;
-        public Keys HighlightKey { get; set; } = Keys.F3;
+        public SButton ConfigKey { get; set; } = SButton.K;
+        public SButton HighlightKey { get; set; } = SButton.F3;
         public Color GridColour { get; set; } = Color.PowderBlue;
         public Dictionary<int, int[,]> SprinklerShapes { get; set; } = new Dictionary<int, int[,]>
         {

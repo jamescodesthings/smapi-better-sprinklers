@@ -11,7 +11,7 @@ namespace BetterSprinklers.Framework
     internal class SprinklerShapeEditMenu : IClickableMenu
     {
         /*********
-        ** Properties
+        ** Fields
         *********/
         /// <summary>The mod configuration.</summary>
         private readonly SprinklerModConfig Config;
