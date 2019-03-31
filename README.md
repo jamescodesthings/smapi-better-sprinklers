@@ -42,6 +42,7 @@ If two players have the mod installed in multiplayer, both ranges will apply.
 - Updated for Stardew Valley 1.3 (including multiplayer support) and SMAPI 3.0.
 - Added support for controller bindings.
 - Added mod-provided API to let other mods access the custom sprinkler coverage.
+- Added support for sprinklers inside custom buildings.
 - Improved compatibility with other mods that change object/recipe data.
 
 ### 2.3

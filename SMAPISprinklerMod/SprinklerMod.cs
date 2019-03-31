@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Locations;
 using StardewValley.TerrainFeatures;
 using SObject = StardewValley.Object;
 
@@ -201,7 +202,7 @@ namespace BetterSprinklers
         /// <summary>Run all sprinklers.</summary>
         private void RunSprinklers()
         {
-            foreach (GameLocation location in Game1.locations)
+            foreach (GameLocation location in this.GetLocations())
             {
                 foreach (KeyValuePair<Vector2, SObject> objectPair in location.objects.Pairs)
                 {
@@ -218,6 +219,18 @@ namespace BetterSprinklers
                     }
                 }
             }
+        }
+
+        /// <summary>Get all game location.</summary>
+        private IEnumerable<GameLocation> GetLocations()
+        {
+            return Game1.locations
+                .Concat(
+                    from location in Game1.locations.OfType<BuildableGameLocation>()
+                    from building in location.buildings
+                    where building.indoors.Value != null
+                    select building.indoors.Value
+                );
         }
 
         /// <summary>Highlight coverage for sprinklers and scarecrows based on the current context.</summary>
