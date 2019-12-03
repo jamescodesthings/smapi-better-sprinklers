@@ -1,14 +1,10 @@
 ﻿{
   "Name": "Better Sprinklers",
   "Author": "Maurício Gomes (Speeder)",
-  "Version": {
-    "MajorVersion": 2,
-    "MinorVersion": 3,
-    "PatchVersion": 0,
-    "Build": null
-  },
-  "MinimumApiVersion": "1.8",
+  "Version": "2.4.0",
+  "Description": "Lets you customise the sprinkler coverage.",
   "UniqueID": "Speeder.BetterSprinklers",
-  "Description": "Make the Sprinklers work better.",
-  "EntryDll": "SMAPISprinklerMod.dll"
+  "EntryDll": "SMAPISprinklerMod.dll",
+  "MinimumApiVersion": "2.10.1",
+  "UpdateKeys": [ "Nexus:41" ]
 }
