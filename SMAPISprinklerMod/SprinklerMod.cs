@@ -51,7 +51,7 @@ namespace BetterSprinklers
             this.BuildingPlacementTiles = helper.Content.Load<Texture2D>("LooseSprites\\buildingPlacementTiles", ContentSource.GameContent);
 
             // set up events
-            helper.Events.Display.RenderingHud += this.OnRenderingHud;
+            helper.Events.Display.RenderedWorld += this.OnRenderedWorld;
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
             helper.Events.Input.ButtonPressed += this.OnButtonPressed;
         }
@@ -130,10 +130,10 @@ namespace BetterSprinklers
         /****
         ** Event handlers
         ****/
-        /// <summary>Raised before drawing the HUD (item toolbar, clock, etc) to the screen. The vanilla HUD may be hidden at this point (e.g. because a menu is open).</summary>
+        /// <summary>Raised after drawing the world.</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event arguments.</param>
-        private void OnRenderingHud(object sender, RenderingHudEventArgs e)
+        private void OnRenderedWorld(object sender, RenderedWorldEventArgs e)
         {
             if (Context.IsWorldReady && Game1.activeClickableMenu == null && Game1.CurrentEvent == null)
                 this.RenderHighlight();
