@@ -51,7 +51,7 @@ namespace BetterSprinklers
             this.BuildingPlacementTiles = helper.Content.Load<Texture2D>("LooseSprites\\buildingPlacementTiles", ContentSource.GameContent);
 
             // set up events
-            helper.Events.Display.RenderingHud += this.OnRenderingHud;
+            helper.Events.Display.RenderedWorld += this.OnRenderedWorld;
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
             helper.Events.Input.ButtonPressed += this.OnButtonPressed;
         }
@@ -130,10 +130,10 @@ namespace BetterSprinklers
         /****
         ** Event handlers
         ****/
-        /// <summary>Raised before drawing the HUD (item toolbar, clock, etc) to the screen. The vanilla HUD may be hidden at this point (e.g. because a menu is open).</summary>
+        /// <summary>Raised after drawing the world.</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event arguments.</param>
-        private void OnRenderingHud(object sender, RenderingHudEventArgs e)
+        private void OnRenderedWorld(object sender, RenderedWorldEventArgs e)
         {
             if (Context.IsWorldReady && Game1.activeClickableMenu == null && Game1.CurrentEvent == null)
                 this.RenderHighlight();
@@ -302,9 +302,9 @@ namespace BetterSprinklers
             int startingX = -Game1.viewport.X % Game1.tileSize;
             float startingY = -(float)Game1.viewport.Y % Game1.tileSize;
             for (int x = startingX; x < Game1.graphics.GraphicsDevice.Viewport.Width; x += Game1.tileSize)
-                Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(x, (int)startingY, 1, Game1.graphics.GraphicsDevice.Viewport.Height), this.Config.GridColour);
+                Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(x, (int)startingY, 1, Game1.graphics.GraphicsDevice.Viewport.Height + Game1.tileSize), this.Config.GridColour);
             for (float y = startingY; y < Game1.graphics.GraphicsDevice.Viewport.Height; y += Game1.tileSize)
-                Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(startingX, (int)y, Game1.graphics.GraphicsDevice.Viewport.Width, 1), this.Config.GridColour);
+                Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(startingX, (int)y, Game1.graphics.GraphicsDevice.Viewport.Width + Game1.tileSize, 1), this.Config.GridColour);
         }
     }
 }
