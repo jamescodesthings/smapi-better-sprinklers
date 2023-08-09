@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BetterSprinklers.Framework;
@@ -14,7 +13,7 @@ using SObject = StardewValley.Object;
 
 namespace BetterSprinklers
 {
-    public class SprinklerMod : Mod, IAssetEditor
+    public class SprinklerMod : Mod
     {
         /*********
         ** Fields
@@ -48,12 +47,14 @@ namespace BetterSprinklers
             // initialise
             this.Config = helper.ReadConfig<SprinklerModConfig>();
             this.ScarecrowGrid = this.GetScarecrowGrid();
-            this.BuildingPlacementTiles = helper.Content.Load<Texture2D>("LooseSprites\\buildingPlacementTiles", ContentSource.GameContent);
+
+            this.BuildingPlacementTiles = helper.GameContent.Load<Texture2D>("LooseSprites/buildingPlacementTiles");
 
             // set up events
             helper.Events.Display.RenderedWorld += this.OnRenderedWorld;
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
             helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+            this.Helper.Events.Content.AssetRequested += this.OnAssetRequested;
         }
 
         /// <summary>Get an API that other mods can access. This is always called after <see cref="Entry" />.</summary>
@@ -62,65 +63,63 @@ namespace BetterSprinklers
             return new BetterSprinklersApi(this.Config, this.MaxGridSize);
         }
 
-        /// <summary>Get whether this instance can edit the given asset.</summary>
-        /// <param name="asset">Basic metadata about the asset being loaded.</param>
-        public bool CanEdit<T>(IAssetInfo asset)
-        {
-            return
-                asset.AssetNameEquals(SprinklerMod.RecipeDataKey)
-                || asset.AssetNameEquals(SprinklerMod.ObjectDataKey);
-        }
-
-        /// <summary>Edit a matched asset.</summary>
-        /// <param name="asset">A helper which encapsulates metadata about an asset and enables changes to it.</param>
-        public void Edit<T>(IAssetData asset)
+        /// <summary>
+        /// Modifies the Sprinkler prices
+        /// </summary>
+        /// <param name="sender">The event sender</param>
+        /// <param name="e">The event args</param>
+        private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
             // recalculate sprinkler crafting resources
-            if (asset.AssetNameEquals(SprinklerMod.RecipeDataKey))
+            if (e.Name.IsEquivalentTo(SprinklerMod.RecipeDataKey))
             {
-                IDictionary<string, string> data = asset.AsDictionary<string, string>().Data;
-                foreach (KeyValuePair<string, string> pair in data.ToArray())
+                e.Edit(asset =>
                 {
-                    if (!pair.Key.Contains("prinkler"))
-                        continue;
+                    var data = asset.AsDictionary<string, string>().Data;
+                    foreach (KeyValuePair<string, string> pair in data.ToArray())
+                    {
+                        if (!pair.Key.Contains("prinkler"))
+                            continue;
 
-                    // get field info
-                    string[] fields = pair.Value.Split('/');
-                    int sprinklerID = int.Parse(fields[2]);
-                    string[] ingredients = fields[0].Split(' ');
-                    if (!this.Config.SprinklerPrices.TryGetValue(sprinklerID, out int multiplier))
-                        continue;
+                        // get field info
+                        string[] fields = pair.Value.Split('/');
+                        int sprinklerID = int.Parse(fields[2]);
+                        string[] ingredients = fields[0].Split(' ');
+                        if (!this.Config.SprinklerPrices.TryGetValue(sprinklerID, out int multiplier))
+                            continue;
 
-                    // multiply ingredients
-                    for (int i = 1; i < ingredients.Length; i += 2)
-                        ingredients[i] = (int.Parse(ingredients[i]) * multiplier).ToString();
-                    fields[0] = string.Join(" ", ingredients);
+                        // multiply ingredients
+                        for (int i = 1; i < ingredients.Length; i += 2)
+                            ingredients[i] = (int.Parse(ingredients[i]) * multiplier).ToString();
+                        fields[0] = string.Join(" ", ingredients);
 
-                    // save
-                    data[pair.Key] = string.Join("/", fields);
-                }
+                        // save
+                        data[pair.Key] = string.Join("/", fields);
+                    }
+                });
             }
 
             // recalculate sale price
-            else if (asset.AssetNameEquals(SprinklerMod.ObjectDataKey))
+            else if (e.Name.IsEquivalentTo(SprinklerMod.ObjectDataKey))
             {
-                IDictionary<int, string> data = asset.AsDictionary<int, string>().Data;
-                foreach (KeyValuePair<int, string> pair in data.ToArray())
+                e.Edit(asset =>
                 {
-                    if (!this.Config.SprinklerPrices.TryGetValue(pair.Key, out int multiplier))
-                        continue;
+                    var data = asset.AsDictionary<int, string>().Data;
 
-                    // multiply cost
-                    string[] fields = pair.Value.Split('/');
-                    fields[1] = (int.Parse(fields[1]) * multiplier).ToString();
+                    foreach (KeyValuePair<int, string> pair in data.ToArray())
+                    {
+                        if (!this.Config.SprinklerPrices.TryGetValue(pair.Key, out int multiplier))
+                            continue;
 
-                    // save
-                    data[pair.Key] = string.Join("/", fields);
-                }
+                        // multiply cost
+                        string[] fields = pair.Value.Split('/');
+                        fields[1] = (int.Parse(fields[1]) * multiplier).ToString();
+
+                        // save
+                        data[pair.Key] = string.Join("/", fields);
+                    }
+                });
             }
-
-            else
-                throw new InvalidOperationException($"Unexpected asset {asset.AssetName}");
         }
 
 
@@ -195,8 +194,8 @@ namespace BetterSprinklers
         /// <summary>Update the sprinkler crafting costs based on the current mod configuration.</summary>
         private void UpdatePrices()
         {
-            this.Helper.Content.InvalidateCache(SprinklerMod.RecipeDataKey);
-            this.Helper.Content.InvalidateCache(SprinklerMod.ObjectDataKey);
+            this.Helper.GameContent.InvalidateCache(SprinklerMod.RecipeDataKey);
+            this.Helper.GameContent.InvalidateCache(SprinklerMod.ObjectDataKey);
         }
 
         /// <summary>Run all sprinklers.</summary>
@@ -208,9 +207,8 @@ namespace BetterSprinklers
                 {
                     int targetID = objectPair.Value.ParentSheetIndex;
                     Vector2 targetTile = objectPair.Key;
-                    if (this.Config.SprinklerShapes.ContainsKey(targetID))
+                    if (this.Config.SprinklerShapes.TryGetValue(targetID, out int[,] grid))
                     {
-                        int[,] grid = this.Config.SprinklerShapes[targetID];
                         GridHelper.ForCoveredTiles(targetTile, grid, tilePos =>
                         {
                             if (location.terrainFeatures.TryGetValue(tilePos, out TerrainFeature terrainFeature) && terrainFeature is HoeDirt dirt)
