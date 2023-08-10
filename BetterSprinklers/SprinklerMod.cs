@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BetterSprinklers.Framework;
+using GenericModConfigMenu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -54,13 +56,91 @@ namespace BetterSprinklers
             helper.Events.Display.RenderedWorld += this.OnRenderedWorld;
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
             helper.Events.Input.ButtonPressed += this.OnButtonPressed;
-            this.Helper.Events.Content.AssetRequested += this.OnAssetRequested;
+            helper.Events.Content.AssetRequested += this.OnAssetRequested;
+            
+            // set up config
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         }
 
         /// <summary>Get an API that other mods can access. This is always called after <see cref="Entry" />.</summary>
         public override object GetApi()
         {
             return new BetterSprinklersApi(this.Config, this.MaxGridSize);
+        }
+        
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        {
+            // get Generic Mod Config Menu's API (if it's installed)
+            var configMenu = this.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            if (configMenu is null)
+                return;
+
+            // register mod
+            configMenu.Register(
+                mod: this.ModManifest,
+                reset: () => this.Config = new SprinklerModConfig(),
+                save: () => this.Helper.WriteConfig(this.Config)
+            );
+
+            // Add generic config options for Sprinkler Prices
+            configMenu.AddNumberOption(
+                mod: this.ModManifest,
+                name: () => "Sprinkler Price",
+                tooltip: () => "The price multiplier of a sprinkler",
+                getValue: () => this.Config.SprinklerPrices[599],
+                setValue: value => this.Config.SprinklerPrices[599] = (int)value,
+                min: 1f,
+                interval: 1f,
+                max: 10f
+            );
+
+            configMenu.AddNumberOption(
+                mod: this.ModManifest,
+                name: () => "Quality Sprinkler Price",
+                tooltip: () => "The price multiplier of a Quality sprinkler",
+                getValue: () => this.Config.SprinklerPrices[621],
+                setValue: value => this.Config.SprinklerPrices[621] = (int)value,
+                min: 1f,
+                interval: 1f,
+                max: 10f
+            );
+
+            configMenu.AddNumberOption(
+                mod: this.ModManifest,
+                name: () => "Iridium Sprinkler Price",
+                tooltip: () => "The price multiplier of an Iridium sprinkler",
+                getValue: () => this.Config.SprinklerPrices[645],
+                setValue: value => this.Config.SprinklerPrices[645] = (int)value,
+                min: 1f,
+                interval: 1f,
+                max: 10f
+            );
+            
+            // if true, show the grid overlay when in F3 mode
+            configMenu.AddBoolOption(
+                mod: this.ModManifest,
+                name: () => "Show Grid",
+                tooltip: () => "When checked the grid shows in F3 mode",
+                getValue: () => this.Config.GridColour == Color.PowderBlue,
+                setValue: value => this.Config.GridColour = value ? Color.PowderBlue : Color.Transparent
+            );
+            
+            // Keybinding updates
+            configMenu.AddKeybind(
+                mod: this.ModManifest,
+                name: () => "Show Config Key",
+                tooltip: () => "The key to press to change the boundary of all sprinklers",
+                getValue: () => this.Config.ConfigKey,
+                setValue: value => this.Config.ConfigKey = value
+            );
+            
+            configMenu.AddKeybind(
+                mod: this.ModManifest,
+                name: () => "Show Overlay Key",
+                tooltip: () => "The key to press to show the boundary of the highlighted sprinkler/scarecrow",
+                getValue: () => this.Config.HighlightKey,
+                setValue: value => this.Config.HighlightKey = value
+            );
         }
 
         /// <summary>
