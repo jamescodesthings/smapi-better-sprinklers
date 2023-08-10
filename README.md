@@ -5,19 +5,6 @@ The goal of this fork is to maintain and rebuild the current version of Better S
 
 The original mod is a great piece of work, however; the original developer (understandably) is no longer maintaining the mod. I'm currently starting a modded playthrough, so I may as well pick up from where he left off. I'll also no doubt eventually be done too, but endeavour to maintain this copy for as long as possible. Anyone is welcome to fork and continue on in kind.
 
-## Changes to the original mod
-
-### Version 2.6.0
-
-- Update to `.Net 5`
-- Update License to MIT for this fork.
-- Update Pathoschild.Stardew.ModBuildConfig to `4.1.1`
-- Change TargetPlatform to `Any CPU`
-- `SMAPI 4` compatibility:
-  - Update `SprinklerMod.cs` to use `Content Interception API`
-  - Update `SprinklerMod.cs` to use `helper.GameContent.Load`
-  - Update `SprinklerMod.cs` to use `helper.GameContent.InvalidateCache`
-
 ## Original Description
 
 **Better Sprinklers** by Maurício Gomes (Speeder) is a [Stardew Valley](http://stardewvalley.net/)
@@ -33,7 +20,7 @@ a sprinkler's or scarecrow's coverage by pointing at it in `F3` mode.
 
 ## Install
 1. [Install the latest version of SMAPI](https://github.com/Pathoschild/SMAPI/releases).
-3. Unzip [the mod files](todo) into your `Mods` folder.
+3. Unzip [the mod files](https://www.nexusmods.com/stardewvalley/mods/17767) into your `Mods` folder.
 4. Run the game using SMAPI.
 
 ## Use
@@ -60,6 +47,17 @@ Better Sprinklers is compatible with Stardew Valley 1.3+ on Linux/Mac/Windows, b
 If two players have the mod installed in multiplayer, both ranges will apply.
 
 ## Versions
+### Version 2.6.0
+
+- Update to `.Net 5`
+- Update License to MIT for this fork.
+- Update Pathoschild.Stardew.ModBuildConfig to `4.1.1`
+- Change TargetPlatform to `Any CPU`
+- `SMAPI 4` compatibility:
+  - Update `SprinklerMod.cs` to use `Content Interception API`
+  - Update `SprinklerMod.cs` to use `helper.GameContent.Load`
+  - Update `SprinklerMod.cs` to use `helper.GameContent.InvalidateCache`
+  
 ### 2.4
 - Updated for Stardew Valley 1.3 (including multiplayer support) and SMAPI 3.0.
 - Added support for controller bindings.
@@ -87,7 +85,3 @@ If two players have the mod installed in multiplayer, both ranges will apply.
 - Added a GUI to configure the sprinklers.
 - Sprinklers now work on all farmable areas, including greenhouses and anything added by mods.
 
-## See also
-* [![Patreon](docs/ipatreon.png)](https://patreon.com/user?u=3066937)
-* [Nexus page](http://www.nexusmods.com/stardewvalley/mods/41)
-* [Discussion thread](http://community.playstarbound.com/threads/configurable-improved-sprinklers-scarecrow-and-sprinklers-area-highlights.112443/)
