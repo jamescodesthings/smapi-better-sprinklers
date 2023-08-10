@@ -1,62 +1,74 @@
 ﻿# Better Sprinklers Updated
+
 A fork of [Better Sprinklers by Maurício Gomes (Speeder)](http://www.nexusmods.com/stardewvalley/mods/41).
 
-The goal of this fork is to maintain and rebuild the current version of Better Sprinklers.
+Sprinklers, but better.
 
-The original mod is a great piece of work, however; the original developer (understandably) is no longer maintaining the mod. I'm currently starting a modded playthrough, so I may as well pick up from where he left off. I'll also no doubt eventually be done too, but endeavour to maintain this copy for as long as possible. Anyone is welcome to fork and continue on in kind.
+Originally by Maurício Gomes (Speeder), maintained by [JamesCodesThings](https://codesthings.com).
 
-## Original Description
+# Contents
+- [Install](#install)
+- [Use](#use)
+- [Compatibility](#compatibility)
+- [Versions](#versions)
+- [Motivation](#motivation)
+- [Found a bug?](#found-a-bug)
 
-**Better Sprinklers** by Maurício Gomes (Speeder) is a [Stardew Valley](http://stardewvalley.net/)
-mod which lets you edit sprinkler coverage (while adjusting their crafting cost), and lets you view
-a sprinkler's or scarecrow's coverage by pointing at it in `F3` mode.
-
-## Contents
-* [Install](#install)
-* [Use](#use)
-* [Compatibility](#compatibility)
-* [Versions](#versions)
-* [See also](#see-also)
-
-## Install
+# Install
 1. [Install the latest version of SMAPI](https://github.com/Pathoschild/SMAPI/releases).
-3. Unzip [the mod files](https://www.nexusmods.com/stardewvalley/mods/17767) into your `Mods` folder.
-4. Run the game using SMAPI.
+2. Unzip [the mod files](https://www.nexusmods.com/stardewvalley/mods/17767) into your `Mods` folder. 
+3. Run the game using [SMAPI](https://github.com/Pathoschild/SMAPI/releases).
 
-## Use
-### Editing sprinkler coverage
-* Press `K` (editable in `config.json`) to show a sprinkler coverage editor and click the squares
-  to set the coverage. You can use any shape you want, though you can't remove the default squares.
-  Press "OK" when you're done, and the mod will automatically adjust the crafting and purchase cost
-  for balance.
+# Use
+## Notes
+- The sprinklers activate in the morning when the day starts.
+- The Cost of building/purchasing sprinklers is increased to balance gameplay.
+  - This is editable in `config.json`, or using [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098))
 
-  > ![](docs/screenshot.png)
-  > ![](docs/circle.png)
-  > ![](docs/butterfly.png)
+## Editing sprinkler coverage
+1. Press `K` to show a sprinkler coverage editor
+  - This is editable in `config.json`, or using [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098))
+1. Click the squares to change the area a sprinkler waters.
+  - The default squares cannot be changed.
+> ![](docs/screenshot.png)
 
-* When placing a sprinkler or scarecrow, its coverage will be highlighted automatically. You can also
+
+
+## Highlighting coverage
+### When placing a sprinkler
+- Coverage will be highlighted by default
+- This can be switched off in the mod's config.
+- When placing a sprinkler or scarecrow, its coverage will be highlighted automatically. You can also
   press `F3` and point at a sprinkler or scarecrow to highlight its coverage.
 
-  > ![](docs/scarecrowarea.png)
+### Ad-hoc
+1. Press F3
+2. Point at a sprinkler or scarecrow.
+> ![](docs/scarecrowarea.png)
 
-* The sprinklers activate in the morning when the day starts.
+### Alternative
+Alternatively, you can use [Data Layers](https://www.nexusmods.com/stardewvalley/mods/1691) to show coverage of sprinklers, scarecrows, and much more.
 
-## Compatibility
+# Compatibility
 Better Sprinklers is compatible with Stardew Valley 1.3+ on Linux/Mac/Windows, both single-player and multiplayer.
 
 If two players have the mod installed in multiplayer, both ranges will apply.
 
+Some mod incompatibilities have been observed, particularly mods that change sprinkler behaviour.
+
+It's out of scope of my aims to improve this. But, I'll happily accept and consider checking out bug reports.
+
 ## Versions
-### 2.6.2
+## 2.6.2
 - Fix placement overlay when switching from mouse to controller
 
-### 2.6.1
+## 2.6.1
 - Add Support for [Generic Mod Config Menu](https://github.com/spacechase0/StardewValleyMods/tree/develop/GenericModConfigMenu)
   - Add config option for each price multiplier
   - Add config option for showing/hiding the grid on highlight
   - Add Keybind Changes
 
-### 2.6.0
+## 2.6.0
 
 - Update to `.Net 5`
 - Update License to MIT for this fork.
@@ -67,30 +79,48 @@ If two players have the mod installed in multiplayer, both ranges will apply.
   - Update `SprinklerMod.cs` to use `helper.GameContent.Load`
   - Update `SprinklerMod.cs` to use `helper.GameContent.InvalidateCache`
   
-### 2.4
+## 2.4
 - Updated for Stardew Valley 1.3 (including multiplayer support) and SMAPI 3.0.
 - Added support for controller bindings.
 - Added mod-provided API to let other mods access the custom sprinkler coverage.
 - Added support for sprinklers inside custom buildings.
 - Improved compatibility with other mods that change object/recipe data.
 
-### 2.3
+## 2.3
 - Corrected forum thread link, and default config minor error.
 
-### 2.2
+## 2.2
 - Updated for Stardew Valley 1.1 and SMAPI 0.40.0 1.1.
 
-### 2.1
+## 2.1
 - Added highlighting to the area of sprinklers and scarecrows.
 - Added grid rendering.
 - Added html readme.
 - Fixed config bug (it was always `K` even if you edited the config.json).
 
-### 2.0.1
+## 2.0.1
 - Fixed compatibility with SMAPI 0.39.2.
 
-### 2.0
+## 2.0
 - Updated to SMAPI 0.39.2.
 - Added a GUI to configure the sprinklers.
 - Sprinklers now work on all farmable areas, including greenhouses and anything added by mods.
 
+# Motivation
+A fork of [Better Sprinklers by Maurício Gomes (Speeder)](http://www.nexusmods.com/stardewvalley/mods/41).
+
+The goal of this fork is to maintain and rebuild the current version of Better Sprinklers.
+
+The original developer has understandably lost touch with the mod. 
+
+I was starting a modded playthrough and loved the mod, but noticed some bugs shared by the wider community.
+
+I decided to pick up the torch while I'm playing Stardew and give a little back.
+I'm Updating the mod, fixing the bugs I'm aware of, and adding some features I'd like to see.
+
+**r/iama:** Senior Software Engineer in the midlands in the UK. A loving father and when the kids are asleep I get a chance to play some games.
+
+You can find more about me at [CodesThings.com](https://codesthings.com).
+
+# Found a Bug?
+Please report it in [Github Issues](https://github.com/jamescodesthings/smapi-better-sprinklers/issues).
