@@ -23,11 +23,11 @@ Originally by Maurício Gomes (Speeder), maintained by [JamesCodesThings](https:
 ## Notes
 - The sprinklers activate in the morning when the day starts.
 - The Cost of building/purchasing sprinklers is increased to balance gameplay.
-  - This is editable in `config.json`, or using [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098))
+  - This is editable in `config.json`, or using [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
 
 ## Editing sprinkler coverage
 1. Press `K` to show a sprinkler coverage editor
-  - This is editable in `config.json`, or using [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098))
+  - This is editable in `config.json`, or using [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
 1. Click the squares to change the area a sprinkler waters.
   - The default squares cannot be changed.
 > ![](docs/screenshot.png)
@@ -38,8 +38,6 @@ Originally by Maurício Gomes (Speeder), maintained by [JamesCodesThings](https:
 ### When placing a sprinkler
 - Coverage will be highlighted by default
 - This can be switched off in the mod's config.
-- When placing a sprinkler or scarecrow, its coverage will be highlighted automatically. You can also
-  press `F3` and point at a sprinkler or scarecrow to highlight its coverage.
 
 ### Ad-hoc
 1. Press F3
