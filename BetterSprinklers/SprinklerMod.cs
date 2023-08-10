@@ -83,12 +83,38 @@ namespace BetterSprinklers
             );
 
             // Add generic config options for Sprinkler Prices
+            configMenu.AddBoolOption(
+                mod: this.ModManifest,
+                name: () => "Balanced Mode Enabled: Crafting",
+                tooltip: () => "When checked the material cost of crafting sprinklers is increased by the multiplier below.",
+                getValue: () => this.Config.BalancedModeEnabledCrafting,
+                setValue: value =>
+                {
+                    this.Config.BalancedModeEnabledCrafting = value;
+                    this.UpdatePrices();
+                });
+            
+            configMenu.AddBoolOption(
+                mod: this.ModManifest,
+                name: () => "Balanced Mode Enabled: Buying",
+                tooltip: () => "When checked the price of sprinklers is increased by the multiplier below.",
+                getValue: () => this.Config.BalancedModeEnabledCrafting,
+                setValue: value =>
+                {
+                    this.Config.BalancedModeEnabledCrafting = value;
+                    this.UpdatePrices();
+                });
+            
             configMenu.AddNumberOption(
                 mod: this.ModManifest,
                 name: () => "Sprinkler Price",
                 tooltip: () => "The price multiplier of a sprinkler",
                 getValue: () => this.Config.SprinklerPrices[599],
-                setValue: value => this.Config.SprinklerPrices[599] = (int)value,
+                setValue: value =>
+                {
+                    this.Config.SprinklerPrices[599] = (int)value;
+                    this.UpdatePrices();
+                },
                 min: 1f,
                 interval: 1f,
                 max: 10f
@@ -99,7 +125,11 @@ namespace BetterSprinklers
                 name: () => "Quality Sprinkler Price",
                 tooltip: () => "The price multiplier of a Quality sprinkler",
                 getValue: () => this.Config.SprinklerPrices[621],
-                setValue: value => this.Config.SprinklerPrices[621] = (int)value,
+                setValue: value =>
+                {
+                    this.Config.SprinklerPrices[621] = (int)value;
+                    this.UpdatePrices();
+                },
                 min: 1f,
                 interval: 1f,
                 max: 10f
@@ -110,7 +140,11 @@ namespace BetterSprinklers
                 name: () => "Iridium Sprinkler Price",
                 tooltip: () => "The price multiplier of an Iridium sprinkler",
                 getValue: () => this.Config.SprinklerPrices[645],
-                setValue: value => this.Config.SprinklerPrices[645] = (int)value,
+                setValue: value =>
+                {
+                    this.Config.SprinklerPrices[645] = (int)value;
+                    this.UpdatePrices();
+                },
                 min: 1f,
                 interval: 1f,
                 max: 10f
@@ -123,6 +157,14 @@ namespace BetterSprinklers
                 tooltip: () => "When checked the grid shows in F3 mode",
                 getValue: () => this.Config.GridColour == Color.PowderBlue,
                 setValue: value => this.Config.GridColour = value ? Color.PowderBlue : Color.Transparent
+            );
+            
+            configMenu.AddBoolOption(
+                mod: this.ModManifest,
+                name: () => "Overlay When Placing",
+                tooltip: () => "When checked the Overlay shows Sprinkler/Scarecrow reach when placing.",
+                getValue: () => this.Config.OverlayEnabledOnPlace,
+                setValue: value => this.Config.OverlayEnabledOnPlace = value
             );
             
             // Keybinding updates
@@ -152,7 +194,7 @@ namespace BetterSprinklers
         {
             // recalculate sprinkler crafting resources
             if (e.Name.IsEquivalentTo(SprinklerMod.RecipeDataKey))
-            {
+            {   
                 e.Edit(asset =>
                 {
                     var data = asset.AsDictionary<string, string>().Data;
@@ -168,6 +210,11 @@ namespace BetterSprinklers
                         if (!this.Config.SprinklerPrices.TryGetValue(sprinklerID, out int multiplier))
                             continue;
 
+                        if (!this.Config.BalancedModeEnabledCrafting)
+                        {
+                            multiplier = 1;
+                        }
+
                         // multiply ingredients
                         for (int i = 1; i < ingredients.Length; i += 2)
                             ingredients[i] = (int.Parse(ingredients[i]) * multiplier).ToString();
@@ -181,7 +228,7 @@ namespace BetterSprinklers
 
             // recalculate sale price
             else if (e.Name.IsEquivalentTo(SprinklerMod.ObjectDataKey))
-            {
+            {   
                 e.Edit(asset =>
                 {
                     var data = asset.AsDictionary<int, string>().Data;
@@ -191,6 +238,11 @@ namespace BetterSprinklers
                         if (!this.Config.SprinklerPrices.TryGetValue(pair.Key, out int multiplier))
                             continue;
 
+                        if (!this.Config.BalancedModeEnabledBuying)
+                        {
+                            multiplier = 1;
+                        }
+                        
                         // multiply cost
                         string[] fields = pair.Value.Split('/');
                         fields[1] = (int.Parse(fields[1]) * multiplier).ToString();
@@ -315,22 +367,26 @@ namespace BetterSprinklers
         [SuppressMessage("ReSharper", "PossibleLossOfFraction", Justification = "The decimals are deliberately truncated during conversion to tile coordinates.")]
         private void RenderHighlight()
         {
+            
             var cursorPos = this.Helper.Input.GetCursorPosition();
-            // accounts for controller mode
-            var grabPos = cursorPos.GrabTile;
+            Vector2 mouseTile = new Vector2((Game1.viewport.X + Game1.getOldMouseX()) / Game1.tileSize, (Game1.viewport.Y + Game1.getOldMouseY()) / Game1.tileSize);
+
+            var tileToHighlightFrom = Game1.GetPlacementGrabTile();
+            
             SObject heldItem = Game1.player.ActiveObject;
 
             // highlight coverage for held item
-            if (heldItem != null)
+            if (this.Config.OverlayEnabledOnPlace && heldItem != null)
             {
+                // accounts for controller mode
                 if (this.Config.SprinklerShapes.ContainsKey(heldItem.ParentSheetIndex))
                 {
-                    this.RenderSprinklerHighlight(heldItem.ParentSheetIndex, grabPos);
+                    this.RenderSprinklerHighlight(heldItem.ParentSheetIndex, tileToHighlightFrom);
                     return;
                 }
                 if (heldItem.bigCraftable.Value && heldItem.Name.Contains("arecrow"))
                 {
-                    this.RenderScarecrowHighlight(grabPos);
+                    this.RenderScarecrowHighlight(tileToHighlightFrom);
                     return;
                 }
             }
@@ -338,12 +394,12 @@ namespace BetterSprinklers
             // highlight coverage for item under cursor
             if (this.ShowInfoOverlay)
             {
-                if (Game1.currentLocation.objects.TryGetValue(grabPos, out SObject target))
+                if (Game1.currentLocation.objects.TryGetValue(mouseTile, out SObject target))
                 {
                     if (this.Config.SprinklerShapes.ContainsKey(target.ParentSheetIndex))
-                        this.RenderSprinklerHighlight(target.ParentSheetIndex, grabPos);
+                        this.RenderSprinklerHighlight(target.ParentSheetIndex, cursorPos.Tile);
                     else if (target.bigCraftable.Value && target.Name.Contains("arecrow"))
-                        this.RenderScarecrowHighlight(grabPos);
+                        this.RenderScarecrowHighlight(cursorPos.Tile);
                 }
                 this.RenderGrid();
             }

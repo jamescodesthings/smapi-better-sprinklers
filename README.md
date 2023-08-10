@@ -6,6 +6,11 @@ Sprinklers, but better.
 
 Originally by Maurício Gomes (Speeder), maintained by [JamesCodesThings](https://codesthings.com).
 
+## Additional Features
+- Updated to latest versions of SMAPI and dotnet 5.
+- Added Comaptibility with [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
+- Added config options to give you more control
+
 # Contents
 - [Install](#install)
 - [Use](#use)
@@ -31,8 +36,6 @@ Originally by Maurício Gomes (Speeder), maintained by [JamesCodesThings](https:
 1. Click the squares to change the area a sprinkler waters.
   - The default squares cannot be changed.
 > ![](docs/screenshot.png)
-
-
 
 ## Highlighting coverage
 ### When placing a sprinkler
