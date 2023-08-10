@@ -47,6 +47,9 @@ Better Sprinklers is compatible with Stardew Valley 1.3+ on Linux/Mac/Windows, b
 If two players have the mod installed in multiplayer, both ranges will apply.
 
 ## Versions
+### 2.6.2
+- Fix placement overlay when switching from mouse to controller
+
 ### 2.6.1
 - Add Support for [Generic Mod Config Menu](https://github.com/spacechase0/StardewValleyMods/tree/develop/GenericModConfigMenu)
   - Add config option for each price multiplier

@@ -315,8 +315,9 @@ namespace BetterSprinklers
         [SuppressMessage("ReSharper", "PossibleLossOfFraction", Justification = "The decimals are deliberately truncated during conversion to tile coordinates.")]
         private void RenderHighlight()
         {
-            // get context
-            Vector2 mouseTile = new Vector2((Game1.viewport.X + Game1.getOldMouseX()) / Game1.tileSize, (Game1.viewport.Y + Game1.getOldMouseY()) / Game1.tileSize);
+            var cursorPos = this.Helper.Input.GetCursorPosition();
+            // accounts for controller mode
+            var grabPos = cursorPos.GrabTile;
             SObject heldItem = Game1.player.ActiveObject;
 
             // highlight coverage for held item
@@ -324,12 +325,12 @@ namespace BetterSprinklers
             {
                 if (this.Config.SprinklerShapes.ContainsKey(heldItem.ParentSheetIndex))
                 {
-                    this.RenderSprinklerHighlight(heldItem.ParentSheetIndex, mouseTile);
+                    this.RenderSprinklerHighlight(heldItem.ParentSheetIndex, grabPos);
                     return;
                 }
                 if (heldItem.bigCraftable.Value && heldItem.Name.Contains("arecrow"))
                 {
-                    this.RenderScarecrowHighlight(mouseTile);
+                    this.RenderScarecrowHighlight(grabPos);
                     return;
                 }
             }
@@ -337,12 +338,12 @@ namespace BetterSprinklers
             // highlight coverage for item under cursor
             if (this.ShowInfoOverlay)
             {
-                if (Game1.currentLocation.objects.TryGetValue(mouseTile, out SObject target))
+                if (Game1.currentLocation.objects.TryGetValue(grabPos, out SObject target))
                 {
                     if (this.Config.SprinklerShapes.ContainsKey(target.ParentSheetIndex))
-                        this.RenderSprinklerHighlight(target.ParentSheetIndex, mouseTile);
+                        this.RenderSprinklerHighlight(target.ParentSheetIndex, grabPos);
                     else if (target.bigCraftable.Value && target.Name.Contains("arecrow"))
-                        this.RenderScarecrowHighlight(mouseTile);
+                        this.RenderScarecrowHighlight(grabPos);
                 }
                 this.RenderGrid();
             }
