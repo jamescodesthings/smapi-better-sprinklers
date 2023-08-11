@@ -1,6 +1,8 @@
 ﻿# Better Sprinklers Updated
 ![Build and Release](https://github.com/jamescodesthings/smapi-better-sprinklers/actions/workflows/build.yml/badge.svg)
 
+[Releases](https://github.com/jamescodesthings/smapi-better-sprinklers/releases/)
+[On Nexus mods](https://www.nexusmods.com/stardewvalley/mods/17767)
 
 A fork of [Better Sprinklers by Maurício Gomes (Speeder)](http://www.nexusmods.com/stardewvalley/mods/41).
 
@@ -11,7 +13,8 @@ Originally by Maurício Gomes (Speeder), maintained by [JamesCodesThings](https:
 ## Additional Features
 - Updated to latest versions of SMAPI and dotnet 5.
 - Added Comaptibility with [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
-- Added config options to give you more control
+- Added config options to give you more control.
+- Controller Support
 
 # Contents
 - [Install](#install)
@@ -52,6 +55,13 @@ Originally by Maurício Gomes (Speeder), maintained by [JamesCodesThings](https:
 ### Alternative
 Alternatively, you can use [Data Layers](https://www.nexusmods.com/stardewvalley/mods/1691) to show coverage of sprinklers, scarecrows, and much more.
 
+#### Note: Data Layers Compatibility
+I'm currently waiting for a PR merge and release of Data Layers.
+
+Until then there's a copy of Data Layers with the PR code:
+[On the Release Page for 2.6.13](https://github.com/jamescodesthings/smapi-better-sprinklers/releases/tag/2.6.13)
+[On the Nexus Mods Page](https://www.nexusmods.com/stardewvalley/mods/17767)
+
 # Compatibility
 Better Sprinklers is compatible with Stardew Valley 1.3+ on Linux/Mac/Windows, both single-player and multiplayer.
 
@@ -62,6 +72,22 @@ Some mod incompatibilities have been observed, particularly mods that change spr
 It's out of scope of my aims to improve this. But, I'll happily accept and consider checking out bug reports.
 
 ## Versions
+## 2.6.14
+- Fix divide by zero error (caused by me)
+- Improve config options for coverage based balance
+- Update default config options to match what (should?) be the default multipliers
+
+## 2.6.13
+- Add a copy of Data Layers with integration
+- Raised PR with Data Layers to add support
+
+## 2.6.12
+- Moved to CI
+- Fix Controller placement tile overlay
+
+## 2.6.3 - 2.6.11
+- Bug fixes and CI testing
+
 ## 2.6.2
 - Fix placement overlay when switching from mouse to controller
 

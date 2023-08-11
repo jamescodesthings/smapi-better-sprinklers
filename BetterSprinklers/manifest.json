@@ -2,7 +2,7 @@
   "Name": "Better Sprinklers Plus",
   "Author": "JamesCodesThings",
   "Version": "2.6.12-dev",
-  "Description": "Lets you customise the sprinkler coverage. A fork of https://www.nexusmods.com/stardewvalley/mods/41/",
+  "Description": "Sprinklers, but better.",
   "UniqueID": "com.CodesThings.BetterSprinklersPlus",
   "EntryDll": "BetterSprinklers.dll",
   "MinimumApiVersion": "3.0.0",

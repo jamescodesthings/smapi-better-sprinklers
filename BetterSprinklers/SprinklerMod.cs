@@ -86,7 +86,7 @@ namespace BetterSprinklers
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
                 name: () => "Balanced Mode Enabled: Crafting",
-                tooltip: () => "When checked the material cost of crafting sprinklers is increased by the multiplier below.",
+                tooltip: () => "When checked the material cost of crafting sprinklers is increased by the multipliers below.",
                 getValue: () => this.Config.BalancedModeEnabledCrafting,
                 setValue: value =>
                 {
@@ -97,7 +97,18 @@ namespace BetterSprinklers
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
                 name: () => "Balanced Mode Enabled: Buying",
-                tooltip: () => "When checked the price of sprinklers is increased by the multiplier below.",
+                tooltip: () => "When checked the price of sprinklers is increased by the multipliers below.",
+                getValue: () => this.Config.BalancedModeEnabledCrafting,
+                setValue: value =>
+                {
+                    this.Config.BalancedModeEnabledCrafting = value;
+                    this.UpdatePrices();
+                });
+            
+            configMenu.AddBoolOption(
+                mod: this.ModManifest,
+                name: () => "Balanced Mode Enabled: By Coverage Area",
+                tooltip: () => "When checked the multiplier below is changed based on sprinkler coverage",
                 getValue: () => this.Config.BalancedModeEnabledCrafting,
                 setValue: value =>
                 {
@@ -117,7 +128,7 @@ namespace BetterSprinklers
                 },
                 min: 1f,
                 interval: 1f,
-                max: 10f
+                max: 44f
             );
 
             configMenu.AddNumberOption(
@@ -132,7 +143,7 @@ namespace BetterSprinklers
                 },
                 min: 1f,
                 interval: 1f,
-                max: 10f
+                max: 112f
             );
 
             configMenu.AddNumberOption(
@@ -147,7 +158,7 @@ namespace BetterSprinklers
                 },
                 min: 1f,
                 interval: 1f,
-                max: 10f
+                max: 200f
             );
             
             // if true, show the grid overlay when in F3 mode

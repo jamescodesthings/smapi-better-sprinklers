@@ -53,6 +53,13 @@ namespace BetterSprinklers.Framework
 
         private readonly List<ClickableComponent> Tabs;
         private readonly ClickableTextureComponent OkButton;
+        
+        public Dictionary<int, int> OriginalAreas { get; set; } = new()
+        {
+            [599] = 5,
+            [621] = 9,
+            [645] = 25,
+        };
 
 
         /*********
@@ -183,20 +190,26 @@ namespace BetterSprinklers.Framework
                         this.SetActiveSprinklerSheetIndex(tab.item.ParentSheetIndex);
                     }
                 }
-
+                
                 if (this.OkButton.containsPoint(x, y))
                 {
                     Game1.playSound("select");
+                    
                     foreach (KeyValuePair<int, int[,]> sprinklerGrid in this.Config.SprinklerShapes)
                     {
                         int counter = 0;
-                        int originalArea = 0;
                         foreach (int stateRequest in sprinklerGrid.Value)
                         {
                             if (stateRequest == 1) ++counter;
-                            if (stateRequest == 2) ++originalArea;
                         }
-                        this.Config.SprinklerPrices[sprinklerGrid.Key] = (counter / originalArea) + 1;
+                        
+                        // This is area-based balancing
+                        var originalArea = OriginalAreas[ActiveSprinklerSheet];
+                        // Guard against / 0 because I'm not clever.
+                        if (originalArea != 0 && this.Config.BalancedModeEnabledByCoverage)
+                        {
+                            this.Config.SprinklerPrices[sprinklerGrid.Key] = (counter / originalArea) + 1;
+                        }
                     }
                     this.OnEdited();
                 }
