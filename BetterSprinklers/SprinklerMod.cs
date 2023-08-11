@@ -21,10 +21,10 @@ namespace BetterSprinklers
         ** Fields
         *********/
         /// <summary>The asset key for the crafting recipes.</summary>
-        private const string RecipeDataKey = "Data/CraftingRecipes";
+        public const string RecipeDataKey = "Data/CraftingRecipes";
 
         /// <summary>The asset key for the object data.</summary>
-        private const string ObjectDataKey = "Data/ObjectInformation";
+        public const string ObjectDataKey = "Data/ObjectInformation";
 
         /// <summary>The maximum grid size.</summary>
         private readonly int MaxGridSize = 19;
@@ -81,11 +81,16 @@ namespace BetterSprinklers
                 reset: () => this.Config = new SprinklerModConfig(),
                 save: () => this.Helper.WriteConfig(this.Config)
             );
+            
+            configMenu.AddSectionTitle(
+                mod: this.ModManifest,
+                () => "Balanced Mode:"
+                );
 
             // Add generic config options for Sprinkler Prices
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
-                name: () => "Balanced Mode Enabled: Crafting",
+                name: () => "When Crafting",
                 tooltip: () => "When checked the material cost of crafting sprinklers is increased by the multipliers below.",
                 getValue: () => this.Config.BalancedModeEnabledCrafting,
                 setValue: value =>
@@ -96,7 +101,7 @@ namespace BetterSprinklers
             
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
-                name: () => "Balanced Mode Enabled: Buying",
+                name: () => "When Buying",
                 tooltip: () => "When checked the price of sprinklers is increased by the multipliers below.",
                 getValue: () => this.Config.BalancedModeEnabledCrafting,
                 setValue: value =>
@@ -107,7 +112,7 @@ namespace BetterSprinklers
             
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
-                name: () => "Balanced Mode Enabled: By Coverage Area",
+                name: () => "By Coverage Area",
                 tooltip: () => "When checked the multiplier below is changed based on sprinkler coverage",
                 getValue: () => this.Config.BalancedModeEnabledCrafting,
                 setValue: value =>
@@ -159,6 +164,12 @@ namespace BetterSprinklers
                 min: 1f,
                 interval: 1f,
                 max: 200f
+            );
+            
+            
+            configMenu.AddSectionTitle(
+                mod: this.ModManifest,
+                () => "Options:"
             );
             
             // if true, show the grid overlay when in F3 mode

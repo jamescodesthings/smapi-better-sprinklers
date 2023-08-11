@@ -72,6 +72,9 @@ Some mod incompatibilities have been observed, particularly mods that change spr
 It's out of scope of my aims to improve this. But, I'll happily accept and consider checking out bug reports.
 
 ## Versions
+## 2.6.15
+- Cleanup the config menu
+
 ## 2.6.14
 - Fix divide by zero error (caused by me)
 - Improve config options for coverage based balance
