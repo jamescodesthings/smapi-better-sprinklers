@@ -1,0 +1,10 @@
+services:
+  smapi:
+    image: jamescodesthings/smapi:latest
+    env_file: .env
+    working_dir: /plugin
+    volumes:
+      - ./:/plugin
+      - ./:/plugin/BetterSprinklers/obj
+      - ./:/plugin/BetterSprinklers/bin
+      - /plugin/stardew
