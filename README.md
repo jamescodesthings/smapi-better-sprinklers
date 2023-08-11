@@ -1,4 +1,6 @@
 ﻿# Better Sprinklers Updated
+![Build and Release](https://github.com/jamescodesthings/smapi-better-sprinklers/actions/workflows/build.yml/badge.svg)
+
 
 A fork of [Better Sprinklers by Maurício Gomes (Speeder)](http://www.nexusmods.com/stardewvalley/mods/41).
 

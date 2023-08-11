@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 if [ ! -d "$GAME_PATH" ]; then
   echo "Extracting to $GAME_PATH"
