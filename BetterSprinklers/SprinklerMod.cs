@@ -371,7 +371,7 @@ namespace BetterSprinklers
             var cursorPos = this.Helper.Input.GetCursorPosition();
             Vector2 mouseTile = new Vector2((Game1.viewport.X + Game1.getOldMouseX()) / Game1.tileSize, (Game1.viewport.Y + Game1.getOldMouseY()) / Game1.tileSize);
 
-            var tileToHighlightFrom = Game1.GetPlacementGrabTile();
+            // var tileToHighlightFrom = Game1.GetPlacementGrabTile(); // almost, off by direction
             
             SObject heldItem = Game1.player.ActiveObject;
 
@@ -379,14 +379,17 @@ namespace BetterSprinklers
             if (this.Config.OverlayEnabledOnPlace && heldItem != null)
             {
                 // accounts for controller mode
+                var tileToHighlightFrom = GetPlacementPosition();
+                if (tileToHighlightFrom == null) return;
+                
                 if (this.Config.SprinklerShapes.ContainsKey(heldItem.ParentSheetIndex))
                 {
-                    this.RenderSprinklerHighlight(heldItem.ParentSheetIndex, tileToHighlightFrom);
+                    this.RenderSprinklerHighlight(heldItem.ParentSheetIndex, (Vector2)tileToHighlightFrom);
                     return;
                 }
                 if (heldItem.bigCraftable.Value && heldItem.Name.Contains("arecrow"))
                 {
-                    this.RenderScarecrowHighlight(tileToHighlightFrom);
+                    this.RenderScarecrowHighlight((Vector2)tileToHighlightFrom);
                     return;
                 }
             }
@@ -440,6 +443,30 @@ namespace BetterSprinklers
                 Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(x, (int)startingY, 1, Game1.graphics.GraphicsDevice.Viewport.Height + Game1.tileSize), this.Config.GridColour);
             for (float y = startingY; y < Game1.graphics.GraphicsDevice.Viewport.Height; y += Game1.tileSize)
                 Game1.spriteBatch.Draw(Game1.staminaRect, new Rectangle(startingX, (int)y, Game1.graphics.GraphicsDevice.Viewport.Width + Game1.tileSize, 1), this.Config.GridColour);
+        }
+        
+        private static Vector2? GetPlacementPosition()
+        {
+            var activeObject = Game1.player.ActiveObject;
+            if (activeObject == null) return null;
+            
+            var x = (int) Game1.GetPlacementGrabTile().X * 64;
+            var y = (int) Game1.GetPlacementGrabTile().Y * 64;
+            Game1.isCheckingNonMousePlacement = !Game1.IsPerformingMousePlacement();
+            if (Game1.isCheckingNonMousePlacement)
+            {
+                var placementPosition = Utility.GetNearbyValidPlacementPosition(Game1.player, Game1.currentLocation, Game1.player.ActiveObject, x, y);
+                x = (int) placementPosition.X;
+                y = (int) placementPosition.Y;
+            }
+
+            return new Vector2
+            {
+                // ReSharper disable once PossibleLossOfFraction
+                X = x / 64,
+                // ReSharper disable once PossibleLossOfFraction
+                Y = y / 64
+            };
         }
     }
 }
