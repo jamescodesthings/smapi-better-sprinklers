@@ -21,7 +21,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           image: jamescodesthings/smapi:latest
-          options: -v ${{ github.workspace }}:/plugin -e PASSWORD=${{ secrets.IMAGE_PASSWORD }}
+          options: -v ${{ github.workspace }}:/plugin -e PASSWORD=${{ secrets.IMAGE_PASSWORD }} -e GAME_PATH=/app/stardew
           run: |
             cd /plugin
             ./set-version.sh "${{ steps.tag_version.outputs.new_tag }}"
