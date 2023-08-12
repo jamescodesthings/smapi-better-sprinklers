@@ -286,7 +286,7 @@ namespace BetterSprinklers
     private void RunSprinklers()
     {
       var costPerTile = GetCostPerTile();
-      var canAfford = (int)Math.Floor(Game1.player.Money / costPerTile);
+      var canAfford = costPerTile == 0f ? Int32.MaxValue : (int)Math.Floor(Game1.player.Money / costPerTile);
       var started = true;
       var expectedCost = 0;
       
