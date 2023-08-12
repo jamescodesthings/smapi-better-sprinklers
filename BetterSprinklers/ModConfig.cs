@@ -13,9 +13,10 @@ namespace BetterSprinklers
         public SButton HighlightKey { get; set; } = SButton.F3;
         public Color GridColour { get; set; } = Color.PowderBlue;
         public bool OverlayEnabledOnPlace { get; set; } = true;
-        public bool BalancedModeEnabledCrafting { get; set; } = true;
-        public bool BalancedModeEnabledBuying { get; set; } = true;
-        public bool BalancedModeEnabledByCoverage { get; set; } = true;
+        public string BalancedMode { get; set; } = "Normal";
+        public bool BalancedModeCostMessage { get; set; } = true;
+        public bool BalancedModeCostsMoneyOnAnyTile { get; set; } = true;
+        
         /// <summary>
         /// The sprinkler default sprinkler shape config
         /// Be warned, this is rotated 90deg (top to bottom is left to right)
@@ -70,12 +71,6 @@ namespace BetterSprinklers
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
             }
-        };
-        public Dictionary<int, int> SprinklerPrices { get; set; } = new()
-        {
-            [599] = 4,
-            [621] = 3,
-            [645] = 3
         };
     }
 }

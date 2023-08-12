@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using BetterSprinklers.Framework;
 using GenericModConfigMenu;
 using Microsoft.Xna.Framework;
@@ -38,6 +40,13 @@ namespace BetterSprinklers
         /// <summary>Whether to show a grid overlay and highlight the coverage for sprinklers or scarecrows under the cursor.</summary>
         private bool ShowInfoOverlay;
 
+        private List<int> SprinklerIds = new()
+        {
+            599,
+            621,
+            645
+        };
+
 
         /*********
         ** Public methods
@@ -56,7 +65,6 @@ namespace BetterSprinklers
             helper.Events.Display.RenderedWorld += this.OnRenderedWorld;
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
             helper.Events.Input.ButtonPressed += this.OnButtonPressed;
-            helper.Events.Content.AssetRequested += this.OnAssetRequested;
             
             // set up config
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -81,101 +89,36 @@ namespace BetterSprinklers
                 reset: () => this.Config = new SprinklerModConfig(),
                 save: () => this.Helper.WriteConfig(this.Config)
             );
-            
-            configMenu.AddSectionTitle(
-                mod: this.ModManifest,
-                () => "Balanced Mode:"
-                );
 
-            // Add generic config options for Sprinkler Prices
-            configMenu.AddBoolOption(
+            configMenu.AddTextOption(
                 mod: this.ModManifest,
-                name: () => "When Crafting",
-                tooltip: () => "When checked the material cost of crafting sprinklers is increased by the multipliers below.",
-                getValue: () => this.Config.BalancedModeEnabledCrafting,
-                setValue: value =>
-                {
-                    this.Config.BalancedModeEnabledCrafting = value;
-                    this.UpdatePrices();
-                });
-            
-            configMenu.AddBoolOption(
-                mod: this.ModManifest,
-                name: () => "When Buying",
-                tooltip: () => "When checked the price of sprinklers is increased by the multipliers below.",
-                getValue: () => this.Config.BalancedModeEnabledCrafting,
-                setValue: value =>
-                {
-                    this.Config.BalancedModeEnabledCrafting = value;
-                    this.UpdatePrices();
-                });
-            
-            configMenu.AddBoolOption(
-                mod: this.ModManifest,
-                name: () => "By Coverage Area",
-                tooltip: () => "When checked the multiplier below is changed based on sprinkler coverage",
-                getValue: () => this.Config.BalancedModeEnabledCrafting,
-                setValue: value =>
-                {
-                    this.Config.BalancedModeEnabledCrafting = value;
-                    this.UpdatePrices();
-                });
-            
-            configMenu.AddNumberOption(
-                mod: this.ModManifest,
-                name: () => "Sprinkler Price",
-                tooltip: () => "The price multiplier of a sprinkler",
-                getValue: () => this.Config.SprinklerPrices[599],
-                setValue: value =>
-                {
-                    this.Config.SprinklerPrices[599] = (int)value;
-                    this.UpdatePrices();
-                },
-                min: 1f,
-                interval: 1f,
-                max: 44f
+                name: () => "Balanced Mode",
+                tooltip: () => "Changes the amount that water costs.",
+                getValue: () => this.Config.BalancedMode,
+                setValue: value => this.Config.BalancedMode = value,
+                allowedValues: new string[] { "Off", "Easy", "Normal", "Hard", "Extra Hard" }
             );
 
-            configMenu.AddNumberOption(
+            configMenu.AddBoolOption(
                 mod: this.ModManifest,
-                name: () => "Quality Sprinkler Price",
-                tooltip: () => "The price multiplier of a Quality sprinkler",
-                getValue: () => this.Config.SprinklerPrices[621],
-                setValue: value =>
-                {
-                    this.Config.SprinklerPrices[621] = (int)value;
-                    this.UpdatePrices();
-                },
-                min: 1f,
-                interval: 1f,
-                max: 112f
+                name: () => "Show Bills Message",
+                tooltip: () => "In the morning you'll see how much your sprinklers have cost.",
+                getValue: () => this.Config.BalancedModeCostMessage,
+                setValue: value => this.Config.BalancedModeCostMessage = value
             );
 
-            configMenu.AddNumberOption(
+            configMenu.AddBoolOption(
                 mod: this.ModManifest,
-                name: () => "Iridium Sprinkler Price",
-                tooltip: () => "The price multiplier of an Iridium sprinkler",
-                getValue: () => this.Config.SprinklerPrices[645],
-                setValue: value =>
-                {
-                    this.Config.SprinklerPrices[645] = (int)value;
-                    this.UpdatePrices();
-                },
-                min: 1f,
-                interval: 1f,
-                max: 200f
-            );
-            
-            
-            configMenu.AddSectionTitle(
-                mod: this.ModManifest,
-                () => "Options:"
+                name: () => "Water costs on any tile",
+                tooltip: () => "Water costs money even if it waters a non-waterable tile.",
+                getValue: () => this.Config.BalancedModeCostsMoneyOnAnyTile,
+                setValue: value => this.Config.BalancedModeCostsMoneyOnAnyTile = value
             );
             
             // if true, show the grid overlay when in F3 mode
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
-                name: () => "Show Grid",
+                name: () => "Show Overlay Grid",
                 tooltip: () => "When checked the grid shows in F3 mode",
                 getValue: () => this.Config.GridColour == Color.PowderBlue,
                 setValue: value => this.Config.GridColour = value ? Color.PowderBlue : Color.Transparent
@@ -183,7 +126,7 @@ namespace BetterSprinklers
             
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
-                name: () => "Overlay When Placing",
+                name: () => "Show Placement Coverage",
                 tooltip: () => "When checked the Overlay shows Sprinkler/Scarecrow reach when placing.",
                 getValue: () => this.Config.OverlayEnabledOnPlace,
                 setValue: value => this.Config.OverlayEnabledOnPlace = value
@@ -207,79 +150,9 @@ namespace BetterSprinklers
             );
         }
 
-        /// <summary>
-        /// Modifies the Sprinkler prices
-        /// </summary>
-        /// <param name="sender">The event sender</param>
-        /// <param name="e">The event args</param>
-        private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
-        {
-            // recalculate sprinkler crafting resources
-            if (e.Name.IsEquivalentTo(SprinklerMod.RecipeDataKey))
-            {   
-                e.Edit(asset =>
-                {
-                    var data = asset.AsDictionary<string, string>().Data;
-                    foreach (KeyValuePair<string, string> pair in data.ToArray())
-                    {
-                        if (!pair.Key.Contains("prinkler"))
-                            continue;
-
-                        // get field info
-                        string[] fields = pair.Value.Split('/');
-                        int sprinklerID = int.Parse(fields[2]);
-                        string[] ingredients = fields[0].Split(' ');
-                        if (!this.Config.SprinklerPrices.TryGetValue(sprinklerID, out int multiplier))
-                            continue;
-
-                        if (!this.Config.BalancedModeEnabledCrafting)
-                        {
-                            multiplier = 1;
-                        }
-
-                        // multiply ingredients
-                        for (int i = 1; i < ingredients.Length; i += 2)
-                            ingredients[i] = (int.Parse(ingredients[i]) * multiplier).ToString();
-                        fields[0] = string.Join(" ", ingredients);
-
-                        // save
-                        data[pair.Key] = string.Join("/", fields);
-                    }
-                });
-            }
-
-            // recalculate sale price
-            else if (e.Name.IsEquivalentTo(SprinklerMod.ObjectDataKey))
-            {   
-                e.Edit(asset =>
-                {
-                    var data = asset.AsDictionary<int, string>().Data;
-
-                    foreach (KeyValuePair<int, string> pair in data.ToArray())
-                    {
-                        if (!this.Config.SprinklerPrices.TryGetValue(pair.Key, out int multiplier))
-                            continue;
-
-                        if (!this.Config.BalancedModeEnabledBuying)
-                        {
-                            multiplier = 1;
-                        }
-                        
-                        // multiply cost
-                        string[] fields = pair.Value.Split('/');
-                        fields[1] = (int.Parse(fields[1]) * multiplier).ToString();
-
-                        // save
-                        data[pair.Key] = string.Join("/", fields);
-                    }
-                });
-            }
-        }
-
-
         /*********
-        ** Private methods
-        *********/
+         ** Private methods
+         *********/
         /****
         ** Event handlers
         ****/
@@ -342,34 +215,78 @@ namespace BetterSprinklers
         {
             this.Helper.WriteConfig(this.Config);
             Game1.addHUDMessage(new HUDMessage("Sprinkler Configurations Saved", Color.Green, 3500f));
-            this.UpdatePrices();
-        }
-
-        /// <summary>Update the sprinkler crafting costs based on the current mod configuration.</summary>
-        private void UpdatePrices()
-        {
-            this.Helper.GameContent.InvalidateCache(SprinklerMod.RecipeDataKey);
-            this.Helper.GameContent.InvalidateCache(SprinklerMod.ObjectDataKey);
         }
 
         /// <summary>Run all sprinklers.</summary>
         private void RunSprinklers()
         {
-            foreach (GameLocation location in this.GetLocations())
+            var wateredTiles = 0;
+            var costPerTile = GetCostPerTile();
+            var canAfford = (int)Math.Floor(Game1.player.Money / costPerTile);
+            this.Monitor.VerboseLog($"Calculating Affordability: {Game1.player.Money}G / {costPerTile} = {canAfford}");
+            foreach (var location in this.GetLocations())
             {
-                foreach (KeyValuePair<Vector2, SObject> objectPair in location.objects.Pairs)
+                foreach (var (targetTile, value) in location.objects.Pairs)
                 {
-                    int targetID = objectPair.Value.ParentSheetIndex;
-                    Vector2 targetTile = objectPair.Key;
-                    if (this.Config.SprinklerShapes.TryGetValue(targetID, out int[,] grid))
+                    var targetId = value.ParentSheetIndex;
+                    if (this.Config.SprinklerShapes.TryGetValue(targetId, out int[,] grid))
                     {
                         GridHelper.ForCoveredTiles(targetTile, grid, tilePos =>
                         {
-                            if (location.terrainFeatures.TryGetValue(tilePos, out TerrainFeature terrainFeature) && terrainFeature is HoeDirt dirt)
+                            // we can't afford any more water
+                            // don't sprinkle
+                            if (wateredTiles >= canAfford) return;
+                            
+                            if (location.terrainFeatures.TryGetValue(tilePos, out TerrainFeature terrainFeature) &&
+                                terrainFeature is HoeDirt dirt)
+                            {
                                 dirt.state.Value = 1;
+                                if (!this.Config.BalancedModeCostsMoneyOnAnyTile)
+                                {
+                                    wateredTiles++;
+                                }
+                            }
+
+                            if (this.Config.BalancedModeCostsMoneyOnAnyTile)
+                            {
+                                wateredTiles++;
+                            }
                         });
                     }
                 }
+            }
+
+            var cost = (int)Math.Round(wateredTiles * costPerTile);
+            this.Monitor.VerboseLog($"Start of day bills: {wateredTiles} watered, costing {cost}G");
+            
+            if(Game1.player.Money - cost >= 0) {
+                Game1.player.Money -= cost;
+            }
+            else
+            {
+                Game1.player.Money = 0;
+            }
+
+            if (this.Config.BalancedModeCostMessage)
+            {
+                Game1.addHUDMessage(new HUDMessage($"Sprinkler Cost: {cost}G", Color.Green, 3500f));
+            }
+        }
+
+        private float GetCostPerTile()
+        {
+            switch (this.Config.BalancedMode)
+            {
+                case "Easy":
+                    return 0.1f;
+                case "Normal":
+                    return 0.25f;
+                case "Hard":
+                    return 0.5f;
+                case "Extra Hard":
+                    return 1f;
+                default:
+                    return 0f;
             }
         }
 
