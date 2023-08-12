@@ -10,37 +10,89 @@ Sprinklers, but better.
 
 Originally by Maurício Gomes (Speeder), maintained by [JamesCodesThings](https://codesthings.com).
 
-## Additional Features
-- Updated to latest versions of SMAPI and dotnet 5.
-- Added Comaptibility with [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
-- Added config options to give you more control.
-- Controller Support
+
 
 # Contents
+- [Features](#features)
 - [Install](#install)
+- [Configuration](#configuration)
 - [Use](#use)
 - [Compatibility](#compatibility)
 - [Versions](#versions)
 - [Motivation](#motivation)
 - [Found a bug?](#found-a-bug)
 
+# Features
+## Edit Sprinkler Coverage
+Pressing `k` (configurable) allows you to change the coverage of each type of sprinkler.
+
+## View Sprinkler/Scarecrow Coverage
+Pressing `F3` (configurable) allows you to show the coverage of the highlighted sprinkler.
+
+## Balanced Mode
+In balanced mode, the sprinklers you have cost money every day.
+
+> Q: What!? Did you implement bills in my cosy game?
+>
+> A: Yeah, I did a little. Don't worry though, you can turn them off, change the amount, etc.
+> It felt like the most immersive way to balance the mod. The previous balance increased the cost of sprinklers, but that's one-off.
+>
+> Q: What if I run out of money?
+>
+> A: Yeah, your sprinklers stop sprinkling (on the last tile you can afford.
+> Same again, configurable.
+
 # Install
 1. [Install the latest version of SMAPI](https://github.com/Pathoschild/SMAPI/releases).
 2. Unzip [the mod files](https://www.nexusmods.com/stardewvalley/mods/17767) into your `Mods` folder. 
 3. Run the game using [SMAPI](https://github.com/Pathoschild/SMAPI/releases).
 
-# Use
-## Notes
-- The sprinklers activate in the morning when the day starts.
-- The Cost of building/purchasing sprinklers is increased to balance gameplay.
-  - This is editable in `config.json`, or using [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
+# Configuration
+## Balanced Mode
+__Off:__ Sprinklers do not have a daily cost.
 
+__Easy:__ Sprinklers cost 0.1g per tile watered, per day.
+
+__Normal:__ Sprinklers cost 0.25g per tile watered, per day.
+
+__Hard:__ Sprinklers cost 0.5g per tile watered, per day.
+
+__Extra Hard:__ Sprinklers cost 1g per tile watered, per day.
+
+## Show Bills Message
+__On:__ Every morning you'll see a message for how much your sprinklers cost.
+
+__Off:__ Message is not shown.
+
+## Water costs on any tile
+__On:__ The water costs money even if the tile is not waterable.
+
+__Off:__ Only waterable tiles cost money.
+
+## Show Overlay Grid
+__On:__ When the Coverage is shown, a grid is also shown.
+
+__Off:__ No grid is shown.
+
+## Show Placement Coverage
+__On:__ The coverage of a sprinkler/scarecrow is shown when placing it.
+
+__Off:__ No coverage is shown.
+
+This is useful if you only want to use Data Layers.
+
+## Show Config Key
+__Use:__ Changes the hotkey to change sprinkler configuration.
+
+## Show Overlay Key
+__Use:__ Changes the hotkey to show coverage overlay.
+
+# Use
 ## Editing sprinkler coverage
 1. Press `K` to show a sprinkler coverage editor
   - This is editable in `config.json`, or using [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
 1. Click the squares to change the area a sprinkler waters.
   - The default squares cannot be changed.
-> ![](docs/screenshot.png)
 
 ## Highlighting coverage
 ### When placing a sprinkler
@@ -50,7 +102,6 @@ Originally by Maurício Gomes (Speeder), maintained by [JamesCodesThings](https:
 ### Ad-hoc
 1. Press F3
 2. Point at a sprinkler or scarecrow.
-> ![](docs/scarecrowarea.png)
 
 ### Alternative
 Alternatively, you can use [Data Layers](https://www.nexusmods.com/stardewvalley/mods/1691) to show coverage of sprinklers, scarecrows, and much more.
@@ -72,6 +123,21 @@ Some mod incompatibilities have been observed, particularly mods that change spr
 It's out of scope of my aims to improve this. But, I'll happily accept and consider checking out bug reports.
 
 ## Versions
+## 2.7.1
+- Update Documentation.
+- Don't show sprinkler cost if `cost = 0`
+
+## 2.7.0
+- Gut the old Balanced Mode
+- ADD a per-day cost for water, water costs money.
+- ADD do not sprinkle tiles if we run out of money for water.
+- ADD Options to change difficulty and turn on/off these features
+
+Todo:
+- Option for Do not sprinkle tiles if we run out of money.
+- Pressure Nozzle should half cost
+- Live Preview of costs on config menu
+
 ## 2.6.15
 - Cleanup the config menu
 
@@ -110,33 +176,6 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
   - Update `SprinklerMod.cs` to use `Content Interception API`
   - Update `SprinklerMod.cs` to use `helper.GameContent.Load`
   - Update `SprinklerMod.cs` to use `helper.GameContent.InvalidateCache`
-  
-## 2.4
-- Updated for Stardew Valley 1.3 (including multiplayer support) and SMAPI 3.0.
-- Added support for controller bindings.
-- Added mod-provided API to let other mods access the custom sprinkler coverage.
-- Added support for sprinklers inside custom buildings.
-- Improved compatibility with other mods that change object/recipe data.
-
-## 2.3
-- Corrected forum thread link, and default config minor error.
-
-## 2.2
-- Updated for Stardew Valley 1.1 and SMAPI 0.40.0 1.1.
-
-## 2.1
-- Added highlighting to the area of sprinklers and scarecrows.
-- Added grid rendering.
-- Added html readme.
-- Fixed config bug (it was always `K` even if you edited the config.json).
-
-## 2.0.1
-- Fixed compatibility with SMAPI 0.39.2.
-
-## 2.0
-- Updated to SMAPI 0.39.2.
-- Added a GUI to configure the sprinklers.
-- Sprinklers now work on all farmable areas, including greenhouses and anything added by mods.
 
 # Motivation
 A fork of [Better Sprinklers by Maurício Gomes (Speeder)](http://www.nexusmods.com/stardewvalley/mods/41).

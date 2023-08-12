@@ -267,7 +267,7 @@ namespace BetterSprinklers
                 Game1.player.Money = 0;
             }
 
-            if (this.Config.BalancedModeCostMessage)
+            if (this.Config.BalancedModeCostMessage && cost > 0)
             {
                 Game1.addHUDMessage(new HUDMessage($"Sprinkler Cost: {cost}G", Color.Green, 3500f));
             }
