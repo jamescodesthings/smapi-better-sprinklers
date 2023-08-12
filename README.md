@@ -2,6 +2,7 @@
 ![Build and Release](https://github.com/jamescodesthings/smapi-better-sprinklers/actions/workflows/build.yml/badge.svg)
 
 [Releases](https://github.com/jamescodesthings/smapi-better-sprinklers/releases/)
+
 [On Nexus mods](https://www.nexusmods.com/stardewvalley/mods/17767)
 
 A fork of [Better Sprinklers by Maurício Gomes (Speeder)](http://www.nexusmods.com/stardewvalley/mods/41).
