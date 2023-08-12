@@ -18,6 +18,7 @@ Originally by Maurício Gomes (Speeder), maintained by [JamesCodesThings](https:
 - [Configuration](#configuration)
 - [Use](#use)
 - [Compatibility](#compatibility)
+- [Roadmap](#roadmap)
 - [Versions](#versions)
 - [Motivation](#motivation)
 - [Found a bug?](#found-a-bug)
@@ -44,12 +45,14 @@ In balanced mode, the sprinklers you have cost money every day.
 
 # Install
 1. [Install the latest version of SMAPI](https://github.com/Pathoschild/SMAPI/releases).
-2. Unzip [the mod files](https://www.nexusmods.com/stardewvalley/mods/17767) into your `Mods` folder. 
+2. Unzip [the mod files](https://www.nexusmods.com/stardewvalley/mods/17767) into your `Mods` folder.
 3. Run the game using [SMAPI](https://github.com/Pathoschild/SMAPI/releases).
 
 # Configuration
 ## Balanced Mode
 __Off:__ Sprinklers do not have a daily cost.
+
+__Very Easy:__ Sprinklers cost 0.05g per tile watered, per day.
 
 __Easy:__ Sprinklers cost 0.1g per tile watered, per day.
 
@@ -57,7 +60,19 @@ __Normal:__ Sprinklers cost 0.25g per tile watered, per day.
 
 __Hard:__ Sprinklers cost 0.5g per tile watered, per day.
 
-__Extra Hard:__ Sprinklers cost 1g per tile watered, per day.
+__Very Hard:__ Sprinklers cost 1g per tile watered, per day.
+
+## Can't Afford
+If you can't afford to run the sprinklers:
+
+__Off:__ the sprinklers run, your wallet is emptied.
+
+__Cut Off:__ the sprinklers cut off after watering the tiles you can water.
+
+__Don't Water:__ the sprinklers don't water your crops.
+
+_note:_ at the moment this does not affect the default spinkler tiles(see the roadmap).
+
 
 ## Show Bills Message
 __On:__ Every morning you'll see a message for how much your sprinklers cost.
@@ -122,7 +137,26 @@ Some mod incompatibilities have been observed, particularly mods that change spr
 
 It's out of scope of my aims to improve this. But, I'll happily accept and consider checking out bug reports.
 
-## Versions
+# Roadmap
+- [x] (balancing) Option: Do not sprinkle tiles if we run out of money.
+- [x] (balancing) Option: Don't water if we can't afford vs Cut out.
+- [x] (ui) Message: When watering is skipped/cut out, warn the user
+  - [x] Option to enable/disable (using main option)
+- [x] Update Mod Screenshots
+- [ ] (ui) Live Preview of costs on config menu
+- [ ] (ui) Click & Drag to change multiple tiles quickly
+- [ ] (gameplay) Ability to change maximum range of each sprinkler type.
+- [ ] (balancing) Pressure Nozzle should cut cost/do something!
+- [ ] (immersion) Same bills cutout with default tiles?
+- [ ] (gamplay) Ability to activate one or all sprinklers manually (same cost).
+  - [ ] (optional) Or just make sure mod is compatible with [Activated Sprinklers](https://github.com/JudeRV/Stardew-ActivatingSprinklers/blob/master/ActivatingSprinklers/ActivatingSprinklers.cs).
+- [ ] (accessibility) i18n basics. 
+
+# Versions
+## 2.8.0
+- Add options for what happens when you cannot afford to run the sprinklers
+- Update readme
+
 ## 2.7.1
 - Update Documentation.
 - Don't show sprinkler cost if `cost = 0`
@@ -132,11 +166,6 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - ADD a per-day cost for water, water costs money.
 - ADD do not sprinkle tiles if we run out of money for water.
 - ADD Options to change difficulty and turn on/off these features
-
-Todo:
-- Option for Do not sprinkle tiles if we run out of money.
-- Pressure Nozzle should half cost
-- Live Preview of costs on config menu
 
 ## 2.6.15
 - Cleanup the config menu
@@ -182,7 +211,7 @@ A fork of [Better Sprinklers by Maurício Gomes (Speeder)](http://www.nexusmods.
 
 The goal of this fork is to maintain and rebuild the current version of Better Sprinklers.
 
-The original developer has understandably lost touch with the mod. 
+The original developer has understandably lost touch with the mod.
 
 I was starting a modded playthrough and loved the mod, but noticed some bugs shared by the wider community.
 
