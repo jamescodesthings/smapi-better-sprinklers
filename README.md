@@ -78,6 +78,13 @@ __On:__ Every morning you'll see a message for how much your sprinklers cost.
 
 __Off:__ Message is not shown.
 
+## Show Can't Afford Warning
+__On:__ If you can't afford to water all your crops one day, you'll get a warning.
+
+__Off:__ Message is not shown.
+
+This one's just for if you want to be warned but don't want the bills message every day.
+
 ## Water costs on any tile
 __On:__ The water costs money even if the tile is not waterable.
 

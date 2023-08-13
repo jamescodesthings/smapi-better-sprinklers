@@ -57,6 +57,7 @@ namespace BetterSprinklers
     public int BalancedMode { get; set; } = (int)BalancedModeOptions.Normal;
     public int CannotAfford { get; set; } = (int)CannotAffordOptions.CutOff;
     public bool BalancedModeCostMessage { get; set; } = true;
+    public bool BalancedModeCannotAffordWarning { get; set; } = true;
     public bool BalancedModeCostsMoneyOnAnyTile { get; set; } = true;
 
     /// <summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BetterSprinklers.Framework;
+using BetterSprinklers.Framework.Helpers;
 using GenericModConfigMenu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -175,6 +176,14 @@ namespace BetterSprinklers
         setValue: value => this.Config.BalancedModeCostMessage = value
       );
 
+      configMenu.AddBoolOption(
+        mod: this.ModManifest,
+        name: () => "Show Can't Afford Warning",
+        tooltip: () => "In the morning you'll be warned if watering did not finish.",
+        getValue: () => this.Config.BalancedModeCannotAffordWarning,
+        setValue: value => this.Config.BalancedModeCannotAffordWarning = value
+      );
+
 
       configMenu.AddSectionTitle(mod: this.ModManifest, () => "Options:");
 
@@ -280,39 +289,73 @@ namespace BetterSprinklers
       this.Helper.WriteConfig(this.Config);
       Game1.addHUDMessage(new HUDMessage("Sprinkler Configurations Saved", Color.Green, 3500f));
     }
-
+    
     /// <summary>Run all sprinklers.</summary>
-    /// todo: this needs a lot of cleaning
     private void RunSprinklers()
     {
-      var costPerTile = GetCostPerTile();
-      var canAfford = costPerTile == 0f ? Int32.MaxValue : (int)Math.Floor(Game1.player.Money / costPerTile);
-      var started = true;
-      var expectedCost = 0;
-      
-      this.Monitor.VerboseLog($"Calculating Affordability: {Game1.player.Money}G / {costPerTile} = {canAfford}");
-
-      // Calculate Whether or not we can afford this watering
-      if (this.Config.CannotAfford == (int)SprinklerModConfig.CannotAffordOptions.DoNotWater)
+      this.Monitor.Log($"Running Sprinklers", LogLevel.Info);
+      if (this.Config.BalancedMode == (int)SprinklerModConfig.BalancedModeOptions.Off)
       {
-        var (_, willWater) = WaterTiles(false, canAfford, true);
-        if (willWater > canAfford) started = false;
-        
-        expectedCost = CalculateCost(willWater);
-        
-        this.Monitor.VerboseLog($"Started: {started}, Will Water: {willWater}, Expected Cost: {expectedCost}G");
+        this.Monitor.VerboseLog($"Balanced mode is off, just water");
+        if (this.Config.BalancedModeCostMessage)
+        {
+          Game1.addHUDMessage(new HUDMessage($"Your sprinklers have run.", Color.Green, 5000f));
+        }
+        this.WaterAll();
+        return;
       }
 
-      // Do the watering
-      var (finished, wateredTiles) = WaterTiles(started, canAfford);
-      
-      // Calculate the cost
-      var cost = CalculateCost(wateredTiles);
-      var startedLogMessage = !started ? " Could not water" : "";
-      var finishedLogMessage = !finished ? " Could not finish watering" : "";
-      this.Monitor.VerboseLog($"Start of day bills: {wateredTiles} watered, costing {cost}G{startedLogMessage}{finishedLogMessage}");
+      this.Monitor.VerboseLog($"Balanced Mode is on, calculating cost");
+      var tilesWeCanWater = GetCountOfTilesWeCanWater();
+      var affordable = GetTilesWeCanAffordToWater();
+      var cost = 0;
 
-      // Pay yo' bills
+      if (tilesWeCanWater > affordable)
+      {
+        this.Monitor.VerboseLog($"We can only afford to water {affordable} tiles, but there are {tilesWeCanWater} tiles to water");
+        if (this.Config.CannotAfford == (int)SprinklerModConfig.CannotAffordOptions.DoNotWater)
+        {
+          this.Monitor.VerboseLog($"Do not water is set, unwatering.");
+          UnwaterAll();
+          cost = CalculateCost(tilesWeCanWater);
+          if (this.Config.BalancedModeCostMessage || this.Config.BalancedModeCannotAffordWarning)
+          {
+            Game1.addHUDMessage(new HUDMessage($"You could not to run your sprinklers today ({cost}G).", Color.Green, 5000f));
+          }
+          return;
+        }
+
+        if (this.Config.CannotAfford == (int)SprinklerModConfig.CannotAffordOptions.CutOff)
+        {
+          cost = CalculateCost(affordable);
+          WaterAllWeCanAfford(affordable);
+          DeductCost(cost);
+          this.Monitor.VerboseLog($"Sprinklers have run ({cost}G), Could not finish watering.");
+          if (this.Config.BalancedModeCostMessage)
+          {
+            Game1.addHUDMessage(new HUDMessage($"Your sprinklers have run ({cost}G), Could not finish watering.", Color.Green, 5000f));
+          } else if (this.Config.BalancedModeCannotAffordWarning)
+          {
+            Game1.addHUDMessage(new HUDMessage($"Could not finish watering.", Color.Green, 5000f));
+          }
+
+          return;
+        }
+      }
+      
+      // Otherwise, water everything and deduct cost
+      WaterAll();
+      cost = CalculateCost(tilesWeCanWater);
+      DeductCost(cost);
+      this.Monitor.VerboseLog($"Sprinklers have run ({cost}G).");
+      if (this.Config.BalancedModeCostMessage)
+      {
+        Game1.addHUDMessage(new HUDMessage($"Your sprinklers have run ({cost}G).", Color.Green, 5000f));
+      }
+    }
+
+    private static void DeductCost(int cost)
+    {
       if (Game1.player.Money - cost >= 0)
       {
         Game1.player.Money -= cost;
@@ -321,84 +364,131 @@ namespace BetterSprinklers
       {
         Game1.player.Money = 0;
       }
+    }
 
-      // Let the player know what's happened
-      if (this.Config.BalancedModeCostMessage && cost > 0)
+    private int GetTilesWeCanAffordToWater()
+    {
+      
+      var costPerTile = GetCostPerTile();
+      var canAfford = costPerTile == 0f ? int.MaxValue : (int)Math.Floor(Game1.player.Money / costPerTile);
+      return canAfford;
+    }
+
+    private void WaterAll()
+    {
+      foreach (var location in  GetLocations())
       {
-        var finishedHudMessage = !finished ? ", not all crops were watered" : "";
-        Game1.addHUDMessage(new HUDMessage($"Your sprinklers have run ({cost}G){finishedHudMessage}.", Color.Green, 5000f));
-        return;
+        foreach (var (tile, sprinkler) in location.AllSprinklers())
+        {
+          this.Monitor.VerboseLog($"Processing Sprinkler at {tile.X}x{tile.Y}: {sprinkler.ParentSheetIndex}");
+          sprinkler.ForCoveredTiles(this.Config, tile, t => WaterTile(location, t));
+        }
       }
-
-      if (!started && this.Config.BalancedModeCostMessage)
+    }
+    private void UnwaterAll()
+    {
+      foreach (var location in  GetLocations())
       {
-        Game1.addHUDMessage(new HUDMessage($"You could not to run your sprinklers today ({expectedCost}G).", Color.Green, 5000f));
+        foreach (var (tile, sprinkler) in location.AllSprinklers())
+        {
+          this.Monitor.VerboseLog($"Processing Sprinkler at {tile.X}x{tile.Y}: {sprinkler.ParentSheetIndex}");
+          sprinkler.ForCoveredTiles(this.Config, tile, t => UnwaterTile(location, t));
+        }
+      }
+    }
+      
+    private void WaterAllWeCanAfford(int affordable)
+    {
+      var current = 0;
+      foreach (var location in  GetLocations())
+      {
+        foreach (var (tile, sprinkler) in location.AllSprinklers())
+        {
+          sprinkler.ForCoveredTiles(this.Config, tile, t =>
+          {
+            if (current < affordable)
+            {
+              WaterTile(location, tile);
+            }
+            else
+            {
+              UnwaterTile(location, tile);
+            }
+          
+            current++;
+          });
+        }
       }
     }
 
-    /// <summary>
-    /// Water tiles, or dry run to calculate costs.
-    /// </summary>
-    /// <param name="started">If true we can start</param>
-    /// <param name="canAfford">The amount of tiles we can afford to water</param>
-    /// <param name="dryRun">If true, don't do the watering, just return whether or not we would finish, and the amount of tiles</param>
-    /// <returns>True if finished/can finish, the number of tiles that will/would be watered.</returns>
-    private (bool, int) WaterTiles(bool started, int canAfford, bool dryRun = false)
+    private void WaterTile(GameLocation location, Vector2 tile)
     {
-      var wateredTiles = 0;
-      var finished = true;
-      
-      if (!dryRun && !started) return (false, 0);
-      
-      foreach (var location in this.GetLocations())
+      SetTileWateredValue(location, tile, 1);
+    }
+    
+    private void UnwaterTile(GameLocation location, Vector2 tile)
+    {
+      SetTileWateredValue(location, tile, 0);
+    }
+
+    private void SetTileWateredValue(GameLocation location, Vector2 tile, int value)
+    {
+      if (!location.terrainFeatures.TryGetValue(tile, out var terrainFeature))
       {
-        foreach (var (targetTile, value) in location.objects.Pairs)
-        {
-          var targetId = value.ParentSheetIndex;
-          if (this.Config.SprinklerShapes.TryGetValue(targetId, out int[,] grid))
-          {
-            GridHelper.ForCoveredTiles(targetTile, grid, tilePos =>
-            {
-              // we can't afford any more water
-              // don't sprinkle
-              if (!dryRun && wateredTiles >= canAfford && this.Config.CannotAfford == (int)SprinklerModConfig.CannotAffordOptions.CutOff)
-              {
-                finished = false;
-                return;
-              }
-
-              if (location.terrainFeatures.TryGetValue(tilePos, out TerrainFeature terrainFeature) &&
-                  terrainFeature is HoeDirt dirt)
-              {
-                if (!dryRun) dirt.state.Value = 1;
-                if (!this.Config.BalancedModeCostsMoneyOnAnyTile)
-                {
-                  wateredTiles++;
-                }
-              }
-
-              if (this.Config.BalancedModeCostsMoneyOnAnyTile)
-              {
-                wateredTiles++;
-              }
-            });
-          }
-        }
+        this.Monitor.VerboseLog($"could not get feature at: {tile.X}x{tile.Y}");
+        return;
       }
 
-      return (finished, wateredTiles);
+      if (!terrainFeature.IsDirt()) return;
+
+      var dirt = (HoeDirt)terrainFeature;
+      dirt.state.Value = value;
     }
 
     /// <summary>
     /// Calculates the cost of watering x tiles
     /// </summary>
-    /// <param name="wateredTiles">The number of tiles to water</param>
+    /// <param name="count">The number of tiles</param>
     /// <returns>The cost in G</returns>
-    private int CalculateCost(int wateredTiles)
+    private int CalculateCost(int count)
     {
       var costPerTile = GetCostPerTile();
-      var cost = (int)Math.Round(wateredTiles * costPerTile);
+      var cost = (int)Math.Round(count * costPerTile);
       return cost;
+    }
+
+    private int GetCountOfTilesWeCanWater()
+    {
+      var count = 0;
+      foreach (var location in  GetLocations())
+      {
+        foreach (var (tile, sprinkler) in location.AllSprinklers())
+        {
+          sprinkler.ForCoveredTiles(this.Config, tile, t =>
+          {
+            if (this.Config.BalancedModeCostsMoneyOnAnyTile)
+            {
+              count++;
+            } else if (CanWaterTile(location, tile))
+            {
+              count++;
+            }
+          });
+        }
+      }
+
+      return count;
+    }
+    
+    private bool CanWaterTile(GameLocation location, Vector2 tile)
+    {
+      if (!location.terrainFeatures.TryGetValue(tile, out var terrainFeature))
+      {
+        this.Monitor.VerboseLog($"could not get feature at: {tile.X}x{tile.Y}");
+        return false;
+      }
+
+      return terrainFeature.IsDirt();
     }
 
     private float GetCostPerTile()
@@ -415,7 +505,7 @@ namespace BetterSprinklers
     }
 
     /// <summary>Get all game location.</summary>
-    private IEnumerable<GameLocation> GetLocations()
+    private static IEnumerable<GameLocation> GetLocations()
     {
       return Game1.locations
         .Concat(
