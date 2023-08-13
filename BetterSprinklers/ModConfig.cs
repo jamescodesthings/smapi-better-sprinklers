@@ -9,7 +9,6 @@ namespace BetterSprinklers
     public enum BalancedModeOptions
     {
       Off,
-      VeryEasy,
       Easy,
       Normal,
       Hard,
@@ -19,7 +18,6 @@ namespace BetterSprinklers
     public static string[] BalancedModeOptionsText =
     {
       "Off",
-      "Very Easy",
       "Easy",
       "Normal",
       "Hard",
@@ -29,7 +27,6 @@ namespace BetterSprinklers
     public static float[] BalancedModeOptionsMultipliers =
     {
       0f,
-      0.05f,
       0.1f,
       0.25f,
       0.5f,

@@ -53,8 +53,6 @@ In balanced mode, the sprinklers you have cost money every day.
 ## Balanced Mode
 __Off:__ Sprinklers do not have a daily cost.
 
-__Very Easy:__ Sprinklers cost 0.05g per tile watered, per day.
-
 __Easy:__ Sprinklers cost 0.1g per tile watered, per day.
 
 __Normal:__ Sprinklers cost 0.25g per tile watered, per day.
