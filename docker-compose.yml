@@ -5,6 +5,6 @@ services:
     working_dir: /plugin
     volumes:
       - ./:/plugin
-      - ./:/plugin/BetterSprinklers/obj
-      - ./:/plugin/BetterSprinklers/bin
+      - ./:/plugin/BetterSprinklersPlus/obj
+      - ./:/plugin/BetterSprinklersPlus/bin
       - /plugin/stardew
