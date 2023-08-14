@@ -4,7 +4,7 @@
   "Version": "2.6.12-dev",
   "Description": "Sprinklers, but better.",
   "UniqueID": "com.CodesThings.BetterSprinklersPlus",
-  "EntryDll": "BetterSprinklers.dll",
+  "EntryDll": "BetterSprinklersPlus.dll",
   "MinimumApiVersion": "3.0.0",
   "UpdateKeys": []
 }

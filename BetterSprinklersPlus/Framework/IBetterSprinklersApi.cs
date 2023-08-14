@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
-namespace BetterSprinklers
+namespace BetterSprinklersPlus.Framework
 {
     /// <summary>The API which provides access to Better Sprinklers for other mods.</summary>
     public interface IBetterSprinklersApi

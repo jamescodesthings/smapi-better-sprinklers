@@ -6,7 +6,7 @@ using StardewValley;
 using StardewValley.Menus;
 using Object = StardewValley.Object;
 
-namespace BetterSprinklers.Framework
+namespace BetterSprinklersPlus.Framework
 {
     internal class SprinklerShapeEditMenu : IClickableMenu
     {
@@ -14,7 +14,7 @@ namespace BetterSprinklers.Framework
         ** Fields
         *********/
         /// <summary>The mod configuration.</summary>
-        private readonly SprinklerModConfig Config;
+        private readonly BetterSprinklersPlusConfig Config;
 
         /// <summary>The callback invoked when the sprinkler settings are changed.</summary>
         private readonly Action OnEdited;
@@ -60,7 +60,7 @@ namespace BetterSprinklers.Framework
         /// <summary>Construct an instance.</summary>
         /// <param name="modConfig">The mod configuration.</param>
         /// <param name="onEdited">The callback invoked when the sprinkler settings are changed.</param>
-        public SprinklerShapeEditMenu(SprinklerModConfig modConfig, Action onEdited)
+        public SprinklerShapeEditMenu(BetterSprinklersPlusConfig modConfig, Action onEdited)
         {
             this.Config = modConfig;
             this.OnEdited = onEdited;

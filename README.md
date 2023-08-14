@@ -149,11 +149,11 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [x] (ui) Message: When watering is skipped/cut out, warn the user
   - [x] Option to enable/disable (using main option)
 - [x] Update Mod Screenshots
+- [x] (immersion) Same bills cutout with default tiles?
 - [ ] (ui) Live Preview of costs on config menu
 - [ ] (ui) Click & Drag to change multiple tiles quickly
 - [ ] (gameplay) Ability to change maximum range of each sprinkler type.
 - [ ] (balancing) Pressure Nozzle should cut cost/do something!
-- [ ] (immersion) Same bills cutout with default tiles?
 - [ ] (gamplay) Ability to activate one or all sprinklers manually (same cost).
   - [ ] (optional) Or just make sure mod is compatible with [Activated Sprinklers](https://github.com/JudeRV/Stardew-ActivatingSprinklers/blob/master/ActivatingSprinklers/ActivatingSprinklers.cs).
 - [ ] (accessibility) i18n basics. 

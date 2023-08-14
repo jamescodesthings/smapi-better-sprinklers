@@ -8,20 +8,25 @@ using StardewValley.Network;
 using StardewValley.TerrainFeatures;
 using Object = StardewValley.Object;
 
-namespace BetterSprinklers.Framework.Helpers
+namespace BetterSprinklersPlus.Framework.Helpers
 {
   /**
    * Helps us get from GameLocations to Sprinkler objects and tiles
    */
-  public static class SprinklersHelper
+  public static class SprinklerHelper
   {
-    public static List<int> SprinklerObjectIds = new List<int>
+    private static readonly List<int> SprinklerObjectIds = new()
     {
       599,
       621,
       645
     };
-    
+
+    public static bool IsSprinkler(this Object obj)
+    {
+      return SprinklerObjectIds.Contains(obj.ParentSheetIndex);
+    }
+
     public static IEnumerable<KeyValuePair<Vector2, Object>> AllSprinklers(this IEnumerable<GameLocation> locations)
     {
       var allSprinklers = new List<KeyValuePair<Vector2, Object>>();
@@ -38,7 +43,7 @@ namespace BetterSprinklers.Framework.Helpers
         .Where(obj => SprinklerObjectIds.Contains(obj.Value.ParentSheetIndex));
     }
     
-    public static void ForCoveredTiles(this Object sprinkler, SprinklerModConfig config, Vector2 tile, Action<Vector2> perform)
+    public static void ForCoveredTiles(this Object sprinkler, BetterSprinklersPlusConfig config, Vector2 tile, Action<Vector2> perform)
     {
       config.SprinklerShapes.TryGetValue(sprinkler.ParentSheetIndex, out int[,] grid);
       foreach (Vector2 coveredTile in GridHelper.GetCoveredTiles(tile , grid))

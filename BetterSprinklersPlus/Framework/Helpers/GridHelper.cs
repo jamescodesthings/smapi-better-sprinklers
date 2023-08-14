@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
-namespace BetterSprinklers.Framework
+namespace BetterSprinklersPlus.Framework.Helpers
 {
     /// <summary>Provides methods for working with sprinkler grids.</summary>
     internal static class GridHelper

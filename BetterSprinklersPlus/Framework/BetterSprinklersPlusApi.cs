@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BetterSprinklersPlus.Framework.Helpers;
 using Microsoft.Xna.Framework;
 
-namespace BetterSprinklers.Framework
+namespace BetterSprinklersPlus.Framework
 {
     /// <summary>The API which provides access to Better Sprinklers for other mods.</summary>
-    public class BetterSprinklersApi : IBetterSprinklersApi
+    public class BetterSprinklersPlusApi : IBetterSprinklersApi
     {
         /*********
         ** Fields
         *********/
         /// <summary>The mod configuration.</summary>
-        private readonly SprinklerModConfig Config;
+        private readonly BetterSprinklersPlusConfig Config;
 
         /// <summary>The maximum sprinkler coverage supported by this mod (in tiles wide or high).</summary>
         private readonly int MaxGridSize;
@@ -23,7 +24,7 @@ namespace BetterSprinklers.Framework
         /// <summary>Construct an instance.</summary>
         /// <param name="config">The mod configuration.</param>
         /// <param name="maxGridSize">The maximum sprinkler coverage supported by this mod (in tiles wide or high).</param>
-        internal BetterSprinklersApi(SprinklerModConfig config, int maxGridSize)
+        internal BetterSprinklersPlusApi(BetterSprinklersPlusConfig config, int maxGridSize)
         {
             this.Config = config;
             this.MaxGridSize = maxGridSize;
