@@ -147,6 +147,13 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [ ] (accessibility) i18n basics. 
 
 # Versions
+## 2.8.9
+- Refactor RunSprinklers method so it's easier to modify and follow.
+- Remove CutOut option, feels unnecessary
+- Remove Grid on placement
+- Clean up and bugfix where it makes sense to.
+- Rename BetterSprinklers to BetterSprinklersPlus everywhere
+
 ## 2.8.0
 - Add options for what happens when you cannot afford to run the sprinklers
 - Update readme
