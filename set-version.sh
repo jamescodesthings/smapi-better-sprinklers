@@ -2,7 +2,7 @@
 
 VERSION=$1
 
-MANIFEST=BetterSprinklers/manifest.json
+MANIFEST=BetterSprinklersPlus/manifest.json
 
 if [ "$VERSION" == "" ]; then
   VERSION=$(git describe --tags --abbrev=0)  
