@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using BetterSprinklersPlus.Framework;
 using BetterSprinklersPlus.Framework.Helpers;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -18,25 +16,27 @@ namespace BetterSprinklersPlus
   // ReSharper disable once UnusedType.Global
   public class BetterSprinklersPlus : Mod
   {
-    /// <summary>The mod configuration.</summary>
+    /// <summary>
+    /// The mod configuration.
+    /// </summary>
     private BetterSprinklersPlusConfig Config;
 
-    private Texture2D BuildingPlacementTiles;
-
-    /// <summary>Whether to show a grid overlay and highlight the coverage for sprinklers or scarecrows under the cursor.</summary>
+    /// <summary>
+    /// Is F3 mode on?
+    /// </summary>
     private bool ShowInfoOverlay;
 
-    /// <summary>The mod entry point, called after the mod is first loaded.</summary>
+    /// <summary>
+    /// The mod entry point, called after the mod is first loaded.
+    /// </summary>
     /// <param name="helper">Provides simplified APIs for writing mods.</param>
     public override void Entry(IModHelper helper)
     {
       Config = BetterSprinklersPlusConfig.ReadConfig(helper);
 
-      BuildingPlacementTiles = Helper.GameContent.Load<Texture2D>("LooseSprites/buildingPlacementTiles");
-
       SetUpEvents();
     }
-      
+
     /// <summary>
     /// Sets up events
     /// </summary>
@@ -48,12 +48,20 @@ namespace BetterSprinklersPlus
       Helper.Events.Input.ButtonPressed += OnButtonPressed;
     }
 
-    /// <summary>Get an API that other mods can access. This is always called after <see cref="Entry" />.</summary>
+    /// <summary>
+    /// Get an API that other mods can access.
+    /// This is always called after <see cref="Entry" />.
+    /// </summary>
     public override object GetApi()
     {
       return new BetterSprinklersPlusApi(Config, BetterSprinklersPlusConfig.MaxGridSize);
     }
 
+    /// <summary>
+    /// Handle game launch
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">The event arguments.</param>
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
     {
       BetterSprinklersPlusConfig.SetupGenericModConfigMenu(Helper, ModManifest, Monitor, () =>
@@ -62,7 +70,9 @@ namespace BetterSprinklersPlus
       });
     }
 
-    /// <summary>Raised after drawing the world.</summary>
+    /// <summary>
+    /// Raised after drawing the world.
+    /// </summary>
     /// <param name="sender">The event sender.</param>
     /// <param name="e">The event arguments.</param>
     private void OnRenderedWorld(object sender, RenderedWorldEventArgs e)
@@ -70,7 +80,9 @@ namespace BetterSprinklersPlus
         RenderHighlight();
     }
 
-    /// <summary>Raised after the game begins a new day (including when the player loads a save).</summary>
+    /// <summary>
+    /// Raised after the game begins a new day (including when the player loads a save).
+    /// </summary>
     /// <param name="sender">The event sender.</param>
     /// <param name="e">The event arguments.</param>
     private void OnDayStarted(object sender, DayStartedEventArgs e)
@@ -78,7 +90,9 @@ namespace BetterSprinklersPlus
       RunSprinklers();
     }
 
-    /// <summary>Raised after the player presses a button on the keyboard, controller, or mouse.</summary>
+    /// <summary>
+    /// Raised after the player presses a button on the keyboard, controller, or mouse.
+    /// </summary>
     /// <param name="sender">The event sender.</param>
     /// <param name="e">The event arguments.</param>
     private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
@@ -98,6 +112,9 @@ namespace BetterSprinklersPlus
       }
     }
 
+    /// <summary>
+    /// Show the sprinkler edit menu
+    /// </summary>
     private void ShowSprinklerEditMenu()
     {
       Game1.activeClickableMenu = new SprinklerShapeEditMenu(Config, () =>
@@ -105,7 +122,10 @@ namespace BetterSprinklersPlus
         BetterSprinklersPlusConfig.SaveChanges(Helper, Config);
       });
     }
-    
+
+    /// <summary>
+    /// Toggles the F3 overlay
+    /// </summary>
     private void ToggleOverlay()
     {
       ShowInfoOverlay = !ShowInfoOverlay;
@@ -132,43 +152,20 @@ namespace BetterSprinklersPlus
       var affordable = GetTilesWeCanAffordToWater();
       int cost;
 
-      if (tilesWeCanWater > affordable)
+      if (tilesWeCanWater > affordable && Config.CannotAfford == (int)BetterSprinklersPlusConfig.CannotAffordOptions.DoNotWater)
       {
         Monitor.VerboseLog(
           $"We can only afford to water {affordable} tiles, but there are {tilesWeCanWater} tiles to water");
-        // ReSharper disable once ConvertIfStatementToSwitchStatement
-        if (Config.CannotAfford == (int)BetterSprinklersPlusConfig.CannotAffordOptions.DoNotWater)
+        Monitor.VerboseLog("Do not water is set, unwatering.");
+        UnwaterAll();
+        cost = CalculateCost(tilesWeCanWater);
+        if (Config.BalancedModeCostMessage || Config.BalancedModeCannotAffordWarning)
         {
-          Monitor.VerboseLog("Do not water is set, unwatering.");
-          UnwaterAll();
-          cost = CalculateCost(tilesWeCanWater);
-          if (Config.BalancedModeCostMessage || Config.BalancedModeCannotAffordWarning)
-          {
-            Game1.addHUDMessage(new HUDMessage($"You could not to run your sprinklers today ({cost}G).",
-              Color.Green, 5000f));
-          }
-
-          return;
+          Game1.addHUDMessage(new HUDMessage($"You could not to run your sprinklers today ({cost}G).",
+            Color.Green, 5000f));
         }
 
-        if (Config.CannotAfford == (int)BetterSprinklersPlusConfig.CannotAffordOptions.CutOff)
-        {
-          cost = CalculateCost(affordable);
-          WaterAllWeCanAfford(affordable);
-          DeductCost(cost);
-          Monitor.VerboseLog($"Sprinklers have run ({cost}G), Could not finish watering.");
-          if (Config.BalancedModeCostMessage)
-          {
-            Game1.addHUDMessage(new HUDMessage(
-              $"Your sprinklers have run ({cost}G), Could not finish watering.", Color.Green, 5000f));
-          }
-          else if (Config.BalancedModeCannotAffordWarning)
-          {
-            Game1.addHUDMessage(new HUDMessage("Could not finish watering.", Color.Green, 5000f));
-          }
-
-          return;
-        }
+        return;
       }
 
       // Otherwise, water everything and deduct cost
@@ -181,7 +178,10 @@ namespace BetterSprinklersPlus
         Game1.addHUDMessage(new HUDMessage($"Your sprinklers have run ({cost}G).", Color.Green, 5000f));
       }
     }
-    
+
+    /// <summary>
+    /// Water all tiles
+    /// </summary>
     private void WaterAll()
     {
       foreach (var location in LocationHelper.GetAllBuildableLocations())
@@ -194,6 +194,9 @@ namespace BetterSprinklersPlus
       }
     }
 
+    /// <summary>
+    /// Unwater all tiles
+    /// </summary>
     private void UnwaterAll()
     {
       foreach (var location in LocationHelper.GetAllBuildableLocations())
@@ -206,40 +209,32 @@ namespace BetterSprinklersPlus
       }
     }
 
-    private void WaterAllWeCanAfford(int affordable)
-    {
-      var current = 0;
-      foreach (var location in LocationHelper.GetAllBuildableLocations())
-      {
-        foreach (var (tile, sprinkler) in location.AllSprinklers())
-        {
-          sprinkler.ForCoveredTiles(Config, tile, _ =>
-          {
-            if (current < affordable)
-            {
-              WaterTile(location, tile);
-            }
-            else
-            {
-              UnwaterTile(location, tile);
-            }
-
-            current++;
-          });
-        }
-      }
-    }
-
+    /// <summary>
+    /// Sets a tile to watered
+    /// </summary>
+    /// <param name="location">The location the tile is in</param>
+    /// <param name="tile">The tile location</param>
     private void WaterTile(GameLocation location, Vector2 tile)
     {
-      SetTileWateredValue(location, tile, 1);
+      SetTileWateredValue(location, tile, HoeDirt.watered);
     }
 
+    /// <summary>
+    /// Sets a tile to dry
+    /// </summary>
+    /// <param name="location">The location the tile is in</param>
+    /// <param name="tile">The tile location</param>
     private void UnwaterTile(GameLocation location, Vector2 tile)
     {
-      SetTileWateredValue(location, tile, 0);
+      SetTileWateredValue(location, tile, HoeDirt.dry);
     }
 
+    /// <summary>
+    /// Sets the dirt tile state
+    /// </summary>
+    /// <param name="location">The location the tile is in</param>
+    /// <param name="tile">The tile location</param>
+    /// <param name="value">The value to set it to</param>
     private void SetTileWateredValue(GameLocation location, Vector2 tile, int value)
     {
       if (!location.terrainFeatures.TryGetValue(tile, out var terrainFeature))
@@ -248,29 +243,27 @@ namespace BetterSprinklersPlus
         return;
       }
 
+      if (value != HoeDirt.dry && value != HoeDirt.watered)
+      {
+        Monitor.Log("Careful, setting the dirt state to something other than watered/dry is untested", LogLevel.Warn);
+        return;
+      }
+
       if (!terrainFeature.IsDirt()) return;
 
       var dirt = (HoeDirt)terrainFeature;
       dirt.state.Value = value;
     }
-    
+
+    /// <summary>
+    /// Gets the count of tiles we can afford to water
+    /// </summary>
+    /// <returns>The count of tiles</returns>
     private int GetTilesWeCanAffordToWater()
     {
       var costPerTile = GetCostPerTile();
       var canAfford = costPerTile == 0f ? int.MaxValue : (int)Math.Floor(Game1.player.Money / costPerTile);
       return canAfford;
-    }
-
-    private static void DeductCost(int cost)
-    {
-      if (Game1.player.Money - cost >= 0)
-      {
-        Game1.player.Money -= cost;
-      }
-      else
-      {
-        Game1.player.Money = 0;
-      }
     }
 
     /// <summary>
@@ -284,7 +277,27 @@ namespace BetterSprinklersPlus
       var cost = (int)Math.Round(count * costPerTile);
       return cost;
     }
-    
+
+    /// <summary>
+    /// Deducts the cost from player money
+    /// </summary>
+    /// <param name="cost">The cost to deduct</param>
+    private static void DeductCost(int cost)
+    {
+      if (Game1.player.Money - cost >= 0)
+      {
+        Game1.player.Money -= cost;
+      }
+      else
+      {
+        Game1.player.Money = 0;
+      }
+    }
+
+    /// <summary>
+    /// Gets the cost per tile in .Gs
+    /// </summary>
+    /// <returns>The cost of watering one tile (as a fraction of a G)</returns>
     private float GetCostPerTile()
     {
       try
@@ -298,6 +311,10 @@ namespace BetterSprinklersPlus
       }
     }
 
+    /// <summary>
+    /// Gets the count of tiles we can water (all tiles in all locations which are covered)
+    /// </summary>
+    /// <returns>The count of tiles we can water</returns>
     private int GetCountOfTilesWeCanWater()
     {
       var count = 0;
@@ -305,59 +322,51 @@ namespace BetterSprinklersPlus
       {
         foreach (var (tile, sprinkler) in location.AllSprinklers())
         {
-          sprinkler.ForCoveredTiles(Config, tile, _ =>
-          {
-            if (Config.BalancedModeCostsMoneyOnAnyTile)
-            {
-              count++;
-            }
-            else if (CanWaterTile(location, tile))
-            {
-              count++;
-            }
-          });
+          sprinkler.ForCoveredTiles(Config, tile, _ => count++);
         }
       }
 
       return count;
     }
 
-    private bool CanWaterTile(GameLocation location, Vector2 tile)
-    {
-      if (!location.terrainFeatures.TryGetValue(tile, out var terrainFeature))
-      {
-        Monitor.VerboseLog($"could not get feature at: {tile.X}x{tile.Y}");
-        return false;
-      }
-
-      return terrainFeature.IsDirt();
-    }
-
-    /// <summary>Highlight coverage for sprinklers and scarecrows based on the current context.</summary>
-    [SuppressMessage("ReSharper", "PossibleLossOfFraction",
-      Justification = "The decimals are deliberately truncated during conversion to tile coordinates.")]
+    /// <summary>
+    /// Highlight coverage for sprinklers and scarecrows held or under the mouse.
+    /// </summary>
     private void RenderHighlight()
     {
-      if (!(Context.IsWorldReady && Game1.activeClickableMenu == null && Game1.CurrentEvent == null))
+      if (!ShouldRender())
       {
         return;
       }
 
-      var cursorPos = Helper.Input.GetCursorPosition();
-      var mouseTile = new Vector2((Game1.viewport.X + Game1.getOldMouseX()) / Game1.tileSize,
-        (Game1.viewport.Y + Game1.getOldMouseY()) / Game1.tileSize);
+      var x = (Game1.viewport.X + Game1.getOldMouseX()) / Game1.tileSize;
+      var y = (Game1.viewport.Y + Game1.getOldMouseY()) / Game1.tileSize;
+
+      var mouseTile = new Vector2(x, y);
 
       HighlightCoverageForHeldObject();
-      HighlightCoverageForObjectUnderCursor(mouseTile, cursorPos);
+      HighlightCoverageForObjectUnderCursor(mouseTile);
     }
 
+    /// <summary>
+    /// Tells us whether or not we should render highlights to the game world
+    /// </summary>
+    /// <returns>True if we should render</returns>
+    private static bool ShouldRender()
+    {
+      return Context.IsWorldReady && Game1.activeClickableMenu == null && Game1.CurrentEvent == null;
+    }
+
+    /// <summary>
+    /// Highlight the coverage for the held object
+    /// </summary>
     private void HighlightCoverageForHeldObject()
     {
       if (!Config.OverlayEnabledOnPlace) return;
-      
+
       var heldObject = Game1.player.ActiveObject;
       if (heldObject == null) return;
-        
+
       // accounts for controller mode
       var tileToHighlightFrom = PlacementHelper.GetPlacementPosition();
       if (tileToHighlightFrom == null) return;
@@ -365,6 +374,7 @@ namespace BetterSprinklersPlus
       if (SprinklerHelper.IsSprinkler(heldObject))
       {
         RenderSprinklerHighlight(heldObject.ParentSheetIndex, (Vector2)tileToHighlightFrom);
+        return;
       }
 
       if (ScarecrowHelper.IsScarecrow(heldObject))
@@ -373,24 +383,23 @@ namespace BetterSprinklersPlus
       }
     }
 
-    private void HighlightCoverageForObjectUnderCursor(Vector2 mouseTile, ICursorPosition cursorPos)
+    /// <summary>
+    /// Highlight coverage for the object under the cursor
+    /// </summary>
+    /// <param name="mouseTile">The mouse tile</param>
+    private void HighlightCoverageForObjectUnderCursor(Vector2 mouseTile)
     {
       if (!ShowInfoOverlay) return;
-      
-      if (Game1.currentLocation.objects.TryGetValue(mouseTile, out var objUnderMouse))
-      {
-        if (SprinklerHelper.IsSprinkler(objUnderMouse)){
-          RenderSprinklerHighlight(objUnderMouse.ParentSheetIndex, cursorPos.Tile);
-        }
-        else if (ScarecrowHelper.IsScarecrow(objUnderMouse))
-        {
-          RenderScarecrowHighlight(cursorPos.Tile);
-        }
-      }
 
-      if (this.Config.GridColour == Color.Transparent) return;
-      
-      RenderGrid();
+      if (!Game1.currentLocation.objects.TryGetValue(mouseTile, out var objUnderMouse)) return;
+
+      if (SprinklerHelper.IsSprinkler(objUnderMouse)){
+        RenderSprinklerHighlight(objUnderMouse.ParentSheetIndex, mouseTile);
+      }
+      else if (ScarecrowHelper.IsScarecrow(objUnderMouse))
+      {
+        RenderScarecrowHighlight(mouseTile);
+      }
     }
 
     /// <summary>Highlight coverage for a sprinkler.</summary>
@@ -398,7 +407,7 @@ namespace BetterSprinklersPlus
     /// <param name="tile">The sprinkler tile.</param>
     private void RenderSprinklerHighlight(int sprinklerId, Vector2 tile)
     {
-      RenderHighlight(tile, Config.SprinklerShapes[sprinklerId]);
+      GridHelper.RenderHighlight(Helper, tile, Config.SprinklerShapes[sprinklerId]);
     }
 
     /// <summary>Highlight coverage for a scarecrow.</summary>
@@ -406,39 +415,7 @@ namespace BetterSprinklersPlus
     private void RenderScarecrowHighlight(Vector2 tile)
     {
       var scarecrowGrid = ScarecrowHelper.GetScarecrowGrid();
-      RenderHighlight(tile, scarecrowGrid);
-    }
-
-    /// <summary>Highlight coverage based on a given grid.</summary>
-    /// <param name="centerTile">The tile at the center of the grid.</param>
-    /// <param name="grid">The grid indicating which tiles to highlight.</param>
-    private void RenderHighlight(Vector2 centerTile, int[,] grid)
-    {
-      GridHelper.ForCoveredTiles(centerTile, grid,
-        tilePos =>
-        {
-          Game1.spriteBatch.Draw(
-            BuildingPlacementTiles,
-            Game1.GlobalToLocal(Game1.viewport, tilePos * Game1.tileSize),
-            Game1.getSourceRectForStandardTileSheet(BuildingPlacementTiles, 0), Color.White, 0f,
-            Vector2.Zero, 1f,
-            SpriteEffects.None, 0.999f);
-        });
-    }
-
-    /// <summary>Render a grid showing the tile layout.</summary>
-    private void RenderGrid()
-    {
-      var startingX = -Game1.viewport.X % Game1.tileSize;
-      var startingY = -(float)Game1.viewport.Y % Game1.tileSize;
-      for (var x = startingX; x < Game1.graphics.GraphicsDevice.Viewport.Width; x += Game1.tileSize)
-        Game1.spriteBatch.Draw(Game1.staminaRect,
-          new Rectangle(x, (int)startingY, 1, Game1.graphics.GraphicsDevice.Viewport.Height + Game1.tileSize),
-          Config.GridColour);
-      for (var y = startingY; y < Game1.graphics.GraphicsDevice.Viewport.Height; y += Game1.tileSize)
-        Game1.spriteBatch.Draw(Game1.staminaRect,
-          new Rectangle(startingX, (int)y, Game1.graphics.GraphicsDevice.Viewport.Width + Game1.tileSize, 1),
-          Config.GridColour);
+      GridHelper.RenderHighlight(Helper, tile, scarecrowGrid);
     }
   }
 }

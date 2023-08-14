@@ -1,12 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
+using StardewValley;
 
 namespace BetterSprinklersPlus.Framework.Helpers
 {
     /// <summary>Provides methods for working with sprinkler grids.</summary>
     internal static class GridHelper
     {
+      /// <summary>Highlight coverage based on a given grid.</summary>
+      /// <param name="helper">The IModHelper</param>
+      /// <param name="centerTile">The tile at the center of the grid.</param>
+      /// <param name="grid">The grid indicating which tiles to highlight.</param>
+      public static void RenderHighlight(IModHelper helper, Vector2 centerTile, int[,] grid)
+      {
+        var buildingPlacementTiles =  helper.GameContent.Load<Texture2D>("LooseSprites/buildingPlacementTiles");
+        
+        ForCoveredTiles(centerTile, grid,
+          tilePos =>
+          {
+            Game1.spriteBatch.Draw(
+              buildingPlacementTiles,
+              Game1.GlobalToLocal(Game1.viewport, tilePos * Game1.tileSize),
+              Game1.getSourceRectForStandardTileSheet(buildingPlacementTiles, 0), Color.White, 0f,
+              Vector2.Zero, 1f,
+              SpriteEffects.None, 0.999f);
+          });
+      }
+
+      
         /*********
         ** Public methods
         *********/

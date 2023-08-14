@@ -66,8 +66,6 @@ If you can't afford to run the sprinklers:
 
 __Off:__ the sprinklers run, your wallet is emptied.
 
-__Cut Off:__ the sprinklers cut off after watering the tiles you can water.
-
 __Don't Water:__ the sprinklers don't water your crops.
 
 _note:_ at the moment this does not affect the default spinkler tiles(see the roadmap).
@@ -84,16 +82,6 @@ __On:__ If you can't afford to water all your crops one day, you'll get a warnin
 __Off:__ Message is not shown.
 
 This one's just for if you want to be warned but don't want the bills message every day.
-
-## Water costs on any tile
-__On:__ The water costs money even if the tile is not waterable.
-
-__Off:__ Only waterable tiles cost money.
-
-## Show Overlay Grid
-__On:__ When the Coverage is shown, a grid is also shown.
-
-__Off:__ No grid is shown.
 
 ## Show Placement Coverage
 __On:__ The coverage of a sprinkler/scarecrow is shown when placing it.

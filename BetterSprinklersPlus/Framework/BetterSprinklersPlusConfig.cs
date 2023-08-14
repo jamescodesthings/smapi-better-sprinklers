@@ -12,7 +12,7 @@ namespace BetterSprinklersPlus.Framework
   {
     /// <summary>The maximum grid size. This one is Scarecrow grids</summary>
     public const int MaxGridSize = 19;
-    
+
     public enum BalancedModeOptions
     {
       Off,
@@ -43,26 +43,22 @@ namespace BetterSprinklersPlus.Framework
     public enum CannotAffordOptions
     {
       Off,
-      CutOff,
       DoNotWater,
     };
 
     private static readonly string[] CannotAffordOptionsText =
     {
       "Off",
-      "Cut Off",
       "Don't Water",
     };
 
     public SButton ShowSprinklerEditKey { get; set; } = SButton.K;
     public SButton ShowOverlayKey { get; set; } = SButton.F3;
-    public Color GridColour { get; set; } = Color.PowderBlue;
     public bool OverlayEnabledOnPlace { get; set; } = true;
     public int BalancedMode { get; set; } = (int)BalancedModeOptions.Normal;
-    public int CannotAfford { get; set; } = (int)CannotAffordOptions.CutOff;
+    public int CannotAfford { get; set; } = (int)CannotAffordOptions.DoNotWater;
     public bool BalancedModeCostMessage { get; set; } = true;
     public bool BalancedModeCannotAffordWarning { get; set; } = true;
-    public bool BalancedModeCostsMoneyOnAnyTile { get; set; } = true;
 
     /// <summary>
     /// The sprinkler default sprinkler shape config
@@ -123,14 +119,14 @@ namespace BetterSprinklersPlus.Framework
     {
       return helper.ReadConfig<BetterSprinklersPlusConfig>();
     }
-    
+
     /// <summary>Save changes to the mod configuration.</summary>
     public static void SaveChanges(IModHelper helper, BetterSprinklersPlusConfig config)
     {
       helper.WriteConfig(config);
       Game1.addHUDMessage(new HUDMessage("Sprinkler Configurations Saved", Color.Green, 3500f));
     }
-    
+
     public static void SetupGenericModConfigMenu(IModHelper helper, IManifest mod, IMonitor monitor,
       Action onUpdate)
     {
@@ -224,14 +220,6 @@ namespace BetterSprinklersPlus.Framework
 
       configMenu.AddBoolOption(
         mod: mod,
-        name: () => "Water costs on any tile",
-        tooltip: () => "Water costs money even if it waters a tile that cannot be watered tile.",
-        getValue: () => config.BalancedModeCostsMoneyOnAnyTile,
-        setValue: value => config.BalancedModeCostsMoneyOnAnyTile = value
-      );
-
-      configMenu.AddBoolOption(
-        mod: mod,
         name: () => "Show Bills Message",
         tooltip: () => "In the morning you'll see how much your sprinklers have cost.",
         getValue: () => config.BalancedModeCostMessage,
@@ -248,14 +236,6 @@ namespace BetterSprinklersPlus.Framework
 
 
       configMenu.AddSectionTitle(mod: mod, () => "Options:");
-
-      configMenu.AddBoolOption(
-        mod: mod,
-        name: () => "Show Overlay Grid",
-        tooltip: () => "When checked the grid shows in F3 mode",
-        getValue: () => config.GridColour == Color.PowderBlue,
-        setValue: value => config.GridColour = value ? Color.PowderBlue : Color.Transparent
-      );
 
       configMenu.AddBoolOption(
         mod: mod,
