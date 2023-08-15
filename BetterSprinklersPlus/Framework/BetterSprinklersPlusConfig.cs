@@ -10,9 +10,6 @@ namespace BetterSprinklersPlus.Framework
 {
   public class BetterSprinklersPlusConfig
   {
-    /// <summary>The maximum grid size. This one is Scarecrow grids</summary>
-    public const int MaxGridSize = 19;
-
     public enum BalancedModeOptions
     {
       Off,
@@ -21,6 +18,15 @@ namespace BetterSprinklersPlus.Framework
       Hard,
       VeryHard,
     };
+
+    public enum CannotAffordOptions
+    {
+      Off,
+      DoNotWater,
+    };
+
+    /// <summary>The maximum grid size. This one is Scarecrow grids</summary>
+    public const int MaxGridSize = 19;
 
     private static readonly string[] BalancedModeOptionsText =
     {
@@ -40,17 +46,18 @@ namespace BetterSprinklersPlus.Framework
       1f
     };
 
-    public enum CannotAffordOptions
-    {
-      Off,
-      DoNotWater,
-    };
-
     private static readonly string[] CannotAffordOptionsText =
     {
       "Off",
       "Don't Water",
     };
+
+    public static BetterSprinklersPlusConfig Active { get; set; }
+
+    public static IModHelper Helper { get; set; }
+    public static IManifest Mod { get; set; }
+
+    public static IMonitor Monitor { get; set; }
 
     public SButton ShowSprinklerEditKey { get; set; } = SButton.K;
     public SButton ShowOverlayKey { get; set; } = SButton.F3;
@@ -112,45 +119,52 @@ namespace BetterSprinklersPlus.Framework
       }
     };
 
+    public static void Init(IModHelper helper, IManifest mod, IMonitor monitor)
+    {
+      Helper = helper;
+      Mod = mod;
+      Monitor = monitor;
+
+      ReadConfig();
+    }
+
     /// <summary>
     /// Reads/Re-reads config
     /// </summary>
-    public static BetterSprinklersPlusConfig ReadConfig(IModHelper helper)
+    public static void ReadConfig()
     {
-      return helper.ReadConfig<BetterSprinklersPlusConfig>();
+      Active = Helper.ReadConfig<BetterSprinklersPlusConfig>();
     }
 
     /// <summary>Save changes to the mod configuration.</summary>
-    public static void SaveChanges(IModHelper helper, BetterSprinklersPlusConfig config)
+    public static void SaveChanges()
     {
-      helper.WriteConfig(config);
+      Helper.WriteConfig(Active);
       Game1.addHUDMessage(new HUDMessage("Sprinkler Configurations Saved", Color.Green, 3500f));
     }
 
-    public static void SetupGenericModConfigMenu(IModHelper helper, IManifest mod, IMonitor monitor,
-      Action onUpdate)
+    public static void SetupGenericModConfigMenu()
     {
-      var config = helper.ReadConfig<BetterSprinklersPlusConfig>();
+      var config = Helper.ReadConfig<BetterSprinklersPlusConfig>();
 
-      var configMenu = helper.ModRegistry
+      var configMenu = Helper.ModRegistry
         .GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 
       if (configMenu is null)
         return;
 
       configMenu.Register(
-        mod: mod,
+        mod: Mod,
         reset: () => { config = new BetterSprinklersPlusConfig(); },
         save: () =>
         {
-          helper.WriteConfig(config);
-          onUpdate();
+          Helper.WriteConfig(config);
         });
 
-      configMenu.AddSectionTitle(mod: mod, () => "Balance:");
+      configMenu.AddSectionTitle(mod: Mod, () => "Balance:");
 
       configMenu.AddTextOption(
-        mod: mod,
+        mod: Mod,
         name: () => "Mode",
         tooltip: () => "Changes the amount that water costs.",
         getValue: () =>
@@ -161,7 +175,7 @@ namespace BetterSprinklersPlus.Framework
           }
           catch (Exception exception)
           {
-            monitor.Log($"Error Getting Balanced Mode option {config.BalancedMode}: {exception.Message}",
+            Monitor.Log($"Error Getting Balanced Mode option {config.BalancedMode}: {exception.Message}",
               LogLevel.Error);
             return "Off";
           }
@@ -176,7 +190,7 @@ namespace BetterSprinklersPlus.Framework
           }
           catch (Exception exception)
           {
-            monitor.Log($"Error Setting Balanced Mode option {value}: {exception.Message}", LogLevel.Error);
+            Monitor.Log($"Error Setting Balanced Mode option {value}: {exception.Message}", LogLevel.Error);
             config.BalancedMode = (int)BalancedModeOptions.Off;
           }
         },
@@ -184,7 +198,7 @@ namespace BetterSprinklersPlus.Framework
       );
 
       configMenu.AddTextOption(
-        mod: mod,
+        mod: Mod,
         name: () => "Can't Afford",
         tooltip: () => "What to do when you can't afford the cost",
         getValue: () =>
@@ -195,7 +209,7 @@ namespace BetterSprinklersPlus.Framework
           }
           catch (Exception exception)
           {
-            monitor.Log($"Error Getting Can't Afford option {config.CannotAfford}: {exception.Message}",
+            Monitor.Log($"Error Getting Can't Afford option {config.CannotAfford}: {exception.Message}",
               LogLevel.Error);
             return "Off";
           }
@@ -210,7 +224,7 @@ namespace BetterSprinklersPlus.Framework
           }
           catch (Exception exception)
           {
-            monitor.Log($"Error Setting Can't Afford option {value}: {exception.Message}",
+            Monitor.Log($"Error Setting Can't Afford option {value}: {exception.Message}",
               LogLevel.Error);
             config.CannotAfford = (int)CannotAffordOptions.Off;
           }
@@ -219,7 +233,7 @@ namespace BetterSprinklersPlus.Framework
       );
 
       configMenu.AddBoolOption(
-        mod: mod,
+        mod: Mod,
         name: () => "Show Bills Message",
         tooltip: () => "In the morning you'll see how much your sprinklers have cost.",
         getValue: () => config.BalancedModeCostMessage,
@@ -227,7 +241,7 @@ namespace BetterSprinklersPlus.Framework
       );
 
       configMenu.AddBoolOption(
-        mod: mod,
+        mod: Mod,
         name: () => "Show Can't Afford Warning",
         tooltip: () => "In the morning you'll be warned if watering did not finish.",
         getValue: () => config.BalancedModeCannotAffordWarning,
@@ -235,20 +249,20 @@ namespace BetterSprinklersPlus.Framework
       );
 
 
-      configMenu.AddSectionTitle(mod: mod, () => "Options:");
+      configMenu.AddSectionTitle(mod: Mod, () => "Options:");
 
       configMenu.AddBoolOption(
-        mod: mod,
+        mod: Mod,
         name: () => "Show Placement Coverage",
         tooltip: () => "When checked the Overlay shows Sprinkler/Scarecrow reach when placing.",
         getValue: () => config.OverlayEnabledOnPlace,
         setValue: value => config.OverlayEnabledOnPlace = value
       );
 
-      configMenu.AddSectionTitle(mod: mod, () => "Key Bindings:");
+      configMenu.AddSectionTitle(mod: Mod, () => "Key Bindings:");
 
       configMenu.AddKeybind(
-        mod: mod,
+        mod: Mod,
         name: () => "Show Config Key",
         tooltip: () => "The key to press to change the boundary of all sprinklers",
         getValue: () => config.ShowSprinklerEditKey,
@@ -256,7 +270,7 @@ namespace BetterSprinklersPlus.Framework
       );
 
       configMenu.AddKeybind(
-        mod: mod,
+        mod: Mod,
         name: () => "Show Overlay Key",
         tooltip: () => "The key to press to show the boundary of the highlighted sprinkler/scarecrow",
         getValue: () => config.ShowOverlayKey,

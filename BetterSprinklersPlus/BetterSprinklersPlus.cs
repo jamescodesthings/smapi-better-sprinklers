@@ -17,11 +17,6 @@ namespace BetterSprinklersPlus
   public class BetterSprinklersPlus : Mod
   {
     /// <summary>
-    /// The mod configuration.
-    /// </summary>
-    private BetterSprinklersPlusConfig Config;
-
-    /// <summary>
     /// Is F3 mode on?
     /// </summary>
     private bool ShowInfoOverlay;
@@ -32,8 +27,6 @@ namespace BetterSprinklersPlus
     /// <param name="helper">Provides simplified APIs for writing mods.</param>
     public override void Entry(IModHelper helper)
     {
-      Config = BetterSprinklersPlusConfig.ReadConfig(helper);
-
       SetUpEvents();
     }
 
@@ -54,7 +47,7 @@ namespace BetterSprinklersPlus
     /// </summary>
     public override object GetApi()
     {
-      return new BetterSprinklersPlusApi(Config, BetterSprinklersPlusConfig.MaxGridSize);
+      return new BetterSprinklersPlusApi(BetterSprinklersPlusConfig.MaxGridSize);
     }
 
     /// <summary>
@@ -64,10 +57,7 @@ namespace BetterSprinklersPlus
     /// <param name="e">The event arguments.</param>
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
     {
-      BetterSprinklersPlusConfig.SetupGenericModConfigMenu(Helper, ModManifest, Monitor, () =>
-      {
-        Config = BetterSprinklersPlusConfig.ReadConfig(Helper);
-      });
+      BetterSprinklersPlusConfig.Init(Helper, ModManifest, Monitor);
     }
 
     /// <summary>
@@ -100,13 +90,13 @@ namespace BetterSprinklersPlus
       if (Game1.activeClickableMenu != null || Game1.CurrentEvent != null)
         return;
 
-      if (e.Button == Config.ShowSprinklerEditKey)
+      if (e.Button == BetterSprinklersPlusConfig.Active.ShowSprinklerEditKey)
       {
         ShowSprinklerEditMenu();
         return;
       }
 
-      if (e.Button == Config.ShowOverlayKey)
+      if (e.Button == BetterSprinklersPlusConfig.Active.ShowOverlayKey)
       {
         ToggleOverlay();
       }
@@ -117,10 +107,7 @@ namespace BetterSprinklersPlus
     /// </summary>
     private void ShowSprinklerEditMenu()
     {
-      Game1.activeClickableMenu = new SprinklerShapeEditMenu(Config, () =>
-      {
-        BetterSprinklersPlusConfig.SaveChanges(Helper, Config);
-      });
+      Game1.activeClickableMenu = new SprinklerShapeEditMenu(BetterSprinklersPlusConfig.SaveChanges);
     }
 
     /// <summary>
@@ -135,10 +122,10 @@ namespace BetterSprinklersPlus
     private void RunSprinklers()
     {
       Monitor.Log("Running Sprinklers", LogLevel.Info);
-      if (Config.BalancedMode == (int)BetterSprinklersPlusConfig.BalancedModeOptions.Off)
+      if (BetterSprinklersPlusConfig.Active.BalancedMode == (int)BetterSprinklersPlusConfig.BalancedModeOptions.Off)
       {
         Monitor.VerboseLog("Balanced mode is off, just water");
-        if (Config.BalancedModeCostMessage)
+        if (BetterSprinklersPlusConfig.Active.BalancedModeCostMessage)
         {
           Game1.addHUDMessage(new HUDMessage("Your sprinklers have run.", Color.Green, 5000f));
         }
@@ -152,14 +139,14 @@ namespace BetterSprinklersPlus
       var affordable = GetTilesWeCanAffordToWater();
       int cost;
 
-      if (tilesWeCanWater > affordable && Config.CannotAfford == (int)BetterSprinklersPlusConfig.CannotAffordOptions.DoNotWater)
+      if (tilesWeCanWater > affordable && BetterSprinklersPlusConfig.Active.CannotAfford == (int)BetterSprinklersPlusConfig.CannotAffordOptions.DoNotWater)
       {
         Monitor.VerboseLog(
           $"We can only afford to water {affordable} tiles, but there are {tilesWeCanWater} tiles to water");
         Monitor.VerboseLog("Do not water is set, unwatering.");
         UnwaterAll();
         cost = CalculateCost(tilesWeCanWater);
-        if (Config.BalancedModeCostMessage || Config.BalancedModeCannotAffordWarning)
+        if (BetterSprinklersPlusConfig.Active.BalancedModeCostMessage || BetterSprinklersPlusConfig.Active.BalancedModeCannotAffordWarning)
         {
           Game1.addHUDMessage(new HUDMessage($"You could not to run your sprinklers today ({cost}G).",
             Color.Green, 5000f));
@@ -173,7 +160,7 @@ namespace BetterSprinklersPlus
       cost = CalculateCost(tilesWeCanWater);
       DeductCost(cost);
       Monitor.VerboseLog($"Sprinklers have run ({cost}G).");
-      if (Config.BalancedModeCostMessage)
+      if (BetterSprinklersPlusConfig.Active.BalancedModeCostMessage)
       {
         Game1.addHUDMessage(new HUDMessage($"Your sprinklers have run ({cost}G).", Color.Green, 5000f));
       }
@@ -189,7 +176,7 @@ namespace BetterSprinklersPlus
         foreach (var (tile, sprinkler) in location.AllSprinklers())
         {
           Monitor.VerboseLog($"Processing Sprinkler at {tile.X}x{tile.Y}: {sprinkler.ParentSheetIndex}");
-          sprinkler.ForCoveredTiles(Config, tile, t => WaterTile(location, t));
+          sprinkler.ForCoveredTiles(BetterSprinklersPlusConfig.Active, tile, t => WaterTile(location, t));
         }
       }
     }
@@ -204,7 +191,7 @@ namespace BetterSprinklersPlus
         foreach (var (tile, sprinkler) in location.AllSprinklers())
         {
           Monitor.VerboseLog($"Processing Sprinkler at {tile.X}x{tile.Y}: {sprinkler.ParentSheetIndex}");
-          sprinkler.ForCoveredTiles(Config, tile, t => UnwaterTile(location, t));
+          sprinkler.ForCoveredTiles(BetterSprinklersPlusConfig.Active, tile, t => UnwaterTile(location, t));
         }
       }
     }
@@ -302,7 +289,7 @@ namespace BetterSprinklersPlus
     {
       try
       {
-        return BetterSprinklersPlusConfig.BalancedModeOptionsMultipliers[Config.BalancedMode];
+        return BetterSprinklersPlusConfig.BalancedModeOptionsMultipliers[BetterSprinklersPlusConfig.Active.BalancedMode];
       }
       catch (Exception e)
       {
@@ -322,7 +309,7 @@ namespace BetterSprinklersPlus
       {
         foreach (var (tile, sprinkler) in location.AllSprinklers())
         {
-          sprinkler.ForCoveredTiles(Config, tile, _ => count++);
+          sprinkler.ForCoveredTiles(BetterSprinklersPlusConfig.Active, tile, _ => count++);
         }
       }
 
@@ -362,7 +349,7 @@ namespace BetterSprinklersPlus
     /// </summary>
     private void HighlightCoverageForHeldObject()
     {
-      if (!Config.OverlayEnabledOnPlace) return;
+      if (!BetterSprinklersPlusConfig.Active.OverlayEnabledOnPlace) return;
 
       var heldObject = Game1.player.ActiveObject;
       if (heldObject == null) return;
@@ -407,7 +394,7 @@ namespace BetterSprinklersPlus
     /// <param name="tile">The sprinkler tile.</param>
     private void RenderSprinklerHighlight(int sprinklerId, Vector2 tile)
     {
-      GridHelper.RenderHighlight(Helper, tile, Config.SprinklerShapes[sprinklerId]);
+      GridHelper.RenderHighlight(Helper, tile, BetterSprinklersPlusConfig.Active.SprinklerShapes[sprinklerId]);
     }
 
     /// <summary>Highlight coverage for a scarecrow.</summary>
