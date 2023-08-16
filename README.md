@@ -138,8 +138,8 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
   - [x] Option to enable/disable (using main option)
 - [x] Update Mod Screenshots
 - [x] (immersion) Same bills cutout with default tiles?
-- [ ] (ui) Live Preview of costs on config menu
-- [ ] (ui) Click & Drag to change multiple tiles quickly
+- [x] (ui) Click & Drag to change multiple tiles quickly
+- [x] (ui) Live Preview of costs on config menu
 - [ ] (gameplay) Ability to change maximum range of each sprinkler type.
 - [ ] (balancing) Pressure Nozzle should cut cost/do something!
 - [ ] (gamplay) Ability to activate one or all sprinklers manually (same cost).
@@ -147,6 +147,13 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [ ] (accessibility) i18n basics. 
 
 # Versions
+## 2.10.0
+- First hack at showing cost on menu.
+- Fix shift key on click/drag.
+
+## 2.9.0
+- First hack at click & drag to toggle multiple squares at once.
+
 ## 2.8.9
 - Refactor RunSprinklers method so it's easier to modify and follow.
 - Remove CutOut option, feels unnecessary

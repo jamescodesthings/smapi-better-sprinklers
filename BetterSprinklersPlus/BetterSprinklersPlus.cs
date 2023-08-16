@@ -107,7 +107,7 @@ namespace BetterSprinklersPlus
     /// </summary>
     private void ShowSprinklerEditMenu()
     {
-      Game1.activeClickableMenu = new SprinklerShapeEditMenu(Helper);
+      Game1.activeClickableMenu = new SprinklerShapeEditMenu(Helper, Monitor);
     }
 
     /// <summary>

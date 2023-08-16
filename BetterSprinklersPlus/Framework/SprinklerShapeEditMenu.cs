@@ -18,8 +18,9 @@ namespace BetterSprinklersPlus.Framework
 
   internal class SprinklerShapeEditMenu : IClickableMenu
   {
-    private readonly Texture2D WhitePixel;
     private readonly IModHelper Helper;
+    private readonly IMonitor Monitor;
+    private readonly Texture2D WhitePixel;
     private readonly List<ClickableComponent> Tabs;
     private readonly ClickableTextureComponent OkButton;
 
@@ -54,11 +55,14 @@ namespace BetterSprinklersPlus.Framework
 
     private TileState? Toggling;
 
+    private int Cost = 0;
+
 
     /// <summary>Constructor</summary>
-    public SprinklerShapeEditMenu(IModHelper helper)
+    public SprinklerShapeEditMenu(IModHelper helper, IMonitor monitor)
     {
       Helper = helper;
+      Monitor = monitor;
       const int menuWidth = MaxArraySize * DefaultTileSize + MinLeftMargin * 2;
       const int menuHeight = MaxArraySize * DefaultTileSize + MinTopMargin * 2;
       var menuX = Game1.viewport.Width / 2 - menuWidth / 2;
@@ -107,6 +111,11 @@ namespace BetterSprinklersPlus.Framework
 
       drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60),
         xPositionOnScreen, yPositionOnScreen, width, height, Color.White);
+
+      // Draw Cost
+      var font = Game1.smallFont;
+      Utility.drawTextWithShadow(b, $"{Cost}G", font, new Vector2(xPositionOnScreen + 20, (yPositionOnScreen + width) - 100), Game1.textColor);
+
 
       var countX = 0;
       int x;
@@ -170,7 +179,7 @@ namespace BetterSprinklersPlus.Framework
       }
 
       // here, if mouse is down and hoveredItem is a tile, toggle the tile.
-      var isLeftMousePressed = Helper.Input.IsDown(SButton.MouseLeft) || Helper.Input.IsDown(SButton.RightShift);
+      var isLeftMousePressed = Helper.Input.IsDown(SButton.MouseLeft);
 
       if (!isLeftMousePressed)
       {
@@ -197,6 +206,7 @@ namespace BetterSprinklersPlus.Framework
       }
 
       SprinklerGrid[HoveredItemX, HoveredItemY] = (int)Toggling;
+      RecalculateCost();
     }
 
 
@@ -223,6 +233,7 @@ namespace BetterSprinklersPlus.Framework
           SprinklerGrid[HoveredItemX, HoveredItemY] =
             1 - SprinklerGrid[HoveredItemX, HoveredItemY];
           Game1.playSound("select");
+          RecalculateCost();
         }
       }
       else
@@ -305,6 +316,55 @@ namespace BetterSprinklersPlus.Framework
 
       LeftMargin = (width - (ArraySize * TileSize)) / 2;
       TopMargin = (height - (ArraySize * TileSize)) / 2;
+
+      RecalculateCost();
+    }
+
+    private void RecalculateCost()
+    {
+      var wateredTileCount = GetCountOfTilesBeingWatered();
+      Cost = CalculateCost(wateredTileCount);
+    }
+
+    private int GetCountOfTilesBeingWatered()
+    {
+      var count = 0;
+      for (var x = 0; x < ArraySize; x++)
+      {
+        for (var y = 0; y < ArraySize; y++)
+        {
+          if (SprinklerGrid[x, y] != (int)TileState.Off)
+          {
+            count++;
+          }
+        }
+      }
+
+      return count;
+    }
+
+    private int CalculateCost(int count)
+    {
+      var costPerTile = GetCostPerTile();
+      var cost = (int)Math.Round(count * costPerTile);
+      return cost;
+    }
+
+    /// <summary>
+    /// Gets the cost per tile in .Gs
+    /// </summary>
+    /// <returns>The cost of watering one tile (as a fraction of a G)</returns>
+    private float GetCostPerTile()
+    {
+      try
+      {
+        return BetterSprinklersPlusConfig.BalancedModeOptionsMultipliers[BetterSprinklersPlusConfig.Active.BalancedMode];
+      }
+      catch (Exception e)
+      {
+        Monitor.Log($"Error getting cost per tile {e.Message}", LogLevel.Error);
+        return 0f;
+      }
     }
   }
 }
