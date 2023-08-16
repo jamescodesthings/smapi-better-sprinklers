@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Mime;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -36,6 +38,7 @@ namespace BetterSprinklersPlus.Framework
     private const int TabLeftMargin = 16;
     private const int TabVerticalMargins = 16;
     private const int TabRightMargin = 32;
+    private const int TextSize = 64;
 
     private int ArraySize = 15;
     private int CenterTile = 7;
@@ -63,10 +66,13 @@ namespace BetterSprinklersPlus.Framework
     {
       Helper = helper;
       Monitor = monitor;
+      
       const int menuWidth = MaxArraySize * DefaultTileSize + MinLeftMargin * 2;
-      const int menuHeight = MaxArraySize * DefaultTileSize + MinTopMargin * 2;
-      var menuX = Game1.viewport.Width / 2 - menuWidth / 2;
-      var menuY = Game1.viewport.Height / 2 - menuHeight / 2;
+      const int menuHeight = MaxArraySize * DefaultTileSize + MinTopMargin * 2 + TextSize;
+      
+      var menuX = Game1.uiViewport.Width / 2 - menuWidth / 2;
+      var menuY = Game1.uiViewport.Height / 2 - menuHeight / 2;
+      
       initialize(menuX, menuY, menuWidth, menuHeight, true);
 
       Tabs = new List<ClickableComponent>();
@@ -112,10 +118,6 @@ namespace BetterSprinklersPlus.Framework
       drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60),
         xPositionOnScreen, yPositionOnScreen, width, height, Color.White);
 
-      // Draw Cost
-      var font = Game1.smallFont;
-      Utility.drawTextWithShadow(b, $"{Cost}G", font, new Vector2(xPositionOnScreen + 20, (yPositionOnScreen + width) - 100), Game1.textColor);
-
 
       var countX = 0;
       int x;
@@ -151,6 +153,11 @@ namespace BetterSprinklersPlus.Framework
         Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, ActiveSprinklerSheet, 16, 16),
         Color.White);
       OkButton.draw(Game1.spriteBatch);
+      
+      
+      // Draw Cost
+      var font = Game1.smallFont;
+      Utility.drawTextWithShadow(b, $"{Cost}G per day", font, new Vector2(xPositionOnScreen + 18, yPositionOnScreen + height - TextSize), Game1.textColor);
 
       Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()),
         Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 0, 16, 16), Color.White, 0f, Vector2.Zero,
@@ -188,6 +195,8 @@ namespace BetterSprinklersPlus.Framework
 
       if (isLeftMousePressed && HoveredItemX != -1 && HoveredItemY != -1)
       {
+        
+        this.Monitor.VerboseLog($"Left mouse is pressed over hovered item");
         Toggle();
       }
 
@@ -202,7 +211,8 @@ namespace BetterSprinklersPlus.Framework
       if (Toggling == null)
       {
         var current = (TileState)SprinklerGrid[HoveredItemX, HoveredItemY];
-        Toggling = current == TileState.Off ? TileState.On : TileState.Off;
+        var updated = current == TileState.Off ? TileState.On : TileState.Off;
+        Toggling = updated;
       }
 
       SprinklerGrid[HoveredItemX, HoveredItemY] = (int)Toggling;
@@ -220,52 +230,18 @@ namespace BetterSprinklersPlus.Framework
     {
       base.receiveLeftClick(x, y, playSound);
 
-      var mouseGridRelX = x - xPositionOnScreen - LeftMargin - Padding;
-      var mouseGridRelY = y - yPositionOnScreen - TopMargin - Padding;
-
-      if (mouseGridRelX > 0 && mouseGridRelY > 0 && mouseGridRelX < ArraySize * TileSize - Padding &&
-          mouseGridRelY < ArraySize * TileSize - Padding)
+      foreach (var tab in Tabs.Where(tab => tab.containsPoint(x, y)))
       {
-        HoveredItemX = mouseGridRelX / TileSize;
-        HoveredItemY = mouseGridRelY / TileSize;
-        if (SprinklerGrid[HoveredItemX, HoveredItemY] != 2)
-        {
-          SprinklerGrid[HoveredItemX, HoveredItemY] =
-            1 - SprinklerGrid[HoveredItemX, HoveredItemY];
-          Game1.playSound("select");
-          RecalculateCost();
-        }
+        Game1.playSound("select");
+        SetActiveSprinklerSheetIndex(tab.item.ParentSheetIndex);
       }
-      else
-      {
-        HoveredItemX = -1;
-        HoveredItemY = -1;
 
-        foreach (var tab in Tabs)
-        {
-          if (tab.containsPoint(x, y))
-          {
-            Game1.playSound("select");
-            SetActiveSprinklerSheetIndex(tab.item.ParentSheetIndex);
-          }
-        }
-
-        if (OkButton.containsPoint(x, y))
-        {
-          Game1.playSound("select");
-          BetterSprinklersPlusConfig.SaveChanges();
-        }
-      }
+      if (!OkButton.containsPoint(x, y)) return;
+      
+      Game1.playSound("select");
+      BetterSprinklersPlusConfig.SaveChanges();
     }
 
-    public override void receiveRightClick(int x, int y, bool playSound = true)
-    {
-    }
-
-
-    /*********
-     ** Private methods
-     *********/
     private void SetActiveSprinklerSheetIndex(int type)
     {
       ActiveSprinklerSheet = type;
@@ -322,8 +298,11 @@ namespace BetterSprinklersPlus.Framework
 
     private void RecalculateCost()
     {
+      this.Monitor.VerboseLog($"Recalculating Cost");
       var wateredTileCount = GetCountOfTilesBeingWatered();
+      this.Monitor.VerboseLog($"{wateredTileCount} tiles covered by this sprinkler type");
       Cost = CalculateCost(wateredTileCount);
+      this.Monitor.VerboseLog($"Which will cost {Cost}G per sprinkler, per day.");
     }
 
     private int GetCountOfTilesBeingWatered()

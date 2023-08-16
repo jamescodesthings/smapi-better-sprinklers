@@ -147,6 +147,12 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [ ] (accessibility) i18n basics. 
 
 # Versions
+## 2.10.1
+- Fix Showing cost on menu
+- Fix click & drag to toggle
+- Fix viewport zoom scale
+- Fix Generic Mod Config Menu
+
 ## 2.10.0
 - First hack at showing cost on menu.
 - Fix shift key on click/drag.

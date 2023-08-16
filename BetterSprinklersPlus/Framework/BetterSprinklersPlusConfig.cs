@@ -126,6 +126,7 @@ namespace BetterSprinklersPlus.Framework
       Monitor = monitor;
 
       ReadConfig();
+      SetupGenericModConfigMenu();
     }
 
     /// <summary>

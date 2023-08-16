@@ -226,7 +226,7 @@ namespace BetterSprinklersPlus
     {
       if (!location.terrainFeatures.TryGetValue(tile, out var terrainFeature))
       {
-        Monitor.VerboseLog($"could not get feature at: {tile.X}x{tile.Y}");
+        // Monitor.VerboseLog($"could not get feature at: {tile.X}x{tile.Y}");
         return;
       }
 
