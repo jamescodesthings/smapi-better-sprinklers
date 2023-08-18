@@ -9,12 +9,12 @@ namespace BetterSprinklersPlus.Framework.Helpers
     {
       return obj.bigCraftable.Value && obj.Name.Contains("arecrow");
     }
-    
+
     public static int[,] GetScarecrowGrid()
     {
-      const int maxGridSize = BetterSprinklersPlusConfig.MaxGridSize;
+      const int maxGridSize = BetterSprinklersPlusConfig.ScarecrowGridSize;
       var grid = new int[maxGridSize, maxGridSize];
-      var scarecrowCenterValue = maxGridSize / 2;
+      const int scarecrowCenterValue = maxGridSize / 2;
       var scarecrowCenter = new Vector2(scarecrowCenterValue, scarecrowCenterValue);
       for (var x = 0; x < maxGridSize; x++)
       {

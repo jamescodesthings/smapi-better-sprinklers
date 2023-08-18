@@ -140,7 +140,8 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [x] (immersion) Same bills cutout with default tiles?
 - [x] (ui) Click & Drag to change multiple tiles quickly
 - [x] (ui) Live Preview of costs on config menu
-- [ ] (gameplay) Ability to change maximum range of each sprinkler type.
+- [x] (gameplay) Ability to change maximum range of each sprinkler type.
+= [ ] (gameplay) Ability to remove default tiles.
 - [ ] (balancing) Pressure Nozzle should cut cost/do something!
 - [ ] (gamplay) Ability to activate one or all sprinklers manually (same cost).
   - [ ] (optional) Or just make sure mod is compatible with [Activated Sprinklers](https://github.com/JudeRV/Stardew-ActivatingSprinklers/blob/master/ActivatingSprinklers/ActivatingSprinklers.cs).

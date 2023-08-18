@@ -47,7 +47,7 @@ namespace BetterSprinklersPlus
     /// </summary>
     public override object GetApi()
     {
-      return new BetterSprinklersPlusApi(BetterSprinklersPlusConfig.MaxGridSize);
+      return new BetterSprinklersPlusApi();
     }
 
     /// <summary>

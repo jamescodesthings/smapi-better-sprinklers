@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -26,7 +25,6 @@ namespace BetterSprinklersPlus.Framework
     private readonly List<ClickableComponent> Tabs;
     private readonly ClickableTextureComponent OkButton;
 
-    private const int MaxArraySize = 15;
     private const int DefaultTileSize = 32;
     private const int Padding = 2;
     private const int MinLeftMargin = 32;
@@ -40,9 +38,9 @@ namespace BetterSprinklersPlus.Framework
     private const int TabRightMargin = 32;
     private const int TextSize = 64;
 
-    private int ArraySize = 15;
-    private int CenterTile = 7;
-    private int TileSize = 32;
+    private int ArraySize;
+    private int CenterTile;
+    private int TileSize;
 
     private int HoveredItemX;
     private int HoveredItemY;
@@ -58,7 +56,7 @@ namespace BetterSprinklersPlus.Framework
 
     private TileState? Toggling;
 
-    private int Cost = 0;
+    private int Cost;
 
 
     /// <summary>Constructor</summary>
@@ -66,13 +64,13 @@ namespace BetterSprinklersPlus.Framework
     {
       Helper = helper;
       Monitor = monitor;
-      
-      const int menuWidth = MaxArraySize * DefaultTileSize + MinLeftMargin * 2;
-      const int menuHeight = MaxArraySize * DefaultTileSize + MinTopMargin * 2 + TextSize;
-      
+
+      var menuWidth = BetterSprinklersPlusConfig.Active.MaxGridSize * DefaultTileSize + MinLeftMargin * 2;
+      var menuHeight = BetterSprinklersPlusConfig.Active.MaxGridSize * DefaultTileSize + MinTopMargin * 2 + TextSize;
+
       var menuX = Game1.uiViewport.Width / 2 - menuWidth / 2;
       var menuY = Game1.uiViewport.Height / 2 - menuHeight / 2;
-      
+
       initialize(menuX, menuY, menuWidth, menuHeight, true);
 
       Tabs = new List<ClickableComponent>();
@@ -153,8 +151,8 @@ namespace BetterSprinklersPlus.Framework
         Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, ActiveSprinklerSheet, 16, 16),
         Color.White);
       OkButton.draw(Game1.spriteBatch);
-      
-      
+
+
       // Draw Cost
       var font = Game1.smallFont;
       Utility.drawTextWithShadow(b, $"{Cost}G per day", font, new Vector2(xPositionOnScreen + 18, yPositionOnScreen + height - TextSize), Game1.textColor);
@@ -195,8 +193,8 @@ namespace BetterSprinklersPlus.Framework
 
       if (isLeftMousePressed && HoveredItemX != -1 && HoveredItemY != -1)
       {
-        
-        this.Monitor.VerboseLog($"Left mouse is pressed over hovered item");
+
+        Monitor.VerboseLog($"Left mouse is pressed over hovered item");
         Toggle();
       }
 
@@ -237,7 +235,7 @@ namespace BetterSprinklersPlus.Framework
       }
 
       if (!OkButton.containsPoint(x, y)) return;
-      
+
       Game1.playSound("select");
       BetterSprinklersPlusConfig.SaveChanges();
     }
@@ -251,12 +249,15 @@ namespace BetterSprinklersPlus.Framework
 
       SprinklerGrid = BetterSprinklersPlusConfig.Active.SprinklerShapes[type];
 
+      ArraySize = BetterSprinklersPlusConfig.Active.MaxCoverage[type];
+      CenterTile = ArraySize / 2;
+      TileSize = ArraySize <= 7 ? 64 : DefaultTileSize;
+
+      Monitor.VerboseLog($"Type: {type} ArraySize: {ArraySize}, CenterTile: {CenterTile}, TileSize {TileSize}");
+
       switch (type)
       {
         case 599:
-          ArraySize = 7;
-          CenterTile = ArraySize / 2;
-          TileSize = 64;
 
           SprinklerGrid[CenterTile, CenterTile] = 2;
           SprinklerGrid[CenterTile - 1, CenterTile] = 2;
@@ -265,10 +266,6 @@ namespace BetterSprinklersPlus.Framework
           SprinklerGrid[CenterTile, CenterTile + 1] = 2;
           break;
         case 621:
-          TileSize = 32;
-          ArraySize = 11;
-          CenterTile = ArraySize / 2;
-
           for (var x = CenterTile - 1; x < CenterTile + 2; x++)
           {
             for (var y = CenterTile - 1; y < CenterTile + 2; y++)
@@ -277,10 +274,6 @@ namespace BetterSprinklersPlus.Framework
 
           break;
         case 645:
-          TileSize = 32;
-          ArraySize = 15;
-          CenterTile = ArraySize / 2;
-
           for (var x = CenterTile - 2; x < CenterTile + 3; x++)
           {
             for (var y = CenterTile - 2; y < CenterTile + 3; y++)
@@ -298,11 +291,11 @@ namespace BetterSprinklersPlus.Framework
 
     private void RecalculateCost()
     {
-      this.Monitor.VerboseLog($"Recalculating Cost");
+      Monitor.VerboseLog($"Recalculating Cost");
       var wateredTileCount = GetCountOfTilesBeingWatered();
-      this.Monitor.VerboseLog($"{wateredTileCount} tiles covered by this sprinkler type");
+      Monitor.VerboseLog($"{wateredTileCount} tiles covered by this sprinkler type");
       Cost = CalculateCost(wateredTileCount);
-      this.Monitor.VerboseLog($"Which will cost {Cost}G per sprinkler, per day.");
+      Monitor.VerboseLog($"Which will cost {Cost}G per sprinkler, per day.");
     }
 
     private int GetCountOfTilesBeingWatered()

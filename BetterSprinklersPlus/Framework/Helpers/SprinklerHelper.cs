@@ -15,7 +15,7 @@ namespace BetterSprinklersPlus.Framework.Helpers
    */
   public static class SprinklerHelper
   {
-    private static readonly List<int> SprinklerObjectIds = new()
+    public static readonly List<int> SprinklerObjectIds = new()
     {
       599,
       621,
@@ -42,7 +42,7 @@ namespace BetterSprinklersPlus.Framework.Helpers
       return location.objects.Pairs
         .Where(obj => SprinklerObjectIds.Contains(obj.Value.ParentSheetIndex));
     }
-    
+
     public static void ForCoveredTiles(this Object sprinkler, BetterSprinklersPlusConfig config, Vector2 tile, Action<Vector2> perform)
     {
       config.SprinklerShapes.TryGetValue(sprinkler.ParentSheetIndex, out int[,] grid);
