@@ -39,12 +39,12 @@ namespace BetterSprinklersPlus.Framework.Helpers
         /// <param name="grid">The grid to convert.</param>
         public static IEnumerable<Vector2> GetCoveredTiles(Vector2 center, int[,] grid)
         {
-            int arrayHalfSizeX = grid.GetLength(0) / 2;
-            int arrayHalfSizeY = grid.GetLength(1) / 2;
-            int minX = (int)center.X - arrayHalfSizeX;
-            int minY = (int)center.Y - arrayHalfSizeY;
-            int maxX = (int)center.X + arrayHalfSizeX;
-            int maxY = (int)center.Y + arrayHalfSizeY;
+            var arrayHalfSizeX = grid.GetLength(0) / 2;
+            var arrayHalfSizeY = grid.GetLength(1) / 2;
+            var minX = (int)center.X - arrayHalfSizeX;
+            var minY = (int)center.Y - arrayHalfSizeY;
+            var maxX = (int)center.X + arrayHalfSizeX;
+            var maxY = (int)center.Y + arrayHalfSizeY;
 
             for (int gridX = 0, x = minX; x <= maxX; x++, gridX++)
             {
@@ -55,6 +55,27 @@ namespace BetterSprinklersPlus.Framework.Helpers
                 }
             }
         }
+        
+        public static IEnumerable<SprinklerHelper.SprinklerTile> GetAllTiles(Vector2 center, int[,] grid)
+        {
+          var arrayHalfSizeX = grid.GetLength(0) / 2;
+          var arrayHalfSizeY = grid.GetLength(1) / 2;
+          var minX = (int)center.X - arrayHalfSizeX;
+          var minY = (int)center.Y - arrayHalfSizeY;
+          var maxX = (int)center.X + arrayHalfSizeX;
+          var maxY = (int)center.Y + arrayHalfSizeY;
+
+          for (var x = minX; x <= maxX; x++)
+          {
+            var offsetX = x - minX;
+            for (var y = minY; y <= maxY; y++)
+            {
+              var offsetY = y - minY;
+              var isCovered = grid[offsetX, offsetY] > 0;
+              yield return new SprinklerHelper.SprinklerTile(x, y, isCovered);
+            }
+          }
+        }
 
         /// <summary>Get a tile grid centered on the given tile position.</summary>
         /// <param name="centerTile">The center tile position.</param>
@@ -62,7 +83,7 @@ namespace BetterSprinklersPlus.Framework.Helpers
         /// <param name="perform">The action to perform for each tile, given the tile position.</param>
         public static void ForCoveredTiles(Vector2 centerTile, int[,] grid, Action<Vector2> perform)
         {
-            foreach (Vector2 tile in GridHelper.GetCoveredTiles(centerTile, grid))
+            foreach (var tile in GridHelper.GetCoveredTiles(centerTile, grid))
             {
                 perform(tile);
             }

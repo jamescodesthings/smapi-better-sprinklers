@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BetterSprinklersPlus.Framework;
 using BetterSprinklersPlus.Framework.Helpers;
 using Microsoft.Xna.Framework;
@@ -19,7 +20,7 @@ namespace BetterSprinklersPlus
     /// <summary>
     /// Is F3 mode on?
     /// </summary>
-    private bool ShowInfoOverlay;
+    private bool _showInfoOverlay;
 
     /// <summary>
     /// The mod entry point, called after the mod is first loaded.
@@ -27,6 +28,7 @@ namespace BetterSprinklersPlus
     /// <param name="helper">Provides simplified APIs for writing mods.</param>
     public override void Entry(IModHelper helper)
     {
+      Logger.init(Monitor);
       SetUpEvents();
     }
 
@@ -57,7 +59,7 @@ namespace BetterSprinklersPlus
     /// <param name="e">The event arguments.</param>
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
     {
-      BetterSprinklersPlusConfig.Init(Helper, ModManifest, Monitor);
+      BetterSprinklersPlusConfig.Init(Helper, ModManifest);
     }
 
     /// <summary>
@@ -92,12 +94,14 @@ namespace BetterSprinklersPlus
 
       if (e.Button == BetterSprinklersPlusConfig.Active.ShowSprinklerEditKey)
       {
+        Logger.Verbose($"{e.Button} pressed, opening sprinkler edit");
         ShowSprinklerEditMenu();
         return;
       }
 
       if (e.Button == BetterSprinklersPlusConfig.Active.ShowOverlayKey)
       {
+        Logger.Verbose($"{e.Button} pressed, showing overlay");
         ToggleOverlay();
       }
     }
@@ -107,7 +111,8 @@ namespace BetterSprinklersPlus
     /// </summary>
     private void ShowSprinklerEditMenu()
     {
-      Game1.activeClickableMenu = new SprinklerShapeEditMenu(Helper, Monitor);
+      Logger.Verbose($"ShowSprinklerEditMenu()");
+      Game1.activeClickableMenu = new CoverageEditMenu(Helper);
     }
 
     /// <summary>
@@ -115,16 +120,16 @@ namespace BetterSprinklersPlus
     /// </summary>
     private void ToggleOverlay()
     {
-      ShowInfoOverlay = !ShowInfoOverlay;
+      _showInfoOverlay = !_showInfoOverlay;
     }
 
     /// <summary>Run all sprinklers.</summary>
     private void RunSprinklers()
     {
-      Monitor.Log("Running Sprinklers", LogLevel.Info);
+      Logger.Info("Running sprinklers");
       if (BetterSprinklersPlusConfig.Active.BalancedMode == (int)BetterSprinklersPlusConfig.BalancedModeOptions.Off)
       {
-        Monitor.VerboseLog("Balanced mode is off, just water");
+        Logger.Verbose("Balanced mode is off, just water");
         if (BetterSprinklersPlusConfig.Active.BalancedModeCostMessage)
         {
           Game1.addHUDMessage(new HUDMessage("Your sprinklers have run.", Color.Green, 5000f));
@@ -134,18 +139,16 @@ namespace BetterSprinklersPlus
         return;
       }
 
-      Monitor.VerboseLog("Balanced Mode is on, calculating cost");
-      var tilesWeCanWater = GetCountOfTilesWeCanWater();
-      var affordable = GetTilesWeCanAffordToWater();
-      int cost;
+      Logger.Verbose("Balanced Mode is on, calculating cost");
+      var cost = CalculateCost();
+      var affordable = Game1.player.Money;
 
-      if (tilesWeCanWater > affordable && BetterSprinklersPlusConfig.Active.CannotAfford == (int)BetterSprinklersPlusConfig.CannotAffordOptions.DoNotWater)
+      if (cost > affordable && BetterSprinklersPlusConfig.Active.CannotAfford == (int)BetterSprinklersPlusConfig.CannotAffordOptions.DoNotWater)
       {
-        Monitor.VerboseLog(
-          $"We can only afford to water {affordable} tiles, but there are {tilesWeCanWater} tiles to water");
-        Monitor.VerboseLog("Do not water is set, unwatering.");
+        Logger.Verbose(
+          $"We can only afford {affordable}G, but watering would cost {cost}G");
+        Logger.Verbose("Do not water is set, unwatering.");
         UnwaterAll();
-        cost = CalculateCost(tilesWeCanWater);
         if (BetterSprinklersPlusConfig.Active.BalancedModeCostMessage || BetterSprinklersPlusConfig.Active.BalancedModeCannotAffordWarning)
         {
           Game1.addHUDMessage(new HUDMessage($"You could not to run your sprinklers today ({cost}G).",
@@ -157,9 +160,8 @@ namespace BetterSprinklersPlus
 
       // Otherwise, water everything and deduct cost
       WaterAll();
-      cost = CalculateCost(tilesWeCanWater);
       DeductCost(cost);
-      Monitor.VerboseLog($"Sprinklers have run ({cost}G).");
+      Logger.Verbose($"Sprinklers have run ({cost}G).");
       if (BetterSprinklersPlusConfig.Active.BalancedModeCostMessage)
       {
         Game1.addHUDMessage(new HUDMessage($"Your sprinklers have run ({cost}G).", Color.Green, 5000f));
@@ -175,8 +177,21 @@ namespace BetterSprinklersPlus
       {
         foreach (var (tile, sprinkler) in location.AllSprinklers())
         {
-          Monitor.VerboseLog($"Processing Sprinkler at {tile.X}x{tile.Y}: {sprinkler.ParentSheetIndex}");
-          sprinkler.ForCoveredTiles(BetterSprinklersPlusConfig.Active, tile, t => WaterTile(location, t));
+          var type = sprinkler.ParentSheetIndex;
+          BetterSprinklersPlusConfig.Active.SprinklerShapes.TryGetValue(type, out var grid);
+          if (grid == null) continue;
+          
+          sprinkler.ForAllTiles(tile, t =>
+          {
+            if (t.IsCovered)
+            {
+              WaterTile(location, t.ToVector2());
+            }
+            else
+            {
+              UnwaterTile(location, t.ToVector2());
+            }
+          });
         }
       }
     }
@@ -190,8 +205,7 @@ namespace BetterSprinklersPlus
       {
         foreach (var (tile, sprinkler) in location.AllSprinklers())
         {
-          Monitor.VerboseLog($"Processing Sprinkler at {tile.X}x{tile.Y}: {sprinkler.ParentSheetIndex}");
-          sprinkler.ForCoveredTiles(BetterSprinklersPlusConfig.Active, tile, t => UnwaterTile(location, t));
+          sprinkler.ForAllTiles(tile, t => UnwaterTile(location, t.ToVector2()));
         }
       }
     }
@@ -226,13 +240,13 @@ namespace BetterSprinklersPlus
     {
       if (!location.terrainFeatures.TryGetValue(tile, out var terrainFeature))
       {
-        // Monitor.VerboseLog($"could not get feature at: {tile.X}x{tile.Y}");
+        // Logger.Verbose($"could not get feature at: {tile.X}x{tile.Y}");
         return;
       }
 
       if (value != HoeDirt.dry && value != HoeDirt.watered)
       {
-        Monitor.Log("Careful, setting the dirt state to something other than watered/dry is untested", LogLevel.Warn);
+        Logger.Warn("Careful, setting the dirt state to something other than watered/dry is untested");
         return;
       }
 
@@ -242,27 +256,29 @@ namespace BetterSprinklersPlus
       dirt.state.Value = value;
     }
 
-    /// <summary>
-    /// Gets the count of tiles we can afford to water
-    /// </summary>
-    /// <returns>The count of tiles</returns>
-    private int GetTilesWeCanAffordToWater()
+    private int CalculateCost()
     {
-      var costPerTile = GetCostPerTile();
-      var canAfford = costPerTile == 0f ? int.MaxValue : (int)Math.Floor(Game1.player.Money / costPerTile);
-      return canAfford;
-    }
+      Logger.Verbose($"CalculateCost()");
+      var cost = 0f;
+      foreach (var location in LocationHelper.GetAllBuildableLocations())
+      {
+        var allPressureNozzles = location.AllPressureNozzles().ToList();
+        var pnMessage = "pressureNozzles:";
+        allPressureNozzles.ForEach(pn => pnMessage += $"{(int)pn.X}x{(int)pn.Y}");
+        Logger.Verbose(pnMessage);
+        foreach (var (tile, sprinkler) in location.AllSprinklers())
+        {
+          var type = sprinkler.ParentSheetIndex;
+          // var hasPressureNozzle = allPressureNozzles.Any(pn => (int)pn.X == (int)tile.X && (int)pn.Y == (int)tile.Y);
+          var costForSprinkler = type.CalculateCostForSprinkler();
+          Logger.Verbose($"Sprinkler at {tile.X}x{tile.Y}, type: {SprinklerHelper.SprinklerTypes[type]}, cost: {costForSprinkler}G");
+          cost += costForSprinkler;
+        }
+      }
 
-    /// <summary>
-    /// Calculates the cost of watering x tiles
-    /// </summary>
-    /// <param name="count">The number of tiles</param>
-    /// <returns>The cost in G</returns>
-    private int CalculateCost(int count)
-    {
-      var costPerTile = GetCostPerTile();
-      var cost = (int)Math.Round(count * costPerTile);
-      return cost;
+      var rounded = (int)Math.Round(cost);
+      Logger.Verbose($"CalculateCost(): {rounded}G");
+      return rounded;
     }
 
     /// <summary>
@@ -281,22 +297,6 @@ namespace BetterSprinklersPlus
       }
     }
 
-    /// <summary>
-    /// Gets the cost per tile in .Gs
-    /// </summary>
-    /// <returns>The cost of watering one tile (as a fraction of a G)</returns>
-    private float GetCostPerTile()
-    {
-      try
-      {
-        return BetterSprinklersPlusConfig.BalancedModeOptionsMultipliers[BetterSprinklersPlusConfig.Active.BalancedMode];
-      }
-      catch (Exception e)
-      {
-        Monitor.Log($"Error getting cost per tile {e.Message}", LogLevel.Error);
-        return 0f;
-      }
-    }
 
     /// <summary>
     /// Gets the count of tiles we can water (all tiles in all locations which are covered)
@@ -376,7 +376,7 @@ namespace BetterSprinklersPlus
     /// <param name="mouseTile">The mouse tile</param>
     private void HighlightCoverageForObjectUnderCursor(Vector2 mouseTile)
     {
-      if (!ShowInfoOverlay) return;
+      if (!_showInfoOverlay) return;
 
       if (!Game1.currentLocation.objects.TryGetValue(mouseTile, out var objUnderMouse)) return;
 

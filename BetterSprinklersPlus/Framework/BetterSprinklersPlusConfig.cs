@@ -27,7 +27,7 @@ namespace BetterSprinklersPlus.Framework
       DoNotWater,
     }
 
-    public static readonly string[] MaxSprinklerCoverageAllowedValues = {
+    public static readonly string[] RangeAllowedValues = {
       "7",
       "11",
       "15",
@@ -65,7 +65,6 @@ namespace BetterSprinklersPlus.Framework
     public static BetterSprinklersPlusConfig Active { get; set; }
     public static IModHelper Helper { get; set; }
     public static IManifest Mod { get; set; }
-    public static IMonitor Monitor { get; set; }
     public SButton ShowSprinklerEditKey { get; set; } = SButton.K;
     public SButton ShowOverlayKey { get; set; } = SButton.F3;
     public bool OverlayEnabledOnPlace { get; set; } = true;
@@ -74,43 +73,51 @@ namespace BetterSprinklersPlus.Framework
     public bool BalancedModeCostMessage { get; set; } = true;
     public bool BalancedModeCannotAffordWarning { get; set; } = true;
 
-    public Dictionary<int, int> MaxCoverage { get; set; } = new()
+    public Dictionary<int, int> Range { get; set; } = new()
     {
       [599] = 7,
       [621] = 11,
       [645] = 15,
     };
+    public Dictionary<int, float> CostMultiplier { get; set; } = new()
+    {
+      [599] = 1.0f,
+      [621] = 0.5f,
+      [645] = 0.25f,
+    };
 
-    public int MaxGridSize => MaxCoverage.Values.Prepend(ScarecrowGridSize).Max();
+    public float PressureNozzleMultiplier { get; set; } = 0.5f;
+
+    public int MaxGridSize => Range.Values.Prepend(ScarecrowGridSize).Max();
 
     /// <summary>
     /// The sprinkler default sprinkler shape config
     /// Be warned, this is rotated 90deg (top to bottom is left to right)
     /// Don't remove the 2s, they are required (at the moment).
     /// </summary>
-    public Dictionary<int, int[,]> SprinklerShapes { get; set; } = new Dictionary<int, int[,]>
+    public Dictionary<int, int[,]> SprinklerShapes { get; set; } = new()
     {
       [599] = new[,]
       {
-        { 0, 0, 1, 1, 1, 0, 0 },
-        { 0, 0, 1, 1, 1, 0, 0 },
-        { 0, 0, 1, 2, 1, 0, 0 },
-        { 0, 0, 2, 2, 2, 0, 0 },
-        { 0, 0, 1, 2, 1, 0, 0 },
-        { 0, 0, 1, 1, 1, 0, 0 },
-        { 0, 0, 1, 1, 1, 0, 0 }
+        { 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 1, 0, 0, 0 },
+        { 0, 0, 1, 0, 1, 0, 0 },
+        { 0, 0, 0, 1, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0 }
       },
       [621] = new[,]
       {
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
       },
@@ -118,27 +125,26 @@ namespace BetterSprinklersPlus.Framework
       {
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
       }
     };
 
-    public static void Init(IModHelper helper, IManifest mod, IMonitor monitor)
+    public static void Init(IModHelper helper, IManifest mod)
     {
       Helper = helper;
       Mod = mod;
-      Monitor = monitor;
 
       ReadConfig();
       SetupGenericModConfigMenu();
@@ -163,14 +169,14 @@ namespace BetterSprinklersPlus.Framework
       try
       {
         var asInt = int.Parse(value);
-        config.MaxCoverage[sprinklerId] = asInt;
+        config.Range[sprinklerId] = asInt;
         var grid = config.SprinklerShapes[sprinklerId];
         var resized = grid.Resize(asInt);
         config.SprinklerShapes[sprinklerId] = resized;
       }
       catch (Exception e)
       {
-        Monitor.Log($"Error changing sprinkler value for {sprinklerId}: {e.Message}", LogLevel.Error);
+        Logger.Error($"Error changing sprinkler value for {sprinklerId}: {e.Message}");
       }
     }
 
@@ -186,7 +192,7 @@ namespace BetterSprinklersPlus.Framework
         mod: Mod,
         reset: () => { BetterSprinklersPlusConfig.Active = new BetterSprinklersPlusConfig(); },
         save: SaveChanges);
-
+      
       configMenu.AddSectionTitle(mod: Mod, () => "Balance:");
 
       configMenu.AddTextOption(
@@ -201,8 +207,7 @@ namespace BetterSprinklersPlus.Framework
           }
           catch (Exception exception)
           {
-            Monitor.Log($"Error Getting Balanced Mode option {Active.BalancedMode}: {exception.Message}",
-              LogLevel.Error);
+            Logger.Error($"Error Getting Balanced Mode option {Active.BalancedMode}: {exception.Message}");
             return "Off";
           }
         },
@@ -216,7 +221,7 @@ namespace BetterSprinklersPlus.Framework
           }
           catch (Exception exception)
           {
-            Monitor.Log($"Error Setting Balanced Mode option {value}: {exception.Message}", LogLevel.Error);
+            Logger.Error($"Error Setting Balanced Mode option {value}: {exception.Message}");
             Active.BalancedMode = (int)BalancedModeOptions.Off;
           }
         },
@@ -235,8 +240,7 @@ namespace BetterSprinklersPlus.Framework
           }
           catch (Exception exception)
           {
-            Monitor.Log($"Error Getting Can't Afford option {Active.CannotAfford}: {exception.Message}",
-              LogLevel.Error);
+            Logger.Error($"Error Getting Can't Afford option {Active.CannotAfford}: {exception.Message}");
             return "Off";
           }
         },
@@ -250,8 +254,7 @@ namespace BetterSprinklersPlus.Framework
           }
           catch (Exception exception)
           {
-            Monitor.Log($"Error Setting Can't Afford option {value}: {exception.Message}",
-              LogLevel.Error);
+            Logger.Error($"Error Setting Can't Afford option {value}: {exception.Message}");
             Active.CannotAfford = (int)CannotAffordOptions.Off;
           }
         },
@@ -276,26 +279,26 @@ namespace BetterSprinklersPlus.Framework
 
       configMenu.AddTextOption(
         mod: Mod,
-        name: () => "Maximum Sprinkler Coverage",
-        getValue: () => $"{Active.MaxCoverage[SprinklerHelper.SprinklerObjectIds[0]]}",
+        name: () => "Sprinkler Range",
+        getValue: () => $"{Active.Range[SprinklerHelper.SprinklerObjectIds[0]]}",
         setValue: value => UpdateMaxCoverage(Active, SprinklerHelper.SprinklerObjectIds[0], value),
-        allowedValues: MaxSprinklerCoverageAllowedValues
+        allowedValues: RangeAllowedValues
       );
 
       configMenu.AddTextOption(
         mod: Mod,
-        name: () => "Maximum Quality Sprinkler Coverage",
-        getValue: () => $"{Active.MaxCoverage[SprinklerHelper.SprinklerObjectIds[1]]}",
+        name: () => "Quality Sprinkler Range",
+        getValue: () => $"{Active.Range[SprinklerHelper.SprinklerObjectIds[1]]}",
         setValue: value => UpdateMaxCoverage(Active, SprinklerHelper.SprinklerObjectIds[1], value),
-        allowedValues: MaxSprinklerCoverageAllowedValues
+        allowedValues: RangeAllowedValues
       );
 
       configMenu.AddTextOption(
         mod: Mod,
-        name: () => "Maximum Iridium Sprinkler Coverage",
-        getValue: () => $"{Active.MaxCoverage[SprinklerHelper.SprinklerObjectIds[2]]}",
+        name: () => "Iridium Sprinkler Range",
+        getValue: () => $"{Active.Range[SprinklerHelper.SprinklerObjectIds[2]]}",
         setValue: value => UpdateMaxCoverage(Active, SprinklerHelper.SprinklerObjectIds[2], value),
-        allowedValues: MaxSprinklerCoverageAllowedValues
+        allowedValues: RangeAllowedValues
       );
 
       configMenu.AddSectionTitle(mod: Mod, () => "Options:");

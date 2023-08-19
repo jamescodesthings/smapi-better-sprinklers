@@ -141,13 +141,30 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [x] (ui) Click & Drag to change multiple tiles quickly
 - [x] (ui) Live Preview of costs on config menu
 - [x] (gameplay) Ability to change maximum range of each sprinkler type.
-= [ ] (gameplay) Ability to remove default tiles.
+- [x] (gameplay) Ability to remove default tiles.
+- [x] (ui) Don't draw tile on center tile.
+- [x] (ui) Add reset button to Sprinkler edit menu.
+- [x] (balancing) Quality and Iridium sprinklers should cost less.
 - [ ] (balancing) Pressure Nozzle should cut cost/do something!
 - [ ] (gamplay) Ability to activate one or all sprinklers manually (same cost).
   - [ ] (optional) Or just make sure mod is compatible with [Activated Sprinklers](https://github.com/JudeRV/Stardew-ActivatingSprinklers/blob/master/ActivatingSprinklers/ActivatingSprinklers.cs).
-- [ ] (accessibility) i18n basics. 
+- [ ] (ui) Add ability to open coverage menu from config menu?
+- [ ] (accessibility) i18n basics.
 
 # Versions
+## 2.12.0
+- ADD ability to remove default tiles
+- REFACTOR rename SprinklerShapeEditMenu to CoverageEditMenu
+- ADD Do not draw center tile in menus
+- ADD Menu to reset to default sprinkler coverage (Cross to the left of OK)
+- RENAME Max Coverage to "Range"
+- REFACTOR Logger to singleton service
+- REFACTOR CoverageEditMenu.draw() to use for loop instead of while to avoid inf-looping.
+- TRY ADD Pressure nozzle halves cost of sprinkler (does not work yet).
+
+## 2.11.0
+- Add ability to change the maximum range of each sprinkler type
+
 ## 2.10.1
 - Fix Showing cost on menu
 - Fix click & drag to toggle
