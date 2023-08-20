@@ -32,7 +32,9 @@ Pressing `k` (configurable) allows you to change the coverage of each type of sp
 Pressing `F3` (configurable) allows you to show the coverage of the highlighted sprinkler.
 
 ## Balanced Mode
-In balanced mode, the sprinklers you have cost money every day.
+In balanced mode, the sprinklers you have cost money every day. The amount is configurable, or you can turn it off.
+
+The default, is 0.25G per tile covered per day, rounded to the nearest whole G.
 
 Quality Sprinklers cost half the cost of Normal Sprinklers.
 
