@@ -163,13 +163,22 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [x] (fix) Overlapping Sprinkler Range issue 
   - (One Sprinkler unwatering another sprinkler's tiles).
 - [x] (gamplay) Ability to activate one or all sprinklers manually (same cost).
+- [x] (fix) rainy day unwatering
+  - Only unwater on default tiles
+  - Do not unwater in the rain
 - [ ] (multiplayer) Make Master Game responsible for Sprinkler Coverage setting?
 - [ ] (ui) Add ability to open coverage menu from config menu?
 - [ ] (accessibility) i18n basics.
 
 # Versions
+## 2.15.1
+- fix: unwatering in the rain no longer happens
+- refactor(perf): only unwater default tiles
+- gameplay: If it's raining, don't run sprinklers or cost
+
 ## 2.15.0
 - Add Feature: Activate Sprinklers
+
 ## 2.14.1
 - FIX Overlapping Sprinkler Range Issue
 

@@ -28,6 +28,58 @@ namespace BetterSprinklersPlus.Framework.Helpers
       [645] = "Iridium Sprinkler",
     };
 
+    public static readonly Dictionary<int, int[,]> DefaultGrids = new()
+    {
+      [599] = new[,]
+      {
+        { 0, 1, 0 },
+        { 1, 0, 1 },
+        { 0, 1, 0 },
+      },
+      [621] = new[,]
+      {
+        { 1, 1, 1 },
+        { 1, 0, 1 },
+        { 1, 1, 1 }
+      },
+      [645] = new[,]
+      {
+        { 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1 },
+        { 1, 1, 0, 1, 1 },
+        { 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1 },
+      }
+    };
+
+    public static readonly Dictionary<int, int[,]> DefaultGridsWithPressureNozzle = new()
+    {
+      [599] = new[,]
+      {
+        { 1, 1, 1 },
+        { 1, 0, 1 },
+        { 1, 1, 1 },
+      },
+      [621] = new[,]
+      {
+        { 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1 },
+        { 1, 1, 0, 1, 1 },
+        { 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1 },
+      },
+      [645] = new[,]
+      {
+        { 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 0, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1 },
+      }
+    };
+
     public static bool IsSprinkler(this Object obj)
     {
       return SprinklerObjectIds.Contains(obj.ParentSheetIndex);
@@ -71,7 +123,7 @@ namespace BetterSprinklersPlus.Framework.Helpers
 
       return grid.CountCoveredTiles();
     }
-    
+
     public static int CountCoveredTiles(this int[,] grid)
     {
       Logger.Verbose($"CountCoveredTiles(int[,] grid)");
@@ -116,6 +168,26 @@ namespace BetterSprinklersPlus.Framework.Helpers
       }
     }
 
+    public static void ForDefaultTiles(this Object sprinkler, Vector2 tile, Action<SprinklerTile> perform)
+    {
+      Logger.Verbose($"ForDefaultTiles(sprinkler, {tile.X}x{tile.Y}, perform)");
+      var hasPressureNozzle = sprinkler.HasPressureNozzle();
+      int[,] grid;
+      if (hasPressureNozzle)
+      {
+        DefaultGridsWithPressureNozzle.TryGetValue(sprinkler.ParentSheetIndex, out grid);
+      }
+      else
+      {
+        DefaultGrids.TryGetValue(sprinkler.ParentSheetIndex, out grid);
+      }
+
+      foreach (var coveredTile in GridHelper.GetAllTiles(tile , grid))
+      {
+        perform(coveredTile);
+      }
+    }
+
     public static bool IsDirt(this TerrainFeature terrainFeature)
     {
       return terrainFeature is HoeDirt;
@@ -126,7 +198,7 @@ namespace BetterSprinklersPlus.Framework.Helpers
 #pragma warning disable AvoidImplicitNetFieldCast
       if (sprinkler == null || sprinkler.heldObject == null) return false;
 #pragma warning restore AvoidImplicitNetFieldCast
-      
+
 #pragma warning disable AvoidImplicitNetFieldCast
       return Utility.IsNormalObjectAtParentSheetIndex(sprinkler.heldObject, 915);
 #pragma warning restore AvoidImplicitNetFieldCast
@@ -139,8 +211,8 @@ namespace BetterSprinklersPlus.Framework.Helpers
 
       return count * costPerTile;
     }
-    
-    
+
+
     public static float CalculateCostForSprinkler(this int[,] grid, int type)
     {
       Logger.Verbose($"CalculateCostForSprinkler(int[,] grid, {SprinklerHelper.SprinklerTypes[type]})");
@@ -171,7 +243,7 @@ namespace BetterSprinklersPlus.Framework.Helpers
 
       var costAfterMultiplier = baseCost * multiplier;
       Logger.Verbose($"cost after type multiplier: {multiplier}");
-      
+
       if (hasPressureNozzle)
       {
         var pressureNozzleMultiplier = BetterSprinklersPlusConfig.Active.PressureNozzleMultiplier;
@@ -182,7 +254,7 @@ namespace BetterSprinklersPlus.Framework.Helpers
       Logger.Verbose($"cost after has pressure nozzle (false): {costAfterMultiplier}");
       return costAfterMultiplier;
     }
-    
+
     /// <summary>
     /// Gets the cost per tile in .Gs
     /// </summary>

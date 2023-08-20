@@ -105,7 +105,7 @@ namespace BetterSprinklersPlus
         ToggleOverlay();
       }
 
-      
+
     }
 
     private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
@@ -125,10 +125,10 @@ namespace BetterSprinklersPlus
       // Check if the object under the cursor is a sprinkler
       // if it is, water and deduct cost appropriately
       if (!SprinklerHelper.SprinklerObjectIds.Contains(obj.ParentSheetIndex)) return;
-      
+
       // Suppress the default action if we are handling it
       Helper.Input.Suppress(button);
-      
+
       if (BetterSprinklersPlusConfig.Active.BalancedMode == (int)BetterSprinklersPlusConfig.BalancedModeOptions.Off)
       {
         Logger.Verbose($"Sprinkler at {tile.X}x{tile.Y} activated");
@@ -147,7 +147,7 @@ namespace BetterSprinklersPlus
         Game1.addHUDMessage(new HUDMessage($"Can't run sprinkler, it will cost too much ({cost}G)", Color.Green, 5000f));
         return;
       }
-            
+
       Logger.Verbose($"Sprinkler at {tile.X}x{tile.Y} activated ({cost}G)");
       ActivateSprinkler(Game1.currentLocation, tile, obj);
       DeductCost(cost);
@@ -177,7 +177,7 @@ namespace BetterSprinklersPlus
       Logger.Info("Running sprinklers");
       // Start by Unwatering all tiles in every sprinkler's radius
       UnwaterAll();
-      
+
       if (BetterSprinklersPlusConfig.Active.BalancedMode == (int)BetterSprinklersPlusConfig.BalancedModeOptions.Off)
       {
         Logger.Verbose("Balanced mode is off, just water");
@@ -211,7 +211,7 @@ namespace BetterSprinklersPlus
       WaterAll();
       DeductCost(cost);
       Logger.Verbose($"Sprinklers have run ({cost}G).");
-      if (BetterSprinklersPlusConfig.Active.BalancedModeCostMessage)
+      if (BetterSprinklersPlusConfig.Active.BalancedModeCostMessage && cost > 0)
       {
         Game1.addHUDMessage(new HUDMessage($"Your sprinklers have run ({cost}G).", Color.Green, 5000f));
       }
@@ -224,6 +224,12 @@ namespace BetterSprinklersPlus
     {
       foreach (var location in LocationHelper.GetAllBuildableLocations())
       {
+        if (Game1.IsRainingHere(location))
+        {
+          Logger.Verbose($"It's raining here, no need to water");
+          continue;
+        }
+
         foreach (var (tile, sprinkler) in location.AllSprinklers())
         {
           ActivateSprinkler(location, tile, sprinkler);
@@ -236,9 +242,9 @@ namespace BetterSprinklersPlus
       var type = sprinkler.ParentSheetIndex;
       BetterSprinklersPlusConfig.Active.SprinklerShapes.TryGetValue(type, out var grid);
       if (grid == null) return;
-      
+
       sprinkler.ApplySprinklerAnimation(location);
-      
+
       sprinkler.ForAllTiles(tile, t =>
       {
         if (t.IsCovered)
@@ -255,9 +261,15 @@ namespace BetterSprinklersPlus
     {
       foreach (var location in LocationHelper.GetAllBuildableLocations())
       {
+        if (Game1.IsRainingHere(location))
+        {
+          Logger.Verbose($"It's raining here, not unwatering");
+          continue;
+        }
+
         foreach (var (tile, sprinkler) in location.AllSprinklers())
         {
-          sprinkler.ForAllTiles(tile, t => UnwaterTile(location, t.ToVector2()));
+          sprinkler.ForDefaultTiles(tile, t => UnwaterTile(location, t.ToVector2()));
         }
       }
     }
@@ -314,6 +326,12 @@ namespace BetterSprinklersPlus
       var cost = 0f;
       foreach (var location in LocationHelper.GetAllBuildableLocations())
       {
+        if (Game1.IsRainingHere(location))
+        {
+          Logger.Verbose($"It's raining here, we are not running the sprinklers, so cost = 0");
+          continue;
+        }
+
         foreach (var (tile, sprinkler) in location.AllSprinklers())
         {
           var type = sprinkler.ParentSheetIndex;
