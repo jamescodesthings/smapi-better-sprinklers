@@ -269,9 +269,9 @@ namespace BetterSprinklersPlus
         foreach (var (tile, sprinkler) in location.AllSprinklers())
         {
           var type = sprinkler.ParentSheetIndex;
-          // var hasPressureNozzle = allPressureNozzles.Any(pn => (int)pn.X == (int)tile.X && (int)pn.Y == (int)tile.Y);
-          var costForSprinkler = type.CalculateCostForSprinkler();
-          Logger.Verbose($"Sprinkler at {tile.X}x{tile.Y}, type: {SprinklerHelper.SprinklerTypes[type]}, cost: {costForSprinkler}G");
+          var hasPressureNozzle = sprinkler.HasPressureNozzle();
+          var costForSprinkler = type.CalculateCostForSprinkler(hasPressureNozzle);
+          Logger.Verbose($"Sprinkler at {tile.X}x{tile.Y}, type: {SprinklerHelper.SprinklerTypes[type]}, hasPressureNozzle: {hasPressureNozzle} cost: {costForSprinkler}G");
           cost += costForSprinkler;
         }
       }

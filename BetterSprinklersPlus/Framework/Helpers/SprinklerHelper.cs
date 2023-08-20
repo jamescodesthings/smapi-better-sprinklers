@@ -121,8 +121,18 @@ namespace BetterSprinklersPlus.Framework.Helpers
     {
       return terrainFeature is HoeDirt;
     }
-    
-    
+
+    public static bool HasPressureNozzle(this Object sprinkler)
+    {
+#pragma warning disable AvoidImplicitNetFieldCast
+      if (sprinkler == null || sprinkler.heldObject == null) return false;
+#pragma warning restore AvoidImplicitNetFieldCast
+      
+#pragma warning disable AvoidImplicitNetFieldCast
+      return Utility.IsNormalObjectAtParentSheetIndex(sprinkler.heldObject, 915);
+#pragma warning restore AvoidImplicitNetFieldCast
+    }
+
     public static float CalculateCostForSprinkler(this int type, bool hasPressureNozzle = false)
     {
       var count = type.CountCoveredTiles();

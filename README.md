@@ -152,7 +152,10 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [ ] (accessibility) i18n basics.
 
 # Versions
-## 2.12.0
+## 2.14.0
+- ADD Pressure Nozzle Halves cost of sprinkler
+
+## 2.13.0
 - ADD ability to remove default tiles
 - REFACTOR rename SprinklerShapeEditMenu to CoverageEditMenu
 - ADD Do not draw center tile in menus
