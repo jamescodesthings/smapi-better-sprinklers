@@ -166,12 +166,17 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [x] (fix) rainy day unwatering
   - Only unwater on default tiles
   - Do not unwater in the rain
+- [x] (fix) Do not activate sprinklers if the menu is open
 - [ ] (multiplayer) Make Master Game responsible for Sprinkler Coverage setting?
 - [ ] (ui) Add ability to open coverage menu from config menu?
 - [ ] (accessibility) i18n basics.
 
 # Versions
-## 2.15.1
+## 2.15.3
+- fix: Do not activate sprinklers on click/check if the menu is open
+- fix: Do not activate sprinklers on click/check if an event is active
+
+## 2.15.2
 - fix: unwatering in the rain no longer happens
 - refactor(perf): only unwater default tiles
 - gameplay: If it's raining, don't run sprinklers or cost

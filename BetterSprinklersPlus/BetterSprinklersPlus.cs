@@ -118,6 +118,9 @@ namespace BetterSprinklersPlus
 
     private void TryActivateSprinkler(SButton button)
     {
+      if (Game1.activeClickableMenu != null || Game1.CurrentEvent != null)
+        return;
+
       var cursorPos = Helper.Input.GetCursorPosition();
       var tile = cursorPos.GrabTile;
 
