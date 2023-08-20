@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using BetterSprinklersPlus.Framework;
 using BetterSprinklersPlus.Framework.Helpers;
 using Microsoft.Xna.Framework;
@@ -41,6 +40,7 @@ namespace BetterSprinklersPlus
       Helper.Events.GameLoop.DayStarted += OnDayStarted;
       Helper.Events.Display.RenderedWorld += OnRenderedWorld;
       Helper.Events.Input.ButtonPressed += OnButtonPressed;
+      Helper.Events.Input.ButtonReleased += OnButtonReleased;
     }
 
     /// <summary>
@@ -104,6 +104,54 @@ namespace BetterSprinklersPlus
         Logger.Verbose($"{e.Button} pressed, showing overlay");
         ToggleOverlay();
       }
+
+      
+    }
+
+    private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
+    {
+      if (e.Button == BetterSprinklersPlusConfig.Active.ActivateKey || e.Button == SButton.ControllerA)
+      {
+        TryActivateSprinkler(e.Button);
+      }
+    }
+
+    private void TryActivateSprinkler(SButton button)
+    {
+      var cursorPos = Helper.Input.GetCursorPosition();
+      var tile = cursorPos.GrabTile;
+
+      if (!Game1.currentLocation.objects.TryGetValue(tile, out StardewValley.Object obj)) return;
+      // Check if the object under the cursor is a sprinkler
+      // if it is, water and deduct cost appropriately
+      if (!SprinklerHelper.SprinklerObjectIds.Contains(obj.ParentSheetIndex)) return;
+      
+      // Suppress the default action if we are handling it
+      Helper.Input.Suppress(button);
+      
+      if (BetterSprinklersPlusConfig.Active.BalancedMode == (int)BetterSprinklersPlusConfig.BalancedModeOptions.Off)
+      {
+        Logger.Verbose($"Sprinkler at {tile.X}x{tile.Y} activated");
+        ActivateSprinkler(Game1.currentLocation, tile, obj);
+        Game1.addHUDMessage(new HUDMessage($"Sprinkler Activated", Color.Green, 5000f));
+        return;
+      }
+
+      var type = obj.ParentSheetIndex;
+      var hasPressureNozzle = obj.HasPressureNozzle();
+      var cost = (int)Math.Round(type.CalculateCostForSprinkler(hasPressureNozzle));
+
+      if (BetterSprinklersPlusConfig.Active.CannotAfford == (int)BetterSprinklersPlusConfig.CannotAffordOptions.DoNotWater && Game1.player.Money < cost)
+      {
+        Logger.Warn($"Player tried to activate sprinkler but it was too expensive ({cost}G) > {Game1.player.Money}");
+        Game1.addHUDMessage(new HUDMessage($"Can't run sprinkler, it will cost too much ({cost}G)", Color.Green, 5000f));
+        return;
+      }
+            
+      Logger.Verbose($"Sprinkler at {tile.X}x{tile.Y} activated ({cost}G)");
+      ActivateSprinkler(Game1.currentLocation, tile, obj);
+      DeductCost(cost);
+      Game1.addHUDMessage(new HUDMessage($"Sprinkler Activated ({cost}G)", Color.Green, 5000f));
     }
 
     /// <summary>
@@ -178,19 +226,26 @@ namespace BetterSprinklersPlus
       {
         foreach (var (tile, sprinkler) in location.AllSprinklers())
         {
-          var type = sprinkler.ParentSheetIndex;
-          BetterSprinklersPlusConfig.Active.SprinklerShapes.TryGetValue(type, out var grid);
-          if (grid == null) continue;
-          
-          sprinkler.ForAllTiles(tile, t =>
-          {
-            if (t.IsCovered)
-            {
-              WaterTile(location, t.ToVector2());
-            }
-          });
+          ActivateSprinkler(location, tile, sprinkler);
         }
       }
+    }
+
+    private void ActivateSprinkler(GameLocation location, Vector2 tile, SObject sprinkler)
+    {
+      var type = sprinkler.ParentSheetIndex;
+      BetterSprinklersPlusConfig.Active.SprinklerShapes.TryGetValue(type, out var grid);
+      if (grid == null) return;
+      
+      sprinkler.ApplySprinklerAnimation(location);
+      
+      sprinkler.ForAllTiles(tile, t =>
+      {
+        if (t.IsCovered)
+        {
+          WaterTile(location, t.ToVector2());
+        }
+      });
     }
 
     /// <summary>
@@ -259,10 +314,6 @@ namespace BetterSprinklersPlus
       var cost = 0f;
       foreach (var location in LocationHelper.GetAllBuildableLocations())
       {
-        var allPressureNozzles = location.AllPressureNozzles().ToList();
-        var pnMessage = "pressureNozzles:";
-        allPressureNozzles.ForEach(pn => pnMessage += $"{(int)pn.X}x{(int)pn.Y}");
-        Logger.Verbose(pnMessage);
         foreach (var (tile, sprinkler) in location.AllSprinklers())
         {
           var type = sprinkler.ParentSheetIndex;
@@ -292,25 +343,6 @@ namespace BetterSprinklersPlus
       {
         Game1.player.Money = 0;
       }
-    }
-
-
-    /// <summary>
-    /// Gets the count of tiles we can water (all tiles in all locations which are covered)
-    /// </summary>
-    /// <returns>The count of tiles we can water</returns>
-    private int GetCountOfTilesWeCanWater()
-    {
-      var count = 0;
-      foreach (var location in LocationHelper.GetAllBuildableLocations())
-      {
-        foreach (var (tile, sprinkler) in location.AllSprinklers())
-        {
-          sprinkler.ForCoveredTiles(BetterSprinklersPlusConfig.Active, tile, _ => count++);
-        }
-      }
-
-      return count;
     }
 
     /// <summary>

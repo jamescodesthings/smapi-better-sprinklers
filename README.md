@@ -28,6 +28,9 @@ Originally by Maurício Gomes (Speeder), maintained by [JamesCodesThings](https:
 ## Edit Sprinkler Coverage
 Pressing `k` (configurable) allows you to change the coverage of each type of sprinkler.
 
+## Activate Sprinklers Manually
+Right clicking (configurable) or hitting the "Check" controller button will activate the highlighted sprinkler.
+
 ## View Sprinkler/Scarecrow Coverage
 Pressing `F3` (configurable) allows you to show the coverage of the highlighted sprinkler.
 
@@ -159,11 +162,14 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [x] (balancing) Pressure Nozzle should cut cost/do something!
 - [x] (fix) Overlapping Sprinkler Range issue 
   - (One Sprinkler unwatering another sprinkler's tiles).
-- [ ] (gamplay) Ability to activate one or all sprinklers manually (same cost).
+- [x] (gamplay) Ability to activate one or all sprinklers manually (same cost).
+- [ ] (multiplayer) Make Master Game responsible for Sprinkler Coverage setting?
 - [ ] (ui) Add ability to open coverage menu from config menu?
 - [ ] (accessibility) i18n basics.
 
 # Versions
+## 2.15.0
+- Add Feature: Activate Sprinklers
 ## 2.14.1
 - FIX Overlapping Sprinkler Range Issue
 

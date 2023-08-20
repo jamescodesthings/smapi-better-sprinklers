@@ -67,6 +67,7 @@ namespace BetterSprinklersPlus.Framework
     public static IManifest Mod { get; set; }
     public SButton ShowSprinklerEditKey { get; set; } = SButton.K;
     public SButton ShowOverlayKey { get; set; } = SButton.F3;
+    public SButton ActivateKey { get; set; } = SButton.MouseRight;
     public bool OverlayEnabledOnPlace { get; set; } = true;
     public int BalancedMode { get; set; } = (int)BalancedModeOptions.Normal;
     public int CannotAfford { get; set; } = (int)CannotAffordOptions.DoNotWater;
@@ -312,6 +313,14 @@ namespace BetterSprinklersPlus.Framework
       );
 
       configMenu.AddSectionTitle(mod: Mod, () => "Key Bindings:");
+
+      configMenu.AddKeybind(
+        mod: Mod,
+        name: () => "Activate Button",
+        tooltip: () => "The button to press to activate a sprinkler",
+        getValue: () => Active.ActivateKey,
+        setValue: value => Active.ActivateKey = value
+      );
 
       configMenu.AddKeybind(
         mod: Mod,
