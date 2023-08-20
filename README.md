@@ -34,6 +34,12 @@ Pressing `F3` (configurable) allows you to show the coverage of the highlighted 
 ## Balanced Mode
 In balanced mode, the sprinklers you have cost money every day.
 
+Quality Sprinklers cost half the cost of Normal Sprinklers.
+
+Iridium Sprinklers cost half the cost of Quality Sprinklers.
+
+Pressure Nozzles half the cost of the sprinkler.
+
 > Q: What!? Did you implement bills in my cosy game?
 >
 > A: Yeah, I did a little. Don't worry though, you can turn them off, change the amount, etc.
@@ -41,7 +47,7 @@ In balanced mode, the sprinklers you have cost money every day.
 >
 > Q: What if I run out of money?
 >
-> A: Yeah, your sprinklers stop sprinkling (on the last tile you can afford.
+> A: Yeah, your sprinklers stop sprinkling.
 > Same again, configurable.
 
 # Install
@@ -60,6 +66,9 @@ __Normal:__ Sprinklers cost 0.25g per tile watered, per day.
 __Hard:__ Sprinklers cost 0.5g per tile watered, per day.
 
 __Very Hard:__ Sprinklers cost 1g per tile watered, per day.
+
+## Sprinkler Range
+Change this to change the maximum range of a sprinkler type.
 
 ## Can't Afford
 If you can't afford to run the sprinklers:
@@ -145,9 +154,9 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [x] (ui) Don't draw tile on center tile.
 - [x] (ui) Add reset button to Sprinkler edit menu.
 - [x] (balancing) Quality and Iridium sprinklers should cost less.
-- [ ] (balancing) Pressure Nozzle should cut cost/do something!
+- [x] (balancing) Pressure Nozzle should cut cost/do something!
 - [ ] (gamplay) Ability to activate one or all sprinklers manually (same cost).
-  - [ ] (optional) Or just make sure mod is compatible with [Activated Sprinklers](https://github.com/JudeRV/Stardew-ActivatingSprinklers/blob/master/ActivatingSprinklers/ActivatingSprinklers.cs).
+ - [ ] (optional) Or just make sure mod is compatible with [Activated Sprinklers](https://github.com/JudeRV/Stardew-ActivatingSprinklers/blob/master/ActivatingSprinklers/ActivatingSprinklers.cs).
 - [ ] (ui) Add ability to open coverage menu from config menu?
 - [ ] (accessibility) i18n basics.
 
