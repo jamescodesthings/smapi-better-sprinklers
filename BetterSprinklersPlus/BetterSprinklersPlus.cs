@@ -127,6 +127,9 @@ namespace BetterSprinklersPlus
     private void RunSprinklers()
     {
       Logger.Info("Running sprinklers");
+      // Start by Unwatering all tiles in every sprinkler's radius
+      UnwaterAll();
+      
       if (BetterSprinklersPlusConfig.Active.BalancedMode == (int)BetterSprinklersPlusConfig.BalancedModeOptions.Off)
       {
         Logger.Verbose("Balanced mode is off, just water");
@@ -142,13 +145,11 @@ namespace BetterSprinklersPlus
       Logger.Verbose("Balanced Mode is on, calculating cost");
       var cost = CalculateCost();
       var affordable = Game1.player.Money;
-
       if (cost > affordable && BetterSprinklersPlusConfig.Active.CannotAfford == (int)BetterSprinklersPlusConfig.CannotAffordOptions.DoNotWater)
       {
         Logger.Verbose(
           $"We can only afford {affordable}G, but watering would cost {cost}G");
         Logger.Verbose("Do not water is set, unwatering.");
-        UnwaterAll();
         if (BetterSprinklersPlusConfig.Active.BalancedModeCostMessage || BetterSprinklersPlusConfig.Active.BalancedModeCannotAffordWarning)
         {
           Game1.addHUDMessage(new HUDMessage($"You could not to run your sprinklers today ({cost}G).",
@@ -186,10 +187,6 @@ namespace BetterSprinklersPlus
             if (t.IsCovered)
             {
               WaterTile(location, t.ToVector2());
-            }
-            else
-            {
-              UnwaterTile(location, t.ToVector2());
             }
           });
         }

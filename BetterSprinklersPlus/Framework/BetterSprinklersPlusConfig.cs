@@ -277,6 +277,8 @@ namespace BetterSprinklersPlus.Framework
         setValue: value => Active.BalancedModeCannotAffordWarning = value
       );
 
+      configMenu.AddSectionTitle(mod: Mod, () => "Options:");
+
       configMenu.AddTextOption(
         mod: Mod,
         name: () => "Sprinkler Range",
@@ -300,8 +302,6 @@ namespace BetterSprinklersPlus.Framework
         setValue: value => UpdateMaxCoverage(Active, SprinklerHelper.SprinklerObjectIds[2], value),
         allowedValues: RangeAllowedValues
       );
-
-      configMenu.AddSectionTitle(mod: Mod, () => "Options:");
 
       configMenu.AddBoolOption(
         mod: Mod,

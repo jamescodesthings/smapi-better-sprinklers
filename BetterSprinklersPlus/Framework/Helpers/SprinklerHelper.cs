@@ -112,7 +112,6 @@ namespace BetterSprinklersPlus.Framework.Helpers
       BetterSprinklersPlusConfig.Active.SprinklerShapes.TryGetValue(sprinkler.ParentSheetIndex, out var grid);
       foreach (var coveredTile in GridHelper.GetAllTiles(tile , grid))
       {
-        Logger.Verbose($"Performing for CoveredTile: {coveredTile.X}x{coveredTile.Y}");
         perform(coveredTile);
       }
     }

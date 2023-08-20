@@ -157,12 +157,16 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [x] (ui) Add reset button to Sprinkler edit menu.
 - [x] (balancing) Quality and Iridium sprinklers should cost less.
 - [x] (balancing) Pressure Nozzle should cut cost/do something!
+- [x] (fix) Overlapping Sprinkler Range issue 
+  - (One Sprinkler unwatering another sprinkler's tiles).
 - [ ] (gamplay) Ability to activate one or all sprinklers manually (same cost).
- - [ ] (optional) Or just make sure mod is compatible with [Activated Sprinklers](https://github.com/JudeRV/Stardew-ActivatingSprinklers/blob/master/ActivatingSprinklers/ActivatingSprinklers.cs).
 - [ ] (ui) Add ability to open coverage menu from config menu?
 - [ ] (accessibility) i18n basics.
 
 # Versions
+## 2.14.1
+- FIX Overlapping Sprinkler Range Issue
+
 ## 2.14.0
 - ADD Pressure Nozzle Halves cost of sprinkler
 
