@@ -11,7 +11,7 @@ namespace BetterSprinklersPlus.Framework
     /// <summary>Get the maximum sprinkler coverage supported by this mod (in tiles wide or high).</summary>
     public int GetMaxGridSize()
     {
-      return BetterSprinklersPlusConfig.Active.MaxGridSize;
+      return BetterSprinklersPlusConfig.Active?.MaxGridSize ?? BetterSprinklersPlusConfig.ScarecrowGridSize;
     }
 
     /// <summary>Get the relative tile coverage by supported sprinkler ID.</summary>
