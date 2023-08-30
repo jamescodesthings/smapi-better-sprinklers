@@ -70,6 +70,11 @@ namespace BetterSprinklersPlus.Framework
     public SButton ActivateKey { get; set; } = SButton.MouseRight;
     public bool OverlayEnabledOnPlace { get; set; } = true;
     public int BalancedMode { get; set; } = (int)BalancedModeOptions.Normal;
+    
+    /// <summary>
+    /// If true the default sprinkler tiles for each sprinkler are free.
+    /// </summary>
+    public bool DefaultsAreFree { get; set; } = false;
     public int CannotAfford { get; set; } = (int)CannotAffordOptions.DoNotWater;
     public bool BalancedModeCostMessage { get; set; } = true;
     public bool BalancedModeCannotAffordWarning { get; set; } = true;
@@ -260,6 +265,14 @@ namespace BetterSprinklersPlus.Framework
           }
         },
         allowedValues: CannotAffordOptionsText
+      );
+
+      configMenu.AddBoolOption(
+        mod: Mod,
+        name: () => "Defaults are free",
+        tooltip: () => "When on, the default tiles for each sprinkler are free",
+        getValue: () => Active.DefaultsAreFree,
+        setValue: value => Active.DefaultsAreFree = value
       );
 
       configMenu.AddBoolOption(

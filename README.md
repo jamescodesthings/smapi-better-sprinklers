@@ -129,13 +129,6 @@ __Use:__ Changes the hotkey to show coverage overlay.
 ### Alternative
 Alternatively, you can use [Data Layers](https://www.nexusmods.com/stardewvalley/mods/1691) to show coverage of sprinklers, scarecrows, and much more.
 
-#### Note: Data Layers Compatibility
-I'm currently waiting for a PR merge and release of Data Layers.
-
-Until then there's a copy of Data Layers with the PR code:
-[On the Release Page for 2.6.13](https://github.com/jamescodesthings/smapi-better-sprinklers/releases/tag/2.6.13)
-[On the Nexus Mods Page](https://www.nexusmods.com/stardewvalley/mods/17767)
-
 # Compatibility
 Better Sprinklers is compatible with Stardew Valley 1.3+ on Linux/Mac/Windows, both single-player and multiplayer.
 
@@ -168,11 +161,15 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
   - Do not unwater in the rain
 - [x] (fix) Do not activate sprinklers if the menu is open
 - [x] (fix) Error during launch reported by Chargoal
+- [x] (balancing) Default tiles are free Option, suggested by MicomiBite
 - [ ] (multiplayer) Make Master Game responsible for Sprinkler Coverage setting?
 - [ ] (ui) Add ability to open coverage menu from config menu?
 - [ ] (accessibility) i18n basics.
 
 # Versions
+## 2.16.0
+- docs: deprecate notice about DataLayers, as the PR has been merged!
+
 ## 2.15.4
 - fix: Error during game launch reported by Chargoal
 

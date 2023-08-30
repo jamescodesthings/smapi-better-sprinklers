@@ -208,7 +208,8 @@ namespace BetterSprinklersPlus.Framework
 
       // Draw Cost
       var font = Game1.smallFont;
-      Utility.drawTextWithShadow(b, $"{_cost}G per day ({_countCovered} tiles x {_costPerTile}G per day)", font,
+      var defaultMessage = BetterSprinklersPlusConfig.Active.DefaultsAreFree ? "extra " : "";
+      Utility.drawTextWithShadow(b, $"{_cost}G per day ({_countCovered} {defaultMessage}tiles x {_costPerTile}G per day)", font,
         new Vector2(xPositionOnScreen + 18, yPositionOnScreen + height - TextSize), Game1.textColor);
 
       Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()),
