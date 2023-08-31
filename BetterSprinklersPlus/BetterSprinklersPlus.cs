@@ -227,7 +227,7 @@ namespace BetterSprinklersPlus
     {
       foreach (var location in LocationHelper.GetAllBuildableLocations())
       {
-        if (Game1.IsRainingHere(location))
+        if (Game1.IsRainingHere(location) && !location.IsGreenhouse)
         {
           Logger.Verbose($"It's raining here, no need to water");
           continue;
@@ -264,7 +264,7 @@ namespace BetterSprinklersPlus
     {
       foreach (var location in LocationHelper.GetAllBuildableLocations())
       {
-        if (Game1.IsRainingHere(location))
+        if (Game1.IsRainingHere(location) && !location.IsGreenhouse)
         {
           Logger.Verbose($"It's raining here, not unwatering");
           continue;
@@ -329,7 +329,7 @@ namespace BetterSprinklersPlus
       var cost = 0f;
       foreach (var location in LocationHelper.GetAllBuildableLocations())
       {
-        if (Game1.IsRainingHere(location))
+        if (Game1.IsRainingHere(location) && !location.IsGreenhouse)
         {
           Logger.Verbose($"It's raining here, we are not running the sprinklers, so cost = 0");
           continue;

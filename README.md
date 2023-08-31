@@ -162,11 +162,16 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [x] (fix) Do not activate sprinklers if the menu is open
 - [x] (fix) Error during launch reported by Chargoal
 - [x] (balancing) Default tiles are free Option, suggested by MicomiBite
+- [ ] (fix) Greenhouse watering/unwatering, reported by hiew32
+- [ ] (balancing) Default tile count is free, suggested by MicomiBite
 - [ ] (multiplayer) Make Master Game responsible for Sprinkler Coverage setting?
 - [ ] (ui) Add ability to open coverage menu from config menu?
 - [ ] (accessibility) i18n basics.
 
 # Versions
+## 2.16.1
+- fix: Greenhouse watering/unwatering, reported by hiew32.
+
 ## 2.16.0
 - docs: deprecate notice about DataLayers, as the PR has been merged!
 
