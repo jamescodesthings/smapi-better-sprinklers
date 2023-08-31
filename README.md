@@ -191,6 +191,12 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [ ] (accessibility) i18n basics.
 
 # Versions
+## 2.17.2
+- Changelog update only.
+
+## 2.17.1
+- fix: Clicking the sprinkler in the edit menu adds an extra tile.
+
 ## 2.17.0
 - feat: Default tile count is free, suggested by MicomiBite
 
