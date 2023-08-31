@@ -185,7 +185,7 @@ It's out of scope of my aims to improve this. But, I'll happily accept and consi
 - [x] (balancing) Default tiles are free Option, suggested by MicomiBite
 - [x] (fix) Greenhouse watering/unwatering, reported by hiew32
 - [x] (balancing) Default tile count is free, suggested by MicomiBite
-- [ ] (fix) Clicking the sprinkler in the edit menu adds an extra tile.
+- [x] (fix) Clicking the sprinkler in the edit menu adds an extra tile.
 - [ ] (multiplayer) Make Master Game responsible for Sprinkler Coverage setting?
 - [ ] (ui) Add ability to open coverage menu from config menu?
 - [ ] (accessibility) i18n basics.

@@ -161,7 +161,7 @@ namespace BetterSprinklersPlus.Framework
       if (_hoveredItemX > -1 && _hoveredItemY > -1)
       {
         // If not Center Tile, draw hover effect
-        if (_hoveredItemX != _centerTile || _hoveredItemX != _centerTile) {
+        if (_hoveredItemX != _centerTile || _hoveredItemY != _centerTile) {
           x = xPositionOnScreen + _leftMargin + _hoveredItemX * _tileSize;
           y = yPositionOnScreen + _topMargin + _hoveredItemY * _tileSize;
         
@@ -246,7 +246,7 @@ namespace BetterSprinklersPlus.Framework
         ResetToggle();
       }
 
-      if (isLeftMousePressed && _hoveredItemX != -1 && _hoveredItemY != -1)
+      if (isLeftMousePressed && _hoveredItemX != -1 && _hoveredItemY != -1 && (_hoveredItemX != _centerTile || _hoveredItemY != _centerTile))
       {
         Logger.Verbose($"Left mouse is pressed over hovered item");
         Toggle();
