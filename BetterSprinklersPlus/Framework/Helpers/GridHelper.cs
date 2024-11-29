@@ -16,7 +16,8 @@ namespace BetterSprinklersPlus.Framework.Helpers
       /// <param name="grid">The grid indicating which tiles to highlight.</param>
       public static void RenderHighlight(IModHelper helper, Vector2 centerTile, int[,] grid)
       {
-        var buildingPlacementTiles =  helper.GameContent.Load<Texture2D>("LooseSprites/buildingPlacementTiles");
+      var buildingPlacementTiles = helper.ModContent.Load<Texture2D>("assets/buildingPlacementTiles.xnb");
+      //var buildingPlacementTiles =  helper.GameContent.Load<Texture2D>("LooseSprites/buildingPlacementTiles");
         
         ForCoveredTiles(centerTile, grid,
           tilePos =>
